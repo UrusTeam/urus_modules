@@ -1,0 +1,29 @@
+Main changelog for urus modules.
+Follows the git like log format without commit hash,
+we especify a detailed description and main
+improvement affected to the code and structure
+project.
+
+Author: Hiroshi Takey (hiro2233) <htakey@gmail.com>
+Date:   Sat Dec 16 03:19:58 2017 -0400
+
+    masterlibs: cleaned for urus.
+
+    Detailed description:
+
+        We mover the APM root library to the masterlibs path,
+        from his point we make improvements and modifications
+        only for masterlibs focusing to fusion and extend it
+        with master-AVR branch that live in legacylibs.
+
+Author: Hiroshi Takey (hiro2233) <htakey@gmail.com>
+Date:   Sat Dec 16 03:17:11 2017 -0400
+
+    legacylibs: cleaned for urus.
+
+    Detailed description:
+
+        We mover the APM (master-AVR) root library to the
+        legacylibs path, from his point we make improvements
+        and modifications only for legacylibs focusing to fusion and extend it
+        with master branch that live in masterlibs.
