@@ -1,6 +1,6 @@
 #pragma once
 
-#include_next <cmath>
+#include <math.h>
 
 #ifndef WAF_BUILD
 #  ifdef __GLIBC__
@@ -40,3 +40,6 @@ using std::isinf;
 #if defined(HAVE_CMATH_ISNAN) && defined(NEED_CMATH_ISNAN_STD_NAMESPACE)
 using std::isnan;
 #endif
+
+#define _M_LOG2_E        0.693147180559945309417
+#define log2f(x) (logf (x) / (float) _M_LOG2_E)
