@@ -77,7 +77,16 @@ public:
 class I2CDeviceManager {
 public:
     /* Get a device handle */
-    virtual OwnPtr<AP_HAL::I2CDevice> get_device(uint8_t bus, uint8_t address) = 0;
+    virtual OwnPtr<AP_HAL::I2CDevice> get_device(uint8_t bus, uint8_t address)
+    {
+        return nullptr;
+    }
+
+    /* Return the number of I2C devices currently registered. */
+    virtual uint8_t get_count() { return 0; }
+
+    /* Get i2c device name at @idx */
+    virtual const char *get_device_name(uint8_t idx) { return nullptr; }
 };
 
 }
