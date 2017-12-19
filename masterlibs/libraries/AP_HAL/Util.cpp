@@ -27,7 +27,7 @@ public:
         return n;
     }
 
-    size_t _offs; 
+    size_t _offs;
     char* const  _str;
     const size_t _size;
 };
@@ -53,23 +53,13 @@ int AP_HAL::Util::vsnprintf(char* str, size_t size, const char *format, va_list 
 
 uint64_t AP_HAL::Util::get_system_clock_ms() const
 {
-#if defined(__APPLE__) && defined(__MACH__)
-    struct timeval ts;
-    gettimeofday(&ts, nullptr);
-    return ((long long)((ts.tv_sec * 1000) + (ts.tv_usec / 1000)));
-#else
-    struct timespec ts;
-    clock_gettime(CLOCK_REALTIME, &ts);
-    const uint64_t seconds = ts.tv_sec;
-    const uint64_t nanoseconds = ts.tv_nsec;
-    return (seconds * 1000ULL + nanoseconds/1000000ULL);
-#endif
+    return 0;
 }
 
 void AP_HAL::Util::get_system_clock_utc(int32_t &hour, int32_t &min, int32_t &sec, int32_t &ms) const
 {
      // get time of day in ms
-    uint64_t time_ms = get_system_clock_ms();
+    uint32_t time_ms = AP_HAL::millis();
 
     // separate time into ms, sec, min, hour and days but all expressed in milliseconds
     ms = time_ms % 1000;
