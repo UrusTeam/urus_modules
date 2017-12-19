@@ -16,14 +16,12 @@
  * with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#pragma GCC optimize("O3")
-
 #include "AP_Math.h"
 
 template <typename T>
 float Vector2<T>::length(void) const
 {
-	return norm(x, y);
+	return pythagorous2(x, y);
 }
 
 
@@ -131,11 +129,8 @@ float Vector2<T>::angle(const Vector2<T> &v2) const
         return 0.0f;
     }
     float cosv = ((*this)*v2) / len;
-    if (cosv >= 1) {
+    if (fabsf(cosv) >= 1) {
         return 0.0f;
-    }
-    if (cosv <= -1) {
-        return M_PI;
     }
     return acosf(cosv);
 }
@@ -158,6 +153,3 @@ template bool Vector2<float>::operator !=(const Vector2<float> &v) const;
 template bool Vector2<float>::is_nan(void) const;
 template bool Vector2<float>::is_inf(void) const;
 template float Vector2<float>::angle(const Vector2<float> &v) const;
-
-// define for int
-template bool Vector2<int>::operator ==(const Vector2<int> &v) const;
