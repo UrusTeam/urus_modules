@@ -16,8 +16,6 @@
  * with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#pragma GCC optimize("O3")
-
 #include "AP_Math.h"
 
 #define HALF_SQRT_2 0.70710678118654757f
@@ -222,7 +220,7 @@ void Vector3<T>::rotate(enum Rotation rotation)
         tmp = x; x = y; y = -tmp;
         return;
     }
-    case ROTATION_ROLL_90_PITCH_68_YAW_293: {
+    case ROTATION_YAW_293_PITCH_68_ROLL_90: {
         float tmpx = x;
         float tmpy = y;
         float tmpz = z;
@@ -272,7 +270,7 @@ T Vector3<T>::operator *(const Vector3<T> &v) const
 template <typename T>
 float Vector3<T>::length(void) const
 {
-    return norm(x, y, z);
+    return pythagorous3(x, y, z);
 }
 
 template <typename T>
@@ -360,15 +358,7 @@ bool Vector3<T>::operator !=(const Vector3<T> &v) const
 template <typename T>
 float Vector3<T>::angle(const Vector3<T> &v2) const
 {
-    float len = this->length() * v2.length();
-    if (len <= 0) {
-        return 0.0f;
-    }
-    float cosv = ((*this)*v2) / len;
-    if (fabsf(cosv) >= 1) {
-        return 0.0f;
-    }
-    return acosf(cosv);
+    return acosf((*this)*v2) / (float)((this->length()*v2.length()));
 }
 
 // multiplication of transpose by a vector
@@ -390,33 +380,7 @@ Matrix3<T> Vector3<T>::mul_rowcol(const Vector3<T> &v2) const
                       v1.z * v2.x, v1.z * v2.y, v1.z * v2.z);
 }
 
-// distance from the tip of this vector to a line segment specified by two vectors
-template <typename T>
-float Vector3<T>::distance_to_segment(const Vector3<T> &seg_start, const Vector3<T> &seg_end) const
-{
-    // triangle side lengths
-    float a = (*this-seg_start).length();
-    float b = (seg_start-seg_end).length();
-    float c = (seg_end-*this).length();
-
-    // protect against divide by zero later
-    if (fabsf(b) < FLT_EPSILON) {
-        return 0.0f;
-    }
-
-    // semiperimeter of triangle
-    float s = (a+b+c) * 0.5f;
-
-    float area_squared = s*(s-a)*(s-b)*(s-c);
-    // area must be constrained above 0 because a triangle could have 3 points could be on a line and float rounding could push this under 0
-    if (area_squared < 0.0f) {
-        area_squared = 0.0f;
-    }
-    float area = safe_sqrt(area_squared);
-    return 2.0f*area/b;
-}
-
-// define for float
+// only define for float
 template void Vector3<float>::rotate(enum Rotation);
 template void Vector3<float>::rotate_inverse(enum Rotation);
 template float Vector3<float>::length(void) const;
@@ -438,11 +402,8 @@ template bool Vector3<float>::operator !=(const Vector3<float> &v) const;
 template bool Vector3<float>::is_nan(void) const;
 template bool Vector3<float>::is_inf(void) const;
 template float Vector3<float>::angle(const Vector3<float> &v) const;
-template float Vector3<float>::distance_to_segment(const Vector3<float> &seg_start, const Vector3<float> &seg_end) const;
 
-// define needed ops for Vector3l
-template Vector3<int32_t> &Vector3<int32_t>::operator +=(const Vector3<int32_t> &v);
-
+#if HAL_CPU_CLASS >= HAL_CPU_CLASS_75
 template void Vector3<double>::rotate(enum Rotation);
 template void Vector3<double>::rotate_inverse(enum Rotation);
 template float Vector3<double>::length(void) const;
@@ -463,3 +424,5 @@ template bool Vector3<double>::operator ==(const Vector3<double> &v) const;
 template bool Vector3<double>::operator !=(const Vector3<double> &v) const;
 template bool Vector3<double>::is_nan(void) const;
 template bool Vector3<double>::is_inf(void) const;
+template float Vector3<double>::angle(const Vector3<double> &v) const;
+#endif
