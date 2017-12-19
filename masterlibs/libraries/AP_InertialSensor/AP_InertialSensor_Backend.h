@@ -72,7 +72,7 @@ public:
 
     // notify of a fifo reset
     void notify_fifo_reset(void);
-    
+
     /*
       device driver IDs. These are used to fill in the devtype field
       of the device ID, which shows up as INS*ID* parameters to
@@ -94,7 +94,7 @@ public:
         DEVTYPE_GYR_MPU9250  = 0x24,
         DEVTYPE_GYR_I3G4250D = 0x25,
     };
-        
+
 protected:
     // access to frontend
     AP_InertialSensor &_imu;
@@ -132,10 +132,10 @@ protected:
 
     // set the amount of oversamping a gyro is doing
     void _set_gyro_oversampling(uint8_t instance, uint8_t n);
-    
+
     // update the sensor rate for FIFO sensors
     void _update_sensor_rate(uint16_t &count, uint32_t &start_us, float &rate_hz);
-    
+
     // set accelerometer max absolute offset for calibration
     void _set_accel_max_abs_offset(uint8_t instance, float offset);
 
@@ -163,7 +163,7 @@ protected:
 
     // increment gyro error_count
     void _inc_gyro_error_count(uint8_t instance);
-    
+
     // backend unique identifier or -1 if backend doesn't identify itself
     int16_t _id = -1;
 
@@ -210,15 +210,8 @@ protected:
     */
     void notify_accel_fifo_reset(uint8_t instance);
     void notify_gyro_fifo_reset(uint8_t instance);
-    
+
     // note that each backend is also expected to have a static detect()
     // function which instantiates an instance of the backend sensor
     // driver if the sensor is available
-
-private:
-
-    bool should_log_imu_raw() const;
-    void log_accel_raw(uint8_t instance, const uint64_t sample_us, const Vector3f &accel);
-    void log_gyro_raw(uint8_t instance, const uint64_t sample_us, const Vector3f &gryo);
-
 };

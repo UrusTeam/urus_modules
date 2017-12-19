@@ -63,7 +63,7 @@ public:
         Invensense_ICM20608,
         Invensense_ICM20602,
     };
-    
+
 private:
     AP_InertialSensor_Invensense(AP_InertialSensor &imu,
                               AP_HAL::OwnPtr<AP_HAL::Device> dev,
@@ -99,7 +99,7 @@ private:
     bool _check_raw_temp(int16_t t2);
 
     int16_t _raw_temp;
-    
+
     // instance numbers of accel and gyro data
     uint8_t _gyro_instance;
     uint8_t _accel_instance;
@@ -108,7 +108,7 @@ private:
 
     float temp_sensitivity = 1.0/340; // degC/LSB
     float temp_zero = 36.53; // degC
-    
+
     float _temp_filtered;
     float _accel_scale;
     LowPassFilter2pFloat _temp_filter;
@@ -126,10 +126,12 @@ private:
     bool _fast_sampling;
 
     // Last status from register user control
-    uint8_t _last_stat_user_ctrl;    
+    uint8_t _last_stat_user_ctrl;
 
     // buffer for fifo read
     uint8_t *_fifo_buffer;
+
+    volatile bool need_reset = false;
 
     /*
       accumulators for fast sampling

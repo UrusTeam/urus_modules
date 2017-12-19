@@ -2,7 +2,6 @@
 #include "AP_InertialSensor.h"
 #include "AP_InertialSensor_Backend.h"
 #include <DataFlash/DataFlash.h>
-#include <AP_Module/AP_Module.h>
 #include <stdio.h>
 
 #define SENSOR_RATE_DEBUG 0
@@ -21,7 +20,7 @@ AP_InertialSensor_Backend::AP_InertialSensor_Backend(AP_InertialSensor &imu) :
 void AP_InertialSensor_Backend::notify_accel_fifo_reset(uint8_t instance)
 {
     _imu._sample_accel_count[instance] = 0;
-    _imu._sample_accel_start_us[instance] = 0;    
+    _imu._sample_accel_start_us[instance] = 0;
 }
 
 /*
@@ -82,7 +81,7 @@ void AP_InertialSensor_Backend::_update_sensor_rate(uint16_t &count, uint32_t &s
     }
 }
 
-void AP_InertialSensor_Backend::_rotate_and_correct_accel(uint8_t instance, Vector3f &accel) 
+void AP_InertialSensor_Backend::_rotate_and_correct_accel(uint8_t instance, Vector3f &accel)
 {
     /*
       accel calibration is always done in sensor frame with this
@@ -92,7 +91,7 @@ void AP_InertialSensor_Backend::_rotate_and_correct_accel(uint8_t instance, Vect
 
     // rotate for sensor orientation
     accel.rotate(_imu._accel_orientation[instance]);
-    
+
     // apply offsets
     accel -= _imu._accel_offset[instance];
 
@@ -106,11 +105,11 @@ void AP_InertialSensor_Backend::_rotate_and_correct_accel(uint8_t instance, Vect
     accel.rotate(_imu._board_orientation);
 }
 
-void AP_InertialSensor_Backend::_rotate_and_correct_gyro(uint8_t instance, Vector3f &gyro) 
+void AP_InertialSensor_Backend::_rotate_and_correct_gyro(uint8_t instance, Vector3f &gyro)
 {
     // rotate for sensor orientation
     gyro.rotate(_imu._gyro_orientation[instance]);
-    
+
     // gyro calibration is always assumed to have been done in sensor frame
     gyro -= _imu._gyro_offset[instance];
 
@@ -160,13 +159,10 @@ void AP_InertialSensor_Backend::_notify_new_gyro_raw_sample(uint8_t instance,
     }
     _imu._gyro_last_sample_us[instance] = sample_us;
 
-    // call gyro_sample hook if any
-    AP_Module::call_hook_gyro_sample(instance, dt, gyro);
-
     // push gyros if optical flow present
     if (hal.opticalflow)
         hal.opticalflow->push_gyro(gyro.x, gyro.y, dt);
-    
+
     // compute delta angle
     Vector3f delta_angle = (gyro + _imu._last_raw_gyro[instance]) * 0.5f * dt;
 
@@ -180,7 +176,7 @@ void AP_InertialSensor_Backend::_notify_new_gyro_raw_sample(uint8_t instance,
     delta_coning = delta_coning % delta_angle;
     delta_coning *= 0.5f;
 
-    if (_sem->take(HAL_SEMAPHORE_BLOCK_FOREVER)) {
+    if (_sem->take(5)) {
         // integrate delta angle accumulator
         // the angles and coning corrections are accumulated separately in the
         // referenced paper, but in simulation little difference was found between
@@ -198,31 +194,6 @@ void AP_InertialSensor_Backend::_notify_new_gyro_raw_sample(uint8_t instance,
         }
         _imu._new_gyro_data[instance] = true;
         _sem->give();
-    }
-
-    log_gyro_raw(instance, sample_us, gyro);
-}
-
-void AP_InertialSensor_Backend::log_gyro_raw(uint8_t instance, const uint64_t sample_us, const Vector3f &gyro)
-{
-    DataFlash_Class *dataflash = DataFlash_Class::instance();
-    if (dataflash == nullptr) {
-        // should not have been called
-        return;
-    }
-    if (should_log_imu_raw()) {
-        uint64_t now = AP_HAL::micros64();
-        struct log_GYRO pkt = {
-            LOG_PACKET_HEADER_INIT((uint8_t)(LOG_GYR1_MSG+instance)),
-            time_us   : now,
-            sample_us : sample_us?sample_us:now,
-            GyrX      : gyro.x,
-            GyrY      : gyro.y,
-            GyrZ      : gyro.z
-        };
-        dataflash->WriteBlock(&pkt, sizeof(pkt));
-    } else {
-        _imu.batchsampler.sample(instance, AP_InertialSensor::IMU_SENSOR_TYPE_GYRO, sample_us, gyro);
     }
 }
 
@@ -251,7 +222,7 @@ void AP_InertialSensor_Backend::_publish_accel(uint8_t instance, const Vector3f 
         cal_sample.x /= accel_scale.x;
         cal_sample.y /= accel_scale.y;
         cal_sample.z /= accel_scale.z;
-        
+
         //remove offsets
         cal_sample += _imu._accel_offset[instance].get() * _imu._delta_velocity_dt[instance] ;
 
@@ -289,12 +260,9 @@ void AP_InertialSensor_Backend::_notify_new_accel_raw_sample(uint8_t instance,
     }
     _imu._accel_last_sample_us[instance] = sample_us;
 
-    // call accel_sample hook if any
-    AP_Module::call_hook_accel_sample(instance, dt, accel, fsync_set);
-    
     _imu.calc_vibration_and_clipping(instance, accel, dt);
 
-    if (_sem->take(HAL_SEMAPHORE_BLOCK_FOREVER)) {
+    if (_sem->take(5)) {
         // delta velocity
         _imu._delta_velocity_acc[instance] += accel * dt;
         _imu._delta_velocity_acc_dt[instance] += dt;
@@ -308,31 +276,6 @@ void AP_InertialSensor_Backend::_notify_new_accel_raw_sample(uint8_t instance,
 
         _imu._new_accel_data[instance] = true;
         _sem->give();
-    }
-
-    log_accel_raw(instance, sample_us, accel);
-}
-
-void AP_InertialSensor_Backend::log_accel_raw(uint8_t instance, const uint64_t sample_us, const Vector3f &accel)
-{
-    DataFlash_Class *dataflash = DataFlash_Class::instance();
-    if (dataflash == nullptr) {
-        // should not have been called
-        return;
-    }
-    if (should_log_imu_raw()) {
-        uint64_t now = AP_HAL::micros64();
-        struct log_ACCEL pkt = {
-            LOG_PACKET_HEADER_INIT((uint8_t)(LOG_ACC1_MSG+instance)),
-            time_us   : now,
-            sample_us : sample_us?sample_us:now,
-            AccX      : accel.x,
-            AccY      : accel.y,
-            AccZ      : accel.z
-        };
-        dataflash->WriteBlock(&pkt, sizeof(pkt));
-    } else {
-        _imu.batchsampler.sample(instance, AP_InertialSensor::IMU_SENSOR_TYPE_ACCEL, sample_us, accel);
     }
 }
 
@@ -390,8 +333,8 @@ void AP_InertialSensor_Backend::_publish_temperature(uint8_t instance, float tem
   common gyro update function for all backends
  */
 void AP_InertialSensor_Backend::update_gyro(uint8_t instance)
-{    
-    if (!_sem->take(HAL_SEMAPHORE_BLOCK_FOREVER)) {
+{
+    if (!_sem->take(5)) {
         return;
     }
 
@@ -413,8 +356,8 @@ void AP_InertialSensor_Backend::update_gyro(uint8_t instance)
   common accel update function for all backends
  */
 void AP_InertialSensor_Backend::update_accel(uint8_t instance)
-{    
-    if (!_sem->take(HAL_SEMAPHORE_BLOCK_FOREVER)) {
+{
+    if (!_sem->take(5)) {
         return;
     }
 
@@ -422,7 +365,7 @@ void AP_InertialSensor_Backend::update_accel(uint8_t instance)
         _publish_accel(instance, _imu._accel_filtered[instance]);
         _imu._new_accel_data[instance] = false;
     }
-    
+
     // possibly update filter frequency
     if (_last_accel_filter_hz[instance] != _accel_filter_cutoff()) {
         _imu._accel_filter[instance].set_cutoff_frequency(_accel_raw_sample_rate(instance), _accel_filter_cutoff());
@@ -430,20 +373,4 @@ void AP_InertialSensor_Backend::update_accel(uint8_t instance)
     }
 
     _sem->give();
-}
-
-bool AP_InertialSensor_Backend::should_log_imu_raw() const
-{
-    if (_imu._log_raw_bit == (uint32_t)-1) {
-        // tracker does not set a bit
-        return false;
-    }
-    const DataFlash_Class *instance = DataFlash_Class::instance();
-    if (instance == nullptr) {
-        return false;
-    }
-    if (!instance->should_log(_imu._log_raw_bit)) {
-        return false;
-    }
-    return true;
 }
