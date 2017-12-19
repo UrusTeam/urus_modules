@@ -30,7 +30,6 @@
  */
 #define SCHED_TASK_CLASS(classname, classptr, func, _rate_hz, _max_time_micros) { \
     .function = FUNCTOR_BIND(classptr, &classname::func, void),\
-    AP_SCHEDULER_NAME_INITIALIZER(func)\
     .rate_hz = _rate_hz,\
     .max_time_micros = _max_time_micros\
 }
@@ -51,17 +50,13 @@
 class AP_Scheduler
 {
 public:
-    AP_Scheduler();
-
-    /* Do not allow copies */
-    AP_Scheduler(const AP_Scheduler &other) = delete;
-    AP_Scheduler &operator=(const AP_Scheduler&) = delete;
+    // constructor
+    AP_Scheduler(void);
 
     FUNCTOR_TYPEDEF(task_fn_t, void);
 
     struct Task {
         task_fn_t function;
-        const char *name;
         float rate_hz;
         uint16_t max_time_micros;
     };
@@ -134,6 +129,4 @@ private:
     // number of ticks that _spare_micros is counted over
     uint8_t _spare_ticks;
 
-    // performance counters
-    AP_HAL::Util::perf_counter_t *_perf_counters;
 };
