@@ -41,7 +41,7 @@ AP_Notify *AP_Notify::_instance;
 #define TOSHIBA_LED_I2C_BUS_EXTERNAL    1
 
 // table of user settable parameters
-const AP_Param::GroupInfo AP_Notify::var_info[] = {
+const AP_Param::GroupInfo AP_Notify::var_info[] PROGMEM = {
 
     // @Param: LED_BRIGHT
     // @DisplayName: LED Brightness
@@ -137,7 +137,7 @@ void AP_Notify::add_backends(void)
   #endif
 
 // Notify devices for VRBRAIN boards
-#elif CONFIG_HAL_BOARD == HAL_BOARD_VRBRAIN  
+#elif CONFIG_HAL_BOARD == HAL_BOARD_VRBRAIN
   #if CONFIG_HAL_BOARD_SUBTYPE == HAL_BOARD_SUBTYPE_VRBRAIN_V45 // Uses px4 LED board
     ADD_BACKEND(new AP_BoardLED());
     ADD_BACKEND(new ToshibaLED_I2C(TOSHIBA_LED_I2C_BUS_EXTERNAL));
@@ -152,7 +152,7 @@ void AP_Notify::add_backends(void)
     ADD_BACKEND(new ExternalLED());
   #endif
 
-// Notify devices for linux boards    
+// Notify devices for linux boards
 #elif CONFIG_HAL_BOARD == HAL_BOARD_LINUX
   #if CONFIG_HAL_BOARD_SUBTYPE == HAL_BOARD_SUBTYPE_LINUX_NAVIO
     ADD_BACKEND(new AP_BoardLED());
@@ -203,7 +203,10 @@ void AP_Notify::add_backends(void)
     ADD_BACKEND(new ToshibaLED_I2C(TOSHIBA_LED_I2C_BUS_INTERNAL));
     ADD_BACKEND(new ToneAlarm_Linux());
   #endif
-
+#elif CONFIG_HAL_BOARD == HAL_BOARD_URUS
+    ADD_BACKEND(new AP_BoardLED());
+    ADD_BACKEND(new ExternalLED());
+    ADD_BACKEND(new Buzzer());
 #else
     ADD_BACKEND(new AP_BoardLED());
     ADD_BACKEND(new ToshibaLED_I2C(TOSHIBA_LED_I2C_BUS_EXTERNAL));
