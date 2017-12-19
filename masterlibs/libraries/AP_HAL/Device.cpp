@@ -70,8 +70,10 @@ void AP_HAL::Device::set_checked_register(uint8_t reg, uint8_t val)
         }
     }
     if (_checked.n_set == _checked.n_allocated) {
+#if 0
         printf("Not enough checked registers for reg 0x%02x on device 0x%x\n",
                (unsigned)reg, (unsigned)get_bus_id());
+#endif
         return;
     }
     regs[_checked.n_set].regnum = reg;
