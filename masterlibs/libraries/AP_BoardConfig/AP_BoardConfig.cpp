@@ -70,7 +70,7 @@
 extern const AP_HAL::HAL& hal;
 
 // table of user settable parameters
-const AP_Param::GroupInfo AP_BoardConfig::var_info[] = {
+const AP_Param::GroupInfo AP_BoardConfig::var_info[] PROGMEM = {
 #if CONFIG_HAL_BOARD == HAL_BOARD_PX4 || CONFIG_HAL_BOARD == HAL_BOARD_VRBRAIN
     // @Param: PWM_COUNT
     // @DisplayName: Auxiliary pin config
@@ -140,7 +140,7 @@ const AP_Param::GroupInfo AP_BoardConfig::var_info[] = {
 #if HAL_HAVE_IMU_HEATER
     // @Param: IMU_TARGTEMP
     // @DisplayName: Target IMU temperature
-    // @Description: This sets the target IMU temperature for boards with controllable IMU heating units. DO NOT SET -1 on The Cube. A value of -1 sets PH1 behaviour 
+    // @Description: This sets the target IMU temperature for boards with controllable IMU heating units. DO NOT SET -1 on The Cube. A value of -1 sets PH1 behaviour
     // @Range: -1 80
     // @Units: degC
     // @User: Advanced
@@ -170,7 +170,7 @@ const AP_Param::GroupInfo AP_BoardConfig::var_info[] = {
 #endif
 
     // ID number 11 reserved for AP_Radio (pending PR)
-    
+
     AP_GROUPEND
 };
 
@@ -205,7 +205,7 @@ void AP_BoardConfig::init_safety()
 }
 
 /*
-  notify user of a fatal startup error related to available sensors. 
+  notify user of a fatal startup error related to available sensors.
 */
 bool AP_BoardConfig::_in_sensor_config_error;
 
