@@ -244,6 +244,10 @@ public:
     /* set number of retries on transfers */
     virtual void set_retries(uint8_t retries) {};
 
+    /* compatibility with legacy boards */
+    virtual void cs_assert() {};
+    virtual void cs_release() {};
+
 protected:
     uint8_t _read_flag = 0;
 
