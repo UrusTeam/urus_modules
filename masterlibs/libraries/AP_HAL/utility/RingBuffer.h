@@ -87,8 +87,13 @@ private:
     uint8_t *buf;
     uint32_t size;
 
+#if !defined(SHAL_CORE_APM2)
     std::atomic<uint32_t> head{0}; // where to read data
     std::atomic<uint32_t> tail{0}; // where to write data
+#else
+    uint32_t head{0}; // where to read data
+    uint32_t tail{0}; // where to write data
+#endif
 };
 
 /*
