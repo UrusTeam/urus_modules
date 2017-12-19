@@ -2,6 +2,7 @@
 
 #include <stdarg.h>
 #include "AP_HAL_Namespace.h"
+#include <AP_Progmem/AP_Progmem.h>
 
 class AP_HAL::Util {
 public:
@@ -93,14 +94,14 @@ public:
 
     /* Support for an imu heating system */
     virtual void set_imu_target_temp(int8_t *target) {}
-    
+
     /*
       performance counter calls - wrapper around original PX4 interface
      */
     enum perf_counter_type {
         PC_COUNT,        /**< count the number of times an event occurs */
         PC_ELAPSED,      /**< measure the time elapsed performing an event */
-        PC_INTERVAL      /**< measure the interval between instances of an event */
+        PC_INTERVAL,      /**< measure the interval between instances of an event */
     };
     typedef void *perf_counter_t;
     virtual perf_counter_t perf_alloc(perf_counter_type t, const char *name) { return nullptr; }
@@ -114,7 +115,7 @@ public:
     // allocate and free DMA-capable memory if possible. Otherwise return normal memory
     virtual void *dma_allocate(size_t size) { return malloc(size); }
     virtual void dma_free(void *ptr, size_t size) { return free(ptr); }
-    
+
 protected:
     // we start soft_armed false, so that actuators don't send any
     // values until the vehicle code has fully started
