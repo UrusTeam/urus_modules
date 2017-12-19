@@ -7,6 +7,7 @@
 #include "RCInput.h"
 #include "RCOutput.h"
 #include "SPIDevice.h"
+#include "I2CDevice.h"
 #include "Storage.h"
 #include "UARTDriver.h"
 #include "system.h"
