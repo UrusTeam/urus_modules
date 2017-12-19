@@ -25,7 +25,13 @@
 #include <stdlib.h>
 
 // used to pack structures
+// used to pack structures
+#if defined(__AVR_ATmega1280__) || defined(__AVR_ATmega2560__)
+#define PACKED
+#else
+#define PROGMEM
 #define PACKED __attribute__((__packed__))
+#endif
 
 // used to mark a function that may be unused in some builds
 #define UNUSED_FUNCTION __attribute__((unused))
