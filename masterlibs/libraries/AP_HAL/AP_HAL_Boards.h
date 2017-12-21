@@ -123,6 +123,8 @@
 /* 150Mhz: PX4 or similar. Assumes:
  *  - hardware floating point
  *  - tens of kilobytes of memory available */
+#define HAL_CPU_CLASS_16   1
+#define HAL_CPU_CLASS_75   2
 #define HAL_CPU_CLASS_150  3
 /* GigaHz class: SITL, BeagleBone etc. Assumes megabytes of memory available. */
 #define HAL_CPU_CLASS_1000 4
