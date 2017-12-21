@@ -3,7 +3,7 @@
 #include <GCS_MAVLink/GCS_MAVLink.h>
 #include "AccelCalibrator.h"
 
-#define AP_ACCELCAL_MAX_NUM_CLIENTS 4
+#define AP_ACCELCAL_MAX_NUM_CLIENTS 1
 class GCS_MAVLINK;
 class AP_AccelCal_Client;
 
@@ -16,7 +16,7 @@ public:
     { update_status(); }
 
     // start all the registered calibrations
-    void start(GCS_MAVLINK *gcs);
+    void start(AP_HAL::UARTDriver *gcs);
 
     // called on calibration cancellation
     void cancel();
@@ -26,7 +26,7 @@ public:
 
     // get the status of the calibrator server as a whole
     accel_cal_status_t get_status() { return _status; }
-    
+
     // Set vehicle position sent by the GCS
     bool gcs_vehicle_position(float position);
 
@@ -34,7 +34,7 @@ public:
     static void register_client(AP_AccelCal_Client* client);
 
 private:
-    GCS_MAVLINK *_gcs;
+    AP_HAL::UARTDriver *_gcs;
     bool _use_gcs_snoop;
     uint32_t _last_position_request_ms;
     uint8_t _step;
@@ -71,7 +71,6 @@ private:
     uint8_t _num_active_calibrators;
 
     AccelCalibrator* get_calibrator(uint8_t i);
-    void _printf(const char*, ...);
 };
 
 class AP_AccelCal_Client {
