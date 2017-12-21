@@ -138,3 +138,19 @@ uint16_t get_random16(void)
     m_w = 18000 * (m_w & 0xFFFFu) + (m_w >> 16);
     return ((m_z << 16) + m_w) & 0xFFFF;
 }
+
+template <typename T>
+float wrap_360(const T angle, float unit_mod)
+{
+    const float ang_360 = 360.f * unit_mod;
+    float res = fmodf(static_cast<float>(angle), ang_360);
+    if (res < 0) {
+        res += ang_360;
+    }
+    return res;
+}
+
+template float wrap_360<int>(const int angle, float unit_mod);
+template float wrap_360<short>(const short angle, float unit_mod);
+template float wrap_360<float>(const float angle, float unit_mod);
+template float wrap_360<double>(const double angle, float unit_mod);

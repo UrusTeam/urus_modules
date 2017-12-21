@@ -152,6 +152,17 @@ Vector2f location_diff(const struct Location &loc1, const struct Location &loc2)
 }
 
 /*
+  return the distance in meters in North/East/Down plane as a N/E/D vector
+  from loc1 to loc2
+ */
+Vector3f location_3d_diff_NED(const struct Location &loc1, const struct Location &loc2)
+{
+    return Vector3f((loc2.lat - loc1.lat) * LOCATION_SCALING_FACTOR,
+                    (loc2.lng - loc1.lng) * LOCATION_SCALING_FACTOR * longitude_scale(loc1),
+                    (loc1.alt - loc2.alt) * 0.01f);
+}
+
+/*
   wrap an angle in centi-degrees to 0..35999
  */
 int32_t wrap_360_cd(int32_t error)

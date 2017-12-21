@@ -89,13 +89,14 @@ void        print_latlon(AP_HAL::BetterStream *s, int32_t lat_or_lon);
 // Converts from WGS84 geodetic coordinates (lat, lon, height)
 // into WGS84 Earth Centered, Earth Fixed (ECEF) coordinates
 // (X, Y, Z)
+#if HAL_CPU_CLASS >= HAL_CPU_CLASS_75
 void        wgsllh2ecef(const Vector3d &llh, Vector3d &ecef);
 
 // Converts from WGS84 Earth Centered, Earth Fixed (ECEF)
 // coordinates (X, Y, Z), into WHS84 geodetic
 // coordinates (lat, lon, height)
 void        wgsecef2llh(const Vector3d &ecef, Vector3d &llh);
-
+#endif
 // return true when lat and lng are within range
 bool        check_lat(float lat);
 bool        check_lng(float lng);
