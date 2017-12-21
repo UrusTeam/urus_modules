@@ -6,11 +6,11 @@
 #include <Filter/DerivativeFilter.h>
 
 // maximum number of sensor instances
-#define BARO_MAX_INSTANCES 3
+#define BARO_MAX_INSTANCES 1
 
 // maximum number of drivers. Note that a single driver can provide
 // multiple sensor instances
-#define BARO_MAX_DRIVERS 3
+#define BARO_MAX_DRIVERS 1
 
 // timeouts for health reporting
 #define BARO_TIMEOUT_MS                 500     // timeout in ms since last successful read

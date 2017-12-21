@@ -25,18 +25,14 @@
 #include <AP_HAL/AP_HAL.h>
 #include <AP_Math/AP_Math.h>
 #include <AP_BoardConfig/AP_BoardConfig.h>
-#include <AP_BoardConfig/AP_BoardConfig_CAN.h>
 #include <AP_Vehicle/AP_Vehicle_Type.h>
 
-#include "AP_Baro_SITL.h"
 #include "AP_Baro_BMP085.h"
 #include "AP_Baro_BMP280.h"
 #include "AP_Baro_HIL.h"
 #include "AP_Baro_KellerLD.h"
 #include "AP_Baro_MS5611.h"
 #include "AP_Baro_LPS25H.h"
-#include "AP_Baro_qflight.h"
-#include "AP_Baro_QURT.h"
 #include "AP_Baro_URUS.h"
 #if HAL_WITH_UAVCAN
 #include "AP_Baro_UAVCAN.h"
@@ -53,7 +49,7 @@
 extern const AP_HAL::HAL& hal;
 
 // table of user settable parameters
-const AP_Param::GroupInfo AP_Baro::var_info[] = {
+const AP_Param::GroupInfo AP_Baro::var_info[] PROGMEM = {
     // NOTE: Index numbers 0 and 1 were for the old integer
     // ground temperature and pressure
 
@@ -105,7 +101,7 @@ const AP_Param::GroupInfo AP_Baro::var_info[] = {
     // @DisplayName: Specific Gravity (For water depth measurement)
     // @Description: This sets the specific gravity of the fluid when flying an underwater ROV.
     // @Values: 1.0:Freshwater,1.024:Saltwater
-    AP_GROUPINFO_FRAME("SPEC_GRAV", 8, AP_Baro, _specific_gravity, 1.0, AP_PARAM_FRAME_SUB),
+    AP_GROUPINFO("SPEC_GRAV", 8, AP_Baro, _specific_gravity, 1.0),
 
 #if BARO_MAX_INSTANCES > 1
     // @Param: ABS_PRESS2
@@ -254,13 +250,19 @@ void AP_Baro::update_calibration()
 float AP_Baro::get_altitude_difference(float base_pressure, float pressure) const
 {
     float ret;
-    float temp    = get_ground_temperature() + C_TO_KELVIN;
+    float temp    = get_ground_temperature() + 273.15f;
+#if HAL_CPU_CLASS <= HAL_CPU_CLASS_16
+    // on slower CPUs use a less exact, but faster, calculation
+    float scaling = base_pressure / pressure;
+    ret = logf(scaling) * temp * 29.271267f;
+#else
+    // on faster CPUs use a more exact calculation
     float scaling = pressure / base_pressure;
 
-    // This is an exact calculation that is within +-2.5m of the standard
-    // atmosphere tables in the troposphere (up to 11,000 m amsl).
-    ret = 153.8462f * temp * (1.0f - expf(0.190259f * logf(scaling)));
-
+    // This is an exact calculation that is within +-2.5m of the standard atmosphere tables
+    // in the troposphere (up to 11,000 m amsl).
+	ret = 153.8462f * temp * (1.0f - expf(0.190259f * logf(scaling)));
+#endif
     return ret;
 }
 
@@ -386,17 +388,11 @@ void AP_Baro::init(void)
         _user_ground_temperature.notify();
     }
 
-    if (_hil_mode) {
-        drivers[0] = new AP_Baro_HIL(*this);
-        _num_drivers = 1;
-        return;
-    }
-
 #if CONFIG_HAL_BOARD == HAL_BOARD_SITL
     ADD_BACKEND(new AP_Baro_SITL(*this));
     return;
 #endif
-    
+
 #if HAL_WITH_UAVCAN
     bool added;
     do {
@@ -488,7 +484,6 @@ void AP_Baro::init(void)
     drivers[0] = new AP_Baro_URUS(*this);
     _num_drivers = 1;
 #endif
-
     // can optionally have baro on I2C too
     if (_ext_bus >= 0) {
 #if APM_BUILD_TYPE(APM_BUILD_ArduSub)
@@ -497,7 +492,7 @@ void AP_Baro::init(void)
 
         ADD_BACKEND(AP_Baro_KellerLD::probe(*this,
                                           std::move(hal.i2c_mgr->get_device(_ext_bus, HAL_BARO_KELLERLD_I2C_ADDR))));
-#else
+#elif HAL_BARO_DEFAULT != HAL_BARO_URUS && HAL_BARO_DEFAULT != HAL_BARO_HIL
         ADD_BACKEND(AP_Baro_MS56XX::probe(*this,
                                           std::move(hal.i2c_mgr->get_device(_ext_bus, HAL_BARO_MS5611_I2C_ADDR))));
 #endif
@@ -532,7 +527,7 @@ void AP_Baro::update(void)
         if (sensors[i].healthy) {
             // update altitude calculation
             float ground_pressure = sensors[i].ground_pressure;
-            if (!is_positive(ground_pressure) || isnan(ground_pressure) || isinf(ground_pressure)) {
+            if (is_zero(ground_pressure) || isnan(ground_pressure) || isinf(ground_pressure)) {
                 sensors[i].ground_pressure = sensors[i].pressure;
             }
             float altitude = sensors[i].altitude;
