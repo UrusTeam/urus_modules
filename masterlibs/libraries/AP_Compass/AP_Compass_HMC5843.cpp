@@ -132,10 +132,11 @@ AP_Compass_Backend *AP_Compass_HMC5843::probe(Compass &compass,
 
 AP_Compass_Backend *AP_Compass_HMC5843::probe_mpu6000(Compass &compass, enum Rotation rotation)
 {
+#if !HAL_MINIMIZE_FEATURES
     AP_InertialSensor &ins = *AP_InertialSensor::get_instance();
 
     AP_HMC5843_BusDriver *bus =
-        new AP_HMC5843_BusDriver_Auxiliary(ins, HAL_INS_MPU60XX_SPI,
+        new AP_HMC5843_BusDriver_Auxiliary(ins, HAL_INS_MPU60XX_I2C,
                                            HAL_COMPASS_HMC5843_I2C_ADDR);
     if (!bus) {
         return nullptr;
@@ -148,20 +149,27 @@ AP_Compass_Backend *AP_Compass_HMC5843::probe_mpu6000(Compass &compass, enum Rot
     }
 
     return sensor;
+#else
+    return nullptr;
+#endif
 }
 
 bool AP_Compass_HMC5843::init()
 {
     AP_HAL::Semaphore *bus_sem = _bus->get_semaphore();
 
-    if (!bus_sem || !bus_sem->take(HAL_SEMAPHORE_BLOCK_FOREVER)) {
+    hal.scheduler->suspend_timer_procs();
+
+    if (!bus_sem || !bus_sem->take(5)) {
+        hal.scheduler->resume_timer_procs();
         hal.console->printf("HMC5843: Unable to get bus semaphore\n");
         return false;
     }
 
+    //hal.scheduler->suspend_timer_procs();
     // high retries for init
-    _bus->set_retries(10);
-    
+    //_bus->set_retries(10);
+
     if (!_bus->configure()) {
         hal.console->printf("HMC5843: Could not configure the bus\n");
         goto errout;
@@ -189,17 +197,19 @@ bool AP_Compass_HMC5843::init()
     _initialised = true;
 
     // lower retries for run
-    _bus->set_retries(3);
-    
+    //_bus->set_retries(3);
+
     bus_sem->give();
 
+    hal.scheduler->resume_timer_procs();
     // perform an initial read
+
     read();
 
     _compass_instance = register_compass();
 
     set_rotation(_compass_instance, _rotation);
-    
+
     _bus->set_device_type(DEVTYPE_HMC5883);
     set_dev_id(_compass_instance, _bus->get_bus_id());
 
@@ -207,16 +217,19 @@ bool AP_Compass_HMC5843::init()
         set_external(_compass_instance, true);
     }
 
-    // read from sensor at 75Hz
-    _bus->register_periodic_callback(13333,
-                                     FUNCTOR_BIND_MEMBER(&AP_Compass_HMC5843::_timer, void));
+    //hal.scheduler->resume_timer_procs();
 
-    hal.console->printf("HMC5843 found on bus 0x%x\n", _bus->get_bus_id());
-    
+    // read from sensor at 75Hz
+    //_bus->register_periodic_callback(1333,
+                                     //FUNCTOR_BIND_MEMBER(&AP_Compass_HMC5843::_timer, void));
+
+    //hal.console->printf("HMC5843 found on bus 0x%x\n", _bus->get_bus_id());
+
     return true;
 
 errout:
     bus_sem->give();
+    hal.scheduler->resume_timer_procs();
     return false;
 }
 
@@ -227,14 +240,28 @@ errout:
  */
 void AP_Compass_HMC5843::_timer()
 {
+
+   uint32_t tnow = AP_HAL::micros();
+   if (_accum_count != 0 && (tnow - _last_accum_time) < 13333) {
+	  // the compass gets new data at 75Hz
+	  return;
+   }
+
+    if (!_sem->take(5)) {
+        return;
+    }
+
     bool result = _read_sample();
 
     // always ask for a new sample
     _take_sample();
-    
+
     if (!result) {
+        _sem->give();
         return;
     }
+
+    _sem->give();
 
     // the _mag_N values are in the range -2048 to 2047, so we can
     // accumulate up to 15 of them in an int16_t. Let's make it 14
@@ -244,7 +271,7 @@ void AP_Compass_HMC5843::_timer()
     // get raw_field - sensor frame, uncorrected
     Vector3f raw_field = Vector3f(_mag_x, _mag_y, _mag_z);
     raw_field *= _gain_scale;
-    
+
     // rotate to the desired orientation
     if (is_external(_compass_instance)) {
         raw_field.rotate(ROTATION_YAW_90);
@@ -252,14 +279,14 @@ void AP_Compass_HMC5843::_timer()
 
     // rotate raw_field from sensor frame to body frame
     rotate_field(raw_field, _compass_instance);
-    
+
     // publish raw_field (uncorrected point sample) for calibration use
     publish_raw_field(raw_field, _compass_instance);
-    
+
     // correct raw_field for known errors
     correct_field(raw_field, _compass_instance);
-    
-    if (_sem->take(HAL_SEMAPHORE_BLOCK_FOREVER)) {
+
+    if (_sem->take(5)) {
         _mag_x_accum += raw_field.x;
         _mag_y_accum += raw_field.y;
         _mag_z_accum += raw_field.z;
@@ -270,8 +297,10 @@ void AP_Compass_HMC5843::_timer()
             _mag_z_accum /= 2;
             _accum_count = 7;
         }
+        //_last_accum_time = tnow;
         _sem->give();
     }
+    _last_accum_time = tnow;
 }
 
 /*
@@ -289,12 +318,18 @@ void AP_Compass_HMC5843::read()
         return;
     }
 
-    if (!_sem->take_nonblocking()) {
+    hal.scheduler->suspend_timer_procs();
+
+    _timer();
+
+    if (!_sem->take(5)) {
+        hal.scheduler->resume_timer_procs();
         return;
     }
-    
+
     if (_accum_count == 0) {
         _sem->give();
+        hal.scheduler->resume_timer_procs();
         return;
     }
 
@@ -307,8 +342,11 @@ void AP_Compass_HMC5843::read()
     _mag_x_accum = _mag_y_accum = _mag_z_accum = 0;
 
     _sem->give();
-    
+
+    hal.scheduler->resume_timer_procs();
+
     publish_filtered_field(field, _compass_instance);
+
 }
 
 bool AP_Compass_HMC5843::_setup_sampling_mode()
@@ -374,7 +412,7 @@ bool AP_Compass_HMC5843::_check_whoami()
     uint8_t id[3];
     if (!_bus->block_read(HMC5843_REG_ID_A, id, 3)) {
         // can't talk on bus
-        return false;        
+        return false;
     }
     if (id[0] != 'H' ||
         id[1] != '4' ||
@@ -401,7 +439,7 @@ bool AP_Compass_HMC5843::_calibrate()
 
     uint8_t base_config = HMC5843_OSR_15HZ;
     uint8_t num_samples = 0;
-    
+
     while (success == 0 && numAttempts < 25 && good_count < 5) {
         numAttempts++;
 
@@ -470,7 +508,7 @@ bool AP_Compass_HMC5843::_calibrate()
     }
 
     _bus->register_write(HMC5843_REG_CONFIG_A, base_config);
-    
+
     if (good_count >= 5) {
         _scaling[0] = _scaling[0] / good_count;
         _scaling[1] = _scaling[1] / good_count;
@@ -492,7 +530,7 @@ bool AP_Compass_HMC5843::_calibrate()
     printf("scaling: %.2f %.2f %.2f\n",
            _scaling[0], _scaling[1], _scaling[2]);
 #endif
-    
+
     return success;
 }
 
@@ -533,6 +571,7 @@ AP_HAL::Device::PeriodicHandle AP_HMC5843_BusDriver_HALDevice::register_periodic
 
 
 /* HMC5843 on an auxiliary bus of IMU driver */
+#if !HAL_MINIMIZE_FEATURES
 AP_HMC5843_BusDriver_Auxiliary::AP_HMC5843_BusDriver_Auxiliary(AP_InertialSensor &ins, uint8_t backend_id,
                                                                uint8_t addr)
 {
@@ -625,5 +664,5 @@ uint32_t AP_HMC5843_BusDriver_Auxiliary::get_bus_id(void) const
 {
     return _bus->get_bus_id();
 }
-
+#endif
 #endif
