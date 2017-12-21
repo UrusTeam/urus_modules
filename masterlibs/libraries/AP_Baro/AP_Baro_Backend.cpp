@@ -3,10 +3,10 @@
 extern const AP_HAL::HAL& hal;
 
 // constructor
-AP_Baro_Backend::AP_Baro_Backend(AP_Baro &baro) : 
-    _frontend(baro) 
+AP_Baro_Backend::AP_Baro_Backend(AP_Baro &baro) :
+    _frontend(baro)
 {
-    _sem = hal.util->new_semaphore();    
+    _sem = hal.util->new_semaphore();
 }
 
 void AP_Baro_Backend::update_healthy_flag(uint8_t instance)
@@ -14,7 +14,7 @@ void AP_Baro_Backend::update_healthy_flag(uint8_t instance)
     if (instance >= _frontend._num_sensors) {
         return;
     }
-    if (!_sem->take_nonblocking()) {
+    if (!_sem->take(5)) {
         return;
     }
 

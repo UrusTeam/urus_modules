@@ -18,6 +18,7 @@ class AP_Baro_MS56XX : public AP_Baro_Backend
 {
 public:
     void update();
+    void accumulate();
 
     enum MS56XX_TYPE {
         BARO_MS5611 = 0,
@@ -27,7 +28,7 @@ public:
     };
 
     static AP_Baro_Backend *probe(AP_Baro &baro, AP_HAL::OwnPtr<AP_HAL::Device> dev, enum MS56XX_TYPE ms56xx_type = BARO_MS5611);
-    
+
 private:
     /*
      * Update @accum and @count with the new sample in @val, taking into
@@ -39,7 +40,7 @@ private:
 
     AP_Baro_MS56XX(AP_Baro &baro, AP_HAL::OwnPtr<AP_HAL::Device> dev, enum MS56XX_TYPE ms56xx_type);
     virtual ~AP_Baro_MS56XX(void) {};
-    
+
     bool _init();
 
     void _calculate_5611();
@@ -78,4 +79,7 @@ private:
     bool _discard_next;
 
     enum MS56XX_TYPE _ms56xx_type;
+    uint32_t    _last_timer;
+    bool _use_timer;
+    bool _use_accumulate;
 };
