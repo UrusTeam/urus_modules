@@ -21,7 +21,9 @@
 #include "polygon.h"
 #include "edc.h"
 #include "float.h"
+#include "location.h"
 #include <AP_Param/AP_Param.h>
+
 
 #ifndef M_PI_F
  #define M_PI_F 3.141592653589793f
@@ -134,6 +136,13 @@ int32_t wrap_360_cd(int32_t error);
 int32_t wrap_180_cd(int32_t error);
 float wrap_360_cd_float(float angle);
 float wrap_180_cd_float(float angle);
+/*
+ * Constrain an euler angle to be within the range: 0 to 360 degrees. The
+ * second parameter changes the units. Default: 1 == degrees, 10 == dezi,
+ * 100 == centi.
+ */
+template <typename T>
+float wrap_360(const T angle, float unit_mod = 1);
 
 /*
   wrap an angle defined in radians to -PI ~ PI (equivalent to +- 180 degrees)
