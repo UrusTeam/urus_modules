@@ -37,8 +37,8 @@
    maximum number of compass instances available on this platform. If more
    than 1 then redundant sensors may be available
  */
-#define COMPASS_MAX_INSTANCES 3
-#define COMPASS_MAX_BACKEND   3
+#define COMPASS_MAX_INSTANCES 1
+#define COMPASS_MAX_BACKEND   1
 
 class Compass
 {
@@ -310,9 +310,6 @@ private:
     bool _start_calibration_mask(uint8_t mask, bool retry=false, bool autosave=false, float delay_sec=0.0f, bool autoreboot=false);
     bool _auto_reboot() { return _compass_cal_autoreboot; }
 
-    // see if we already have probed a driver by bus type
-    bool _have_driver(AP_HAL::Device::BusType bus_type, uint8_t bus_num, uint8_t address, uint8_t devtype) const;
-
 
     //keep track of which calibrators have been saved
     bool _cal_saved[COMPASS_MAX_INSTANCES];
@@ -339,10 +336,11 @@ private:
         DRIVER_UAVCAN   =11,
         DRIVER_QMC5883  =12,
         DRIVER_SITL     =13,
+        DRIVER_URUS     =14,
     };
 
     bool _driver_enabled(enum DriverType driver_type);
-    
+
     // backend objects
     AP_Compass_Backend *_backends[COMPASS_MAX_BACKEND];
     uint8_t     _backend_count;
