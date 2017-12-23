@@ -48,6 +48,19 @@ void AP_MotorsMatrix::set_update_rate( uint16_t speed_hz )
     rc_set_freq(0xFF, _speed_hz );
 }
 
+// enable - starts allowing signals to be sent to motors
+void AP_MotorsMatrix::enable()
+{
+    int8_t i;
+
+    // enable output channels
+    for( i=0; i<AP_MOTORS_MAX_NUM_MOTORS; i++ ) {
+        if( motor_enabled[i] ) {
+            rc_enable_ch(i);
+        }
+    }
+}
+
 // set frame class (i.e. quad, hexa, heli) and type (i.e. x, plus)
 void AP_MotorsMatrix::set_frame_class_and_type(motor_frame_class frame_class, motor_frame_type frame_type)
 {
