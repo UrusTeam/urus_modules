@@ -27,7 +27,7 @@ extern const AP_HAL::HAL& hal;
 
 SRV_Channel::servo_mask_t SRV_Channel::have_pwm_mask;
 
-const AP_Param::GroupInfo SRV_Channel::var_info[] = {
+const AP_Param::GroupInfo SRV_Channel::var_info[] PROGMEM = {
     // @Param: MIN
     // @DisplayName: Minimum PWM
     // @Description: minimum PWM pulse width in microseconds. Typically 1000 is lower limit, 1500 is neutral and 2000 is upper limit.
@@ -131,7 +131,7 @@ void SRV_Channel::set_output_pwm(uint16_t pwm)
 void SRV_Channel::set_angle(int16_t angle)
 {
     type_angle = true;
-    high_out = angle;    
+    high_out = angle;
     type_setup = true;
 }
 
