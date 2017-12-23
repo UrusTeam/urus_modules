@@ -2,7 +2,7 @@
 
 #include "AP_Compass.h"
 
-#define URUS_NUM_COMPASSES 2
+#define URUS_NUM_COMPASSES 1
 
 class AP_Compass_URUS : public AP_Compass_Backend
 {
