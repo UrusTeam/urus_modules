@@ -29,6 +29,9 @@ public:
     // you must have setup_motors before calling this
     void                set_update_rate(uint16_t speed_hz);
 
+    // enable - starts allowing signals to be sent to motors
+    void                enable();
+
     // output_test - spin a motor at the pwm value specified
     //  motor_seq is the motor's sequence number from 1 to the number of motors on the frame
     //  pwm value is an actual pwm value that will be output, normally in the range of 1000 ~ 2000
@@ -65,7 +68,7 @@ protected:
 
     // call vehicle supplied thrust compensation if set
     void                thrust_compensation(void) override;
-    
+
     float               _roll_factor[AP_MOTORS_MAX_NUM_MOTORS]; // each motors contribution to roll
     float               _pitch_factor[AP_MOTORS_MAX_NUM_MOTORS]; // each motors contribution to pitch
     float               _yaw_factor[AP_MOTORS_MAX_NUM_MOTORS];  // each motors contribution to yaw (normally 1 or -1)

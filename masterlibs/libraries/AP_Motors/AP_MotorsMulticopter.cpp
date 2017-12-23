@@ -25,7 +25,7 @@
 extern const AP_HAL::HAL& hal;
 
 // parameters for the motor class
-const AP_Param::GroupInfo AP_MotorsMulticopter::var_info[] = {
+const AP_Param::GroupInfo AP_MotorsMulticopter::var_info[] PROGMEM = {
     // 0 was used by TB_RATIO
     // 1,2,3 were used by throttle curve
     // 5 was SPIN_ARMED
@@ -158,7 +158,7 @@ const AP_Param::GroupInfo AP_MotorsMulticopter::var_info[] = {
 
     // @Param: SPOOL_TIME
     // @DisplayName: Spool up time
-    // @Description: Time in seconds to spool up the motors from zero to min throttle. 
+    // @Description: Time in seconds to spool up the motors from zero to min throttle.
     // @Range: 0 2
     // @Units: s
     // @Increment: 0.1
@@ -174,7 +174,7 @@ const AP_Param::GroupInfo AP_MotorsMulticopter::var_info[] = {
     AP_GROUPINFO("BOOST_SCALE",  37, AP_MotorsMulticopter,  _boost_scale, 0),
 
     // 38 RESERVED for BAT_POW_MAX
-    
+
     AP_GROUPEND
 };
 
@@ -219,7 +219,7 @@ void AP_MotorsMulticopter::output()
 
     // apply any thrust compensation for the frame
     thrust_compensation();
-    
+
     // convert rpy_thrust values to pwm
     output_to_motors();
 
@@ -232,10 +232,10 @@ void AP_MotorsMulticopter::output_boost_throttle(void)
 {
     if (_boost_scale > 0) {
         float throttle = constrain_float(get_throttle() * _boost_scale, 0, 1);
-        SRV_Channels::set_output_scaled(SRV_Channel::k_boost_throttle, throttle*1000);        
+        SRV_Channels::set_output_scaled(SRV_Channel::k_boost_throttle, throttle*1000);
     }
 }
-    
+
 
 // sends minimum values out to the motors
 void AP_MotorsMulticopter::output_min()
