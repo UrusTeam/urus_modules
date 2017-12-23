@@ -63,7 +63,7 @@ void CORE_AVR::init_core() const
      * PD2 : RX1 (uartB)
      * PH0 : RX2 (uartC)
      */
-    coreUARTA_Driver.begin(115200, 16, 128);
+    coreUARTA_Driver.begin(115200, 32, 128);
 
     PORTE |= _BV(0);
     PORTD |= _BV(2);
