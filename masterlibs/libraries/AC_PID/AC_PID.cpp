@@ -4,7 +4,7 @@
 #include <AP_Math/AP_Math.h>
 #include "AC_PID.h"
 
-const AP_Param::GroupInfo AC_PID::var_info[] = {
+const AP_Param::GroupInfo AC_PID::var_info[] PROGMEM = {
     // @Param: P
     // @DisplayName: PID Proportional Gain
     // @Description: P Gain which produces an output value that is proportional to the current error value
@@ -38,7 +38,7 @@ const AP_Param::GroupInfo AC_PID::var_info[] = {
     // @DisplayName: FF FeedForward Gain
     // @Description: FF Gain which produces an output value that is proportional to the demanded input
     AP_GROUPINFO("FF",   7, AC_PID, _ff, 0),
-    
+
     AP_GROUPEND
 };
 
