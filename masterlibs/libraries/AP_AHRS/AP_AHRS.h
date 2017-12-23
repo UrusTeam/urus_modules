@@ -45,13 +45,17 @@ enum AHRS_VehicleClass {
 
 
 // forward declare view class
+#if !HAL_MINIMIZE_FEATURES
 class AP_AHRS_View;
+#endif
 
 class AP_AHRS
 {
 public:
+#if !HAL_MINIMIZE_FEATURES
     friend class AP_AHRS_View;
-    
+#endif
+
     // Constructor
     AP_AHRS(AP_InertialSensor &ins, AP_Baro &baro, AP_GPS &gps) :
         roll(0.0f),
@@ -146,7 +150,7 @@ public:
         }
         return AP_HAL::millis() - _last_flying_ms;
     }
-    
+
     AHRS_VehicleClass get_vehicle_class(void) const {
         return _vehicle_class;
     }
@@ -222,7 +226,7 @@ public:
     virtual uint8_t get_primary_gyro_index(void) const {
         return _ins.get_primary_gyro();
     }
-    
+
     // accelerometer values in the earth frame in m/s/s
     virtual const Vector3f &get_accel_ef(uint8_t i) const {
         return _accel_ef[i];
@@ -253,7 +257,7 @@ public:
     virtual bool have_ekf_logging(void) const {
         return false;
     }
-    
+
     // Euler angles (radians)
     float roll;
     float pitch;
@@ -329,7 +333,7 @@ public:
     // return true if airspeed comes from an airspeed sensor, as
     // opposed to an IMU estimate
     bool airspeed_sensor_enabled(void) const {
-        return _airspeed != nullptr && _airspeed->use() && _airspeed->healthy();
+        return false;//_airspeed != nullptr && _airspeed->use() && _airspeed->healthy();
     }
 
     // return a ground vector estimate in meters/second, in North/East order
@@ -456,7 +460,7 @@ public:
     virtual bool get_secondary_quaternion(Quaternion &quat) {
         return false;
     }
-    
+
     // return secondary position solution if available
     virtual bool get_secondary_position(struct Location &loc) {
         return false;
@@ -532,7 +536,7 @@ public:
     virtual bool resetHeightDatum(void) {
         return false;
     }
-    
+
     // get_variances - provides the innovations normalised using the innovation variance where a value of 0
     // indicates perfect consistency between the measurement and the EKF solution and a value of of 1 is the maximum
     // inconsistency that will be accepted by the filter
@@ -540,7 +544,7 @@ public:
     virtual bool get_variances(float &velVar, float &posVar, float &hgtVar, Vector3f &magVar, float &tasVar, Vector2f &offset) const {
         return false;
     }
-    
+
     // time that the AHRS has been up
     virtual uint32_t uptime_ms(void) const = 0;
 
@@ -553,8 +557,10 @@ public:
     virtual void getCorrectedDeltaVelocityNED(Vector3f& ret, float& dt) const { ret.zero(); _ins.get_delta_velocity(ret); dt = _ins.get_delta_velocity_dt(); }
 
     // create a view
+#if !HAL_MINIMIZE_FEATURES
     AP_AHRS_View *create_view(enum Rotation rotation);
-    
+#endif
+
     // return calculated AOA
     float getAOA(void);
 
@@ -601,7 +607,7 @@ protected:
     void calc_trig(const Matrix3f &rot,
                    float &cr, float &cp, float &cy,
                    float &sr, float &sp, float &sy) const;
-    
+
     // update_trig - recalculates _cos_roll, _cos_pitch, etc based on latest attitude
     //      should be called after _dcm_matrix is updated
     void update_trig(void);
@@ -663,7 +669,9 @@ protected:
     uint8_t _active_accel_instance;
 
     // optional view class
+#if !HAL_MINIMIZE_FEATURES
     AP_AHRS_View *_view;
+#endif
 
     // AOA and SSA
     float _AOA, _SSA;

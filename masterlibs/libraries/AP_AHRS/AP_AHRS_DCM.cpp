@@ -696,7 +696,7 @@ AP_AHRS_DCM::drift_correction(float deltat)
         // waiting for more data
         return;
     }
-    
+
     bool using_gps_corrections = false;
     float ra_scale = 1.0f/(_ra_deltat*GRAVITY_MSS);
 
@@ -966,7 +966,7 @@ bool AP_AHRS_DCM::get_position(struct Location &loc) const
     location_offset(loc, _position_offset_north, _position_offset_east);
     if (_flags.fly_forward && _have_position) {
         float gps_delay_sec = 0;
-        _gps.get_lag(gps_delay_sec);
+        gps_delay_sec = _gps.get_lag();
         location_update(loc, _gps.ground_course_cd() * 0.01f, _gps.ground_speed() * gps_delay_sec);
     }
     return _have_position;

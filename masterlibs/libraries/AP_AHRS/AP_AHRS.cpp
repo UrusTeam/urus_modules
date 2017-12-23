@@ -21,7 +21,7 @@
 extern const AP_HAL::HAL& hal;
 
 // table of user settable parameters
-const AP_Param::GroupInfo AP_AHRS::var_info[] = {
+const AP_Param::GroupInfo AP_AHRS::var_info[] PROGMEM = {
     // index 0 and 1 are for old parameters that are no longer not used
 
     // @Param: GPS_GAIN
@@ -261,7 +261,7 @@ void AP_AHRS::calc_trig(const Matrix3f &rot,
         sy = 0.0f;
         cy = 1.0f;
     }
-    
+
     float cx2 = rot.c.x * rot.c.x;
     if (cx2 >= 1.0f) {
         cp = 0;
@@ -317,6 +317,7 @@ void AP_AHRS::update_cd_values(void)
 /*
   create a rotated view of AP_AHRS
  */
+#if !HAL_MINIMIZE_FEATURES
 AP_AHRS_View *AP_AHRS::create_view(enum Rotation rotation)
 {
     if (_view != nullptr) {
@@ -326,6 +327,7 @@ AP_AHRS_View *AP_AHRS::create_view(enum Rotation rotation)
     _view = new AP_AHRS_View(*this, rotation);
     return _view;
 }
+#endif
 
 /*
  * Update AOA and SSA estimation based on airspeed, velocity vector and wind vector
@@ -349,7 +351,7 @@ void AP_AHRS::update_AOA_SSA(void)
         return;
     }
     _last_AOA_update_ms = now;
-    
+
     Vector3f aoa_velocity, aoa_wind;
 
     // get velocity and wind
