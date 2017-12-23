@@ -461,6 +461,38 @@ uint8_t AP_Param::type_size(enum ap_var_type type)
     return 0;
 }
 
+/*
+  extract 9 bit key from Param_header
+ */
+uint16_t AP_Param::get_key(const Param_header &phdr)
+{
+    return ((uint16_t)phdr.key_high)<<8 | phdr.key;
+}
+
+/*
+  set 9 bit key in Param_header
+ */
+void AP_Param::set_key(Param_header &phdr, uint16_t key)
+{
+    phdr.key  = key & 0xFF;
+    phdr.key_high = key >> 8;
+}
+
+/*
+  return true if a header is the end of eeprom sentinal
+ */
+bool AP_Param::is_sentinal(const Param_header &phdr)
+{
+    // note that this is an ||, not an &&, as this makes us more
+    // robust to power off while adding a variable to EEPROM
+    if (phdr.type == _sentinal_type ||
+        get_key(phdr) == _sentinal_key ||
+        phdr.group_element == _sentinal_group) {
+        return true;
+    }
+    return false;
+}
+
 // scan the EEPROM looking for a given variable by header content
 // return true if found, along with the offset in the EEPROM where
 // the variable is stored
@@ -931,6 +963,26 @@ void AP_Param::setup_sketch_defaults(void)
     }
 }
 
+/*
+  find an old parameter and return it.
+ */
+bool AP_Param::find_old_parameter(const struct ConversionInfo2 *info, AP_Param *value)
+{
+    // find the old value in EEPROM.
+    uint16_t pofs;
+    AP_Param::Param_header header;
+    header.type = PGM_UINT8(&info->type);
+    set_key(header, PGM_UINT8(&info->old_key));
+    header.group_element = PGM_UINT8(&info->old_group_element);
+    if (!scan(&header, &pofs)) {
+        // the old parameter isn't saved in the EEPROM.
+        return false;
+    }
+
+    // load the old value from EEPROM
+    _storage.read_block(value, pofs+sizeof(header), type_size((enum ap_var_type)header.type));
+    return true;
+}
 
 // Load all variables from EEPROM
 //

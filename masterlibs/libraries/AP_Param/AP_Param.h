@@ -34,6 +34,27 @@
 #define AP_MAX_NAME_SIZE 16
 #define AP_NESTED_GROUPS_ENABLED
 
+/*
+  flags for variables in var_info and group tables
+ */
+
+// a nested offset is for subgroups that are not subclasses
+#define AP_PARAM_FLAG_NESTED_OFFSET 1
+
+// vehicle and frame type flags, used to hide parameters when not
+// relevent to a vehicle type. Use AP_Param::set_frame_type_flags() to
+// enable parameters flagged in this way. frame type flags are stored
+// in flags field, shifted by AP_PARAM_FRAME_TYPE_SHIFT.
+#define AP_PARAM_FRAME_TYPE_SHIFT   5
+
+// supported frame types for parameters
+#define AP_PARAM_FRAME_COPTER       (1<<0)
+#define AP_PARAM_FRAME_ROVER        (1<<1)
+#define AP_PARAM_FRAME_PLANE        (1<<2)
+#define AP_PARAM_FRAME_SUB          (1<<3)
+#define AP_PARAM_FRAME_TRICOPTER    (1<<4)
+#define AP_PARAM_FRAME_HELI         (1<<5)
+
 // a variant of offsetof() to work around C++ restrictions.
 // this can only be used when the offset of a variable in a object
 // is constant and known at compile time
@@ -43,12 +64,22 @@
 #define AP_CLASSTYPE(class, element) ((uint8_t)(((const class *) 1)->element.vtype))
 
 // declare a group var_info line
+#define AP_GROUPINFO_FLAGS(name, idx, clazz, element, def, flags) { AP_CLASSTYPE(clazz, element), idx, name, AP_VAROFFSET(clazz, element), {def_value : def}, flags }
+
+// declare a group var_info line with a frame type mask
+#define AP_GROUPINFO_FRAME(name, idx, clazz, element, def, frame_flags) AP_GROUPINFO_FLAGS(name, idx, clazz, element, def, (frame_flags)<<AP_PARAM_FRAME_TYPE_SHIFT )
+
+// declare a group var_info line
 #define AP_GROUPINFO(name, idx, class, element, def) { AP_CLASSTYPE(class, element), idx, name, AP_VAROFFSET(class, element), {def_value : def} }
 
 // declare a nested group entry in a group var_info
 #ifdef AP_NESTED_GROUPS_ENABLED
  #define AP_NESTEDGROUPINFO(class, idx) { AP_PARAM_GROUP, idx, "", 0, { group_info : class::var_info } }
 #endif
+
+// declare a subgroup entry in a group var_info. This is for having another arbitrary object as a member of the parameter list of
+// an object
+#define AP_SUBGROUPINFO(element, name, idx, thisclazz, elclazz) { AP_PARAM_GROUP, idx, name, AP_VAROFFSET(thisclazz, element), { group_info : elclazz::var_info }, AP_PARAM_FLAG_NESTED_OFFSET }
 
 #define AP_GROUPEND     { AP_PARAM_NONE, 0xFF, "", 0, { group_info : NULL } }
 #define AP_VAREND       { AP_PARAM_NONE, "", 0, NULL, { group_info : NULL } }
@@ -84,6 +115,7 @@ public:
             const struct GroupInfo *group_info;
             const float def_value;
         };
+        uint16_t flags;
     };
     struct Info {
         uint8_t type; // AP_PARAM_*
@@ -100,6 +132,13 @@ public:
         uint8_t old_group_element; // index in old object
         enum ap_var_type type; // AP_PARAM_*
         const char new_name[AP_MAX_NAME_SIZE+1];
+    };
+
+    struct ConversionInfo2 {
+        uint8_t old_key; // k_param_*
+        uint8_t old_group_element; // index in old object
+        enum ap_var_type type; // AP_PARAM_*
+        const char *new_name;
     };
 
     // called once at startup to setup the _var_info[] table. This
@@ -227,6 +266,9 @@ public:
     // does not recurse into the sub-objects
     static void         setup_sketch_defaults(void);
 
+    // find an old parameter and return it.
+    static bool find_old_parameter(const struct ConversionInfo2 *info, AP_Param *value);
+
     // convert old vehicle parameters to new object parameters
     static void         convert_old_parameters(const struct ConversionInfo *conversion_table, uint8_t table_size);
 
@@ -316,8 +358,10 @@ private:
  *  - type: the ap_var_type value for the variable
  */
     struct Param_header {
+        // to get 9 bits for key we needed to split it into two parts to keep binary compatibility
         uint32_t key : 8;
-        uint32_t type : 6;
+        uint32_t type : 5;
+        uint32_t key_high : 1;
         uint32_t group_element : 18;
     };
 
@@ -369,6 +413,9 @@ private:
                                     const struct GroupInfo *group_info,
                                     enum ap_var_type *ptype);
     static void                 write_sentinal(uint16_t ofs);
+    static uint16_t             get_key(const Param_header &phdr);
+    static void                 set_key(Param_header &phdr, uint16_t key);
+    static bool                 is_sentinal(const Param_header &phrd);
     static bool                 scan(
                                     const struct Param_header *phdr,
                                     uint16_t *pofs);
