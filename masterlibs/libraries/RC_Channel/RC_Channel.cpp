@@ -27,7 +27,7 @@ extern const AP_HAL::HAL& hal;
 
 #include "RC_Channel.h"
 
-const AP_Param::GroupInfo RC_Channel::var_info[] = {
+const AP_Param::GroupInfo RC_Channel::var_info[] PROGMEM = {
     // @Param: MIN
     // @DisplayName: RC min PWM
     // @Description: RC minimum PWM pulse width in microseconds. Typically 1000 is lower limit, 1500 is neutral and 2000 is upper limit.
@@ -120,7 +120,7 @@ RC_Channel::set_pwm(int16_t pwm)
     }
 }
 
-// read input from APM_RC - create a control_in value, but use a 
+// read input from APM_RC - create a control_in value, but use a
 // zero value for the dead zone. When done this way the control_in
 // value can be used as servo_out to give the same output as input
 void

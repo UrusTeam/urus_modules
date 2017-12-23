@@ -30,7 +30,7 @@ extern const AP_HAL::HAL& hal;
 
 RC_Channel *RC_Channels::channels;
 
-const AP_Param::GroupInfo RC_Channels::var_info[] = {
+const AP_Param::GroupInfo RC_Channels::var_info[] PROGMEM = {
     // @Group: 1_
     // @Path: RC_Channel.cpp
     AP_SUBGROUPINFO(obj_channels[0], "1_",  1, RC_Channels, RC_Channel),
@@ -94,7 +94,7 @@ const AP_Param::GroupInfo RC_Channels::var_info[] = {
     // @Group: 16_
     // @Path: RC_Channel.cpp
     AP_SUBGROUPINFO(obj_channels[15], "16_", 16, RC_Channels, RC_Channel),
-    
+
     AP_GROUPEND
 };
 
@@ -105,7 +105,7 @@ const AP_Param::GroupInfo RC_Channels::var_info[] = {
 RC_Channels::RC_Channels(void)
 {
     channels = obj_channels;
-    
+
     // set defaults from the parameter table
     AP_Param::setup_object_defaults(this, var_info);
 
