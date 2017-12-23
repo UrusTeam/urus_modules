@@ -18,12 +18,8 @@
 #include "AP_RangeFinder_PulsedLightLRF.h"
 #include "AP_RangeFinder_MaxsonarI2CXL.h"
 #include "AP_RangeFinder_MaxsonarSerialLV.h"
-#include "AP_RangeFinder_PX4_PWM.h"
-#include "AP_RangeFinder_BBB_PRU.h"
 #include "AP_RangeFinder_LightWareI2C.h"
 #include "AP_RangeFinder_LightWareSerial.h"
-#include "AP_RangeFinder_Bebop.h"
-#include "AP_RangeFinder_MAVLink.h"
 #include "AP_RangeFinder_LeddarOne.h"
 #include "AP_RangeFinder_uLanding.h"
 #include "AP_RangeFinder_TeraRangerI2C.h"
@@ -33,20 +29,20 @@
 extern const AP_HAL::HAL &hal;
 
 // table of user settable parameters
-const AP_Param::GroupInfo RangeFinder::var_info[] = {
+const AP_Param::GroupInfo RangeFinder::var_info[] PROGMEM = {
     // @Param: _TYPE
     // @DisplayName: Rangefinder type
     // @Description: What type of rangefinder device that is connected
     // @Values: 0:None,1:Analog,2:MaxbotixI2C,3:LidarLiteV2-I2C,5:PX4-PWM,6:BBB-PRU,7:LightWareI2C,8:LightWareSerial,9:Bebop,10:MAVLink,11:uLanding,12:LeddarOne,13:MaxbotixSerial,14:TeraRangerI2C,15:LidarLiteV3-I2C,16:VL53L0X
     // @User: Standard
-    AP_GROUPINFO("_TYPE",    0, RangeFinder, state[0].type, 0),
+    AP_GROUPINFO("_TYPE",    0, RangeFinder, state[0].type, 1),
 
     // @Param: _PIN
     // @DisplayName: Rangefinder pin
     // @Description: Analog pin that rangefinder is connected to. Set this to 0..9 for the APM2 analog pins. Set to 64 on an APM1 for the dedicated 'airspeed' port on the end of the board. Set to 11 on PX4 for the analog 'airspeed' port. Set to 15 on the Pixhawk for the analog 'airspeed' port.
     // @Values: -1:Not Used, 0:APM2-A0, 1:APM2-A1, 2:APM2-A2, 3:APM2-A3, 4:APM2-A4, 5:APM2-A5, 6:APM2-A6, 7:APM2-A7, 8:APM2-A8, 9:APM2-A9, 11:PX4-airspeed port, 15:Pixhawk-airspeed port, 64:APM1-airspeed port
     // @User: Standard
-    AP_GROUPINFO("_PIN",     1, RangeFinder, state[0].pin, -1),
+    AP_GROUPINFO("_PIN",     1, RangeFinder, state[0].pin, 1),
 
     // @Param: _SCALING
     // @DisplayName: Rangefinder scaling
@@ -100,7 +96,7 @@ const AP_Param::GroupInfo RangeFinder::var_info[] = {
     // @Units: ms
     // @Increment: 1
     // @User: Standard
-    AP_GROUPINFO("_SETTLE", 8, RangeFinder, state[0].settle_time_ms, 0),
+    AP_GROUPINFO("_SETTLE", 8, RangeFinder, state[0].settle_time_ms, 100),
 
     // @Param: _RMETRIC
     // @DisplayName: Ratiometric
@@ -521,7 +517,7 @@ const AP_Param::GroupInfo RangeFinder::var_info[] = {
     // @User: Advanced
     AP_GROUPINFO("4_ORIENT", 56, RangeFinder, state[3].orientation, ROTATION_PITCH_270),
 #endif
-    
+
     AP_GROUPEND
 };
 
@@ -601,12 +597,13 @@ bool RangeFinder::_add_backend(AP_RangeFinder_Backend *backend)
 }
 
 /*
-  detect if an instance of a rangefinder is connected. 
+  detect if an instance of a rangefinder is connected.
  */
 void RangeFinder::detect_instance(uint8_t instance)
 {
     enum RangeFinder_Type _type = (enum RangeFinder_Type)state[instance].type.get();
     switch (_type) {
+#if !HAL_MINIMIZE_FEATURES
     case RangeFinder_TYPE_PLI2C:
     case RangeFinder_TYPE_PLI2CV3:
         if (!_add_backend(AP_RangeFinder_PulsedLightLRF::detect(1, state[instance], _type))) {
@@ -705,6 +702,7 @@ void RangeFinder::detect_instance(uint8_t instance)
             drivers[instance] = new AP_RangeFinder_MaxsonarSerialLV(state[instance], serial_manager);
         }
         break;
+#endif
     case RangeFinder_TYPE_ANALOG:
         // note that analog will always come back as present if the pin is valid
         if (AP_RangeFinder_analog::detect(state[instance])) {
