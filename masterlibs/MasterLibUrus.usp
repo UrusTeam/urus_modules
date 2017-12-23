@@ -70,13 +70,31 @@
 				</Compiler>
 				<Linker>
 					<Add option="-s" />
+					<Add option="-maccumulate-args" />
 				</Linker>
 			</Target>
 		</Build>
+		<Unit filename="libraries/AP_AHRS/AP_AHRS.cpp" />
+		<Unit filename="libraries/AP_AHRS/AP_AHRS_DCM.cpp" />
+		<Unit filename="libraries/AP_AHRS/AP_AHRS_View.cpp" />
 		<Unit filename="libraries/AP_AccelCal/AP_AccelCal.cpp" />
 		<Unit filename="libraries/AP_AccelCal/AccelCalibrator.cpp" />
+		<Unit filename="libraries/AP_Airspeed/AP_Airspeed.cpp" />
+		<Unit filename="libraries/AP_Baro/AP_Baro.cpp" />
+		<Unit filename="libraries/AP_Baro/AP_Baro_Backend.cpp" />
+		<Unit filename="libraries/AP_Baro/AP_Baro_MS5611.cpp" />
 		<Unit filename="libraries/AP_BoardConfig/AP_BoardConfig.cpp" />
 		<Unit filename="libraries/AP_Common/c++.cpp" />
+		<Unit filename="libraries/AP_Compass/AP_Compass.cpp" />
+		<Unit filename="libraries/AP_Compass/AP_Compass_Backend.cpp" />
+		<Unit filename="libraries/AP_Compass/AP_Compass_HMC5843.cpp" />
+		<Unit filename="libraries/AP_Compass/CompassCalibrator.cpp" />
+		<Unit filename="libraries/AP_Compass/Compass_learn.cpp" />
+		<Unit filename="libraries/AP_Declination/AP_Declination.cpp" />
+		<Unit filename="libraries/AP_GPS/AP_GPS.cpp" />
+		<Unit filename="libraries/AP_GPS/AP_GPS_NMEA.cpp" />
+		<Unit filename="libraries/AP_GPS/AP_GPS_UBLOX.cpp" />
+		<Unit filename="libraries/AP_GPS/GPS_Backend.cpp" />
 		<Unit filename="libraries/AP_HAL/AP_HAL_Boards.h" />
 		<Unit filename="libraries/AP_HAL/HAL.cpp" />
 		<Unit filename="libraries/AP_HAL/UARTDriver.cpp" />
@@ -131,12 +149,22 @@
 		<Unit filename="libraries/AP_Notify/ExternalLED.cpp" />
 		<Unit filename="libraries/AP_Param/AP_Param.cpp" />
 		<Unit filename="libraries/AP_Scheduler/AP_Scheduler.cpp" />
+		<Unit filename="libraries/AP_SerialManager/AP_SerialManager.cpp" />
+		<Unit filename="libraries/DataFlash/DataFlash.cpp" />
+		<Unit filename="libraries/DataFlash/DataFlash_APM2.cpp" />
+		<Unit filename="libraries/DataFlash/DataFlash_Block.cpp" />
+		<Unit filename="libraries/DataFlash/LogFile.cpp" />
 		<Unit filename="libraries/Filter/DerivativeFilter.cpp" />
 		<Unit filename="libraries/Filter/LowPassFilter.cpp" />
 		<Unit filename="libraries/Filter/LowPassFilter2p.cpp" />
+		<Unit filename="libraries/SRV_Channel/SRV_Channel.cpp" />
 		<Unit filename="libraries/StorageManager/StorageManager.cpp" />
 		<Extensions>
-			<code_completion />
+			<code_completion>
+				<search_path add="libraries" />
+				<search_path add="libraries\AP_HAL" />
+				<search_path add="libraries\AP_HAL_URUS" />
+			</code_completion>
 			<envvars />
 			<debugger />
 		</Extensions>
