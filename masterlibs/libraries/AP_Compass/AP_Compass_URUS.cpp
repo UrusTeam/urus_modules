@@ -31,7 +31,6 @@ AP_Compass_URUS::AP_Compass_URUS(Compass &compass):
     memset(_compass_instance, 0, sizeof(_compass_instance));
     _compass._setup_earth_field();
     _compass.setHIL(0,1,1,1);
-    _compass.setHIL(1,1,1,1);
 }
 
 // detect the sensor
