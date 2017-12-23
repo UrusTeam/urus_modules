@@ -632,7 +632,7 @@ void SRV_Channels::set_angle(SRV_Channel::Aux_servo_function_t function, uint16_
         if (channels[i].function == function) {
             channels[i].set_angle(angle);
         }
-    }    
+    }
 }
 
 // call set_range() on matching channels
@@ -659,7 +659,7 @@ void SRV_Channels::constrain_pwm(SRV_Channel::Aux_servo_function_t function)
 /*
   upgrade RC* parameters into SERVO* parameters. This does the following:
 
-  - copies MIN/MAX/TRIM values from old RC parameters into new RC* parameters and SERVO* parameters. 
+  - copies MIN/MAX/TRIM values from old RC parameters into new RC* parameters and SERVO* parameters.
   - copies RCn_FUNCTION to SERVOn_FUNCTION
   - maps old RCn_REV to SERVOn_REVERSE and RCn_REVERSE
 
@@ -713,7 +713,7 @@ bool SRV_Channels::upgrade_parameters(const uint8_t rc_keys[14], uint16_t aux_ch
 
         for (uint8_t j=0; j<ARRAY_SIZE(mapping); j++) {
             const struct mapping &m = mapping[j];
-            AP_Param::ConversionInfo info;
+            AP_Param::ConversionInfo2 info;
             AP_Int8 v8;
             AP_Int16 v16;
             AP_Param *v = m.type == AP_PARAM_INT16?(AP_Param*)&v16:(AP_Param*)&v8;
@@ -804,7 +804,7 @@ void SRV_Channels::upgrade_motors_servo(uint8_t ap_motors_key, uint8_t ap_motors
 
     for (uint8_t j=0; j<ARRAY_SIZE(mapping); j++) {
         const struct mapping &m = mapping[j];
-        AP_Param::ConversionInfo info;
+        AP_Param::ConversionInfo2 info;
         AP_Int8 v8;
         AP_Int16 v16;
         AP_Param *v = m.type == AP_PARAM_INT16?(AP_Param*)&v16:(AP_Param*)&v8;

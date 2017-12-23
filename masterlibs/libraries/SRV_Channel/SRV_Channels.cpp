@@ -26,15 +26,17 @@ extern const AP_HAL::HAL& hal;
 
 SRV_Channel *SRV_Channels::channels;
 SRV_Channels *SRV_Channels::instance;
+#if !HAL_MINIMIZE_FEATURES
 AP_Volz_Protocol *SRV_Channels::volz_ptr;
 AP_SBusOut *SRV_Channels::sbus_ptr;
+#endif
 
 bool SRV_Channels::disabled_passthrough;
 bool SRV_Channels::initialised;
 Bitmask SRV_Channels::function_mask{SRV_Channel::k_nr_aux_servo_functions};
 SRV_Channels::srv_function SRV_Channels::functions[SRV_Channel::k_nr_aux_servo_functions];
 
-const AP_Param::GroupInfo SRV_Channels::var_info[] = {
+const AP_Param::GroupInfo SRV_Channels::var_info[] PROGMEM = {
     // @Group: 1_
     // @Path: SRV_Channel.cpp
     AP_SUBGROUPINFO(obj_channels[0], "1_",  1, SRV_Channels, SRV_Channel),
@@ -113,7 +115,7 @@ const AP_Param::GroupInfo SRV_Channels::var_info[] = {
     // @User: Advanced
     // @Units: Hz
     AP_GROUPINFO("_RATE",  18, SRV_Channels, default_rate, 50),
-
+#if !HAL_MINIMIZE_FEATURES
     // @Group: _VOLZ_
     // @Path: ../AP_Volz_Protocol/AP_Volz_Protocol.cpp
     AP_SUBGROUPINFO(volz, "_VOLZ_",  19, SRV_Channels, AP_Volz_Protocol),
@@ -121,7 +123,7 @@ const AP_Param::GroupInfo SRV_Channels::var_info[] = {
     // @Group: _SBUS_
     // @Path: ../AP_SBusOut/AP_SBusOut.cpp
     AP_SUBGROUPINFO(sbus, "_SBUS_",  20, SRV_Channels, AP_SBusOut),
-
+#endif
     AP_GROUPEND
 };
 
@@ -140,9 +142,10 @@ SRV_Channels::SRV_Channels(void)
     for (uint8_t i=0; i<NUM_SERVO_CHANNELS; i++) {
         channels[i].ch_num = i;
     }
-
+#if !HAL_MINIMIZE_FEATURES
     volz_ptr = &volz;
     sbus_ptr = &sbus;
+#endif
 }
 
 /*
@@ -205,9 +208,11 @@ void SRV_Channels::push()
 {
     hal.rcout->push();
 
+#if !HAL_MINIMIZE_FEATURES
     // give volz library a chance to update
     volz_ptr->update();
 
     // give sbus library a chance to update
     sbus_ptr->update();
+#endif
 }
