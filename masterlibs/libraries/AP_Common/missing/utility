@@ -1,6 +1,8 @@
 #pragma once
 
-#if !defined(SHAL_CORE_APM2)
+#include <AP_HAL/AP_HAL.h>
+
+#if !defined(SHAL_CORE_APM)
 #include_next <utility>
 #endif
 
