@@ -46,10 +46,12 @@ bool CLCoreUrusScheduler_Avr::in_main_thread() const
 void CLCoreUrusScheduler_Avr::init()
 {
     ISRRegistry& isrregistry = CORE_AVR::isrregistry;
+#if defined(SHAL_CORE_APM2)
     CLCoreUrusUtil_Avr* coreUtil = (CLCoreUrusUtil_Avr*)NSCORE_URUS::get_Util();
 
     clk_core_timers.clk_per_sec = F_CPU;
     start_sched();
+#endif
 
     CLCoreUrusTimers_Avr::avr_timer.init();
 
@@ -65,7 +67,9 @@ void CLCoreUrusScheduler_Avr::init()
     /* Turn on global interrupt flag, AVR interupt system will start from this point */
 
     sei();
+#if defined(SHAL_CORE_APM2)
     coreUtil->memcheck_init();
+#endif
 }
 
 void CLCoreUrusScheduler_Avr::_fire_isr_sched()
@@ -85,9 +89,9 @@ void CLCoreUrusScheduler_Avr::delay_microseconds(uint16_t usec)
 
 void CLCoreUrusScheduler_Avr::delay(uint16_t ms)
 {
-
-    start = AP_HAL::millis();
     now_micros = AP_HAL::micros();
+#if defined(SHAL_CORE_APM2)
+    start = AP_HAL::millis();
     dt_micros = 0;
     centinel_micros = URUS_MAGIC_TIME;
     ms_cb = ms;
@@ -112,6 +116,20 @@ void CLCoreUrusScheduler_Avr::delay(uint16_t ms)
             }
         }
     }
+#else
+    while (ms > 0) {
+        while ((AP_HAL::micros() - now_micros) >= 1000) {
+            ms--;
+            if (ms == 0) break;
+            now_micros += 1000;
+        }
+        if (_min_delay_cb_ms <= ms) {
+            if (_delay_cb) {
+                _delay_cb();
+            }
+        }
+    }
+#endif
 }
 
 void CLCoreUrusScheduler_Avr::register_delay_callback(AP_HAL::Proc proc,
@@ -164,16 +182,11 @@ void CLCoreUrusScheduler_Avr::resume_timer_procs()
     }
 }
 
-bool CLCoreUrusScheduler_Avr::in_timerprocess()
-{
-    return _in_timer_proc;
-}
-
 void CLCoreUrusScheduler_Avr::system_initialized()
 {
     if (_initialized) {
         AP_HAL::panic(
-            "PANIC: scheduler system initialized called more than once");
+            PSTR("PANIC: scheduler system initialized called more than once"));
     }
 
     _initialized = true;
@@ -181,7 +194,7 @@ void CLCoreUrusScheduler_Avr::system_initialized()
 
 void CLCoreUrusScheduler_Avr::reboot(bool hold_in_bootloader)
 {
-    hal.uartA->printf("GOING DOWN FOR A REBOOT\r\n");
+    hal.uartA->printf_PS(PSTR("GOING DOWN FOR A REBOOT\r\n"));
     hal.scheduler->delay(100);
 #if defined(SHAL_CORE_APM2)
     /* The APM2 bootloader will reset the watchdog shortly after
@@ -241,11 +254,5 @@ void CLCoreUrusScheduler_Avr::_run_timer_procs(bool called_from_isr)
 
     _in_timer_proc = false;
 }
-
-void CLCoreUrusScheduler_Avr::_run_io_procs(bool called_from_isr)
-{}
-
-void CLCoreUrusScheduler_Avr::stop_clock(uint64_t time_usec)
-{}
 
 #endif // CONFIG_SHAL_CORE == SHAL_CORE_APM

@@ -35,6 +35,8 @@
 #define  AVR_TIMER_TCCRA        TCCR5A
 #define  AVR_TIMER_TCCRB        TCCR5B
 #define  AVR_TIMER_OCRA         OCR5A
+#define  AVR_TIMER_OCRB         OCR5B
+#define  AVR_TIMER_OCRC         OCR5C
 #define  AVR_TIMER_TIMSK        TIMSK5
 #define  AVR_TIMER_TOIE         TOIE5
 #define  AVR_TIMER_WGM0         WGM50
@@ -49,6 +51,7 @@
 #define  AVR_TIMER_TCCRA        TCCR1A
 #define  AVR_TIMER_TCCRB        TCCR1B
 #define  AVR_TIMER_OCRA         OCR1A
+#define  AVR_TIMER_OCRB         OCR1B
 #define  AVR_TIMER_TIMSK        TIMSK1
 #define  AVR_TIMER_TOIE         TOIE1
 #define  AVR_TIMER_WGM0         WGM10
@@ -104,8 +107,10 @@ void AVRTimer::init()
     UCSR0B = 0;
 
     // OCR5B and OCR5C will be used by RCOutput_APM2. Init to 0xFFFF to prevent premature PWM output
-    OCR5B  = 0xFFFF;
-    OCR5C  = 0xFFFF;
+    AVR_TIMER_OCRB  = 0xFFFF;
+#if defined(SHAL_CORE_APM2)
+    AVR_TIMER_OCRC  = 0xFFFF;
+#endif
 
     SREG = oldSREGinit;
 }

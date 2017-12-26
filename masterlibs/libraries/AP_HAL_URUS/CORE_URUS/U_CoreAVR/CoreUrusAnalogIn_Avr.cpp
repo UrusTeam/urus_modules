@@ -165,13 +165,21 @@ void CLCoreUrusAnalogSource_Avr::setup_read()
         _read_start_time_ms = AP_HAL::millis();
     }
     if (_pin == ANALOG_INPUT_BOARD_VCC) {
+#if defined(SHAL_CORE_APM328)
+        ADMUX = _BV(REFS0)|_BV(MUX3)|_BV(MUX2)|_BV(MUX1);
+#elif defined(SHAL_CORE_APM2)
         ADCSRB = (ADCSRB & ~(1 << MUX5));
         ADMUX = _BV(REFS0)|_BV(MUX4)|_BV(MUX3)|_BV(MUX2)|_BV(MUX1);
+#endif
     } else if (_pin == ANALOG_INPUT_NONE) {
         /* noop */
     } else {
+#if defined(SHAL_CORE_APM328)
+        ADMUX = _BV(REFS0) | (_pin & 0x07);
+#elif defined(SHAL_CORE_APM2)
         ADCSRB = (ADCSRB & ~(1 << MUX5)) | (((_pin >> 3) & 0x01) << MUX5);
         ADMUX = _BV(REFS0) | (_pin & 0x07);
+#endif
     }
 }
 
@@ -245,8 +253,8 @@ void CLCoreUrusAnalogIn_Avr::_register_channel(CLCoreUrusAnalogSource_Avr* ch)
 {
     if (_num_channels >= AVR_INPUT_MAX_CHANNELS) {
         for(;;) {
-            hal.console->printf(
-                "Error: AP_HAL_AVR::CLCoreUrusAnalogIn_Avr out of channels\n");
+            hal.console->printf_PS(
+                PSTR("Error: AP_HAL_AVR::CLCoreUrusAnalogIn_Avr out of channels\n"));
             hal.scheduler->delay(1000);
         }
     }
@@ -260,7 +268,11 @@ void CLCoreUrusAnalogIn_Avr::_register_channel(CLCoreUrusAnalogSource_Avr* ch)
 
     if (_num_channels == 1) {
         /* After registering the first channel, we can enable the ADC */
+#if defined(SHAL_CORE_APM328)
+        PRR &= ~_BV(PRADC);
+#elif defined(SHAL_CORE_APM2)
         PRR0 &= ~_BV(PRADC);
+#endif
         ADCSRA |= _BV(ADEN);
     }
 }

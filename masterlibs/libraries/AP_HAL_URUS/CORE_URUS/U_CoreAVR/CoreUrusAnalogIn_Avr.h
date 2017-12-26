@@ -6,7 +6,11 @@
 #include "../CORE_URUS_NAMESPACE.h"
 #include "../CoreUrusAnalogIn.h"
 
+#if defined(SHAL_CORE_APM2)
 #define AVR_INPUT_MAX_CHANNELS 12
+#elif defined(SHAL_CORE_APM328)
+#define AVR_INPUT_MAX_CHANNELS 3
+#endif
 
 class CLCoreUrusAnalogSource_Avr : public NSCORE_URUS::CLCoreUrusAnalogSource {
 public:

@@ -40,7 +40,7 @@ class CLCoreUrusSPI0Device_Avr : public NSCORE_URUS::CLCoreUrusSPIDevice {
 public:
     CLCoreUrusSPI0Device_Avr(SPIDesc &device_desc);
 
-    virtual ~CLCoreUrusSPI0Device_Avr();
+    ~CLCoreUrusSPI0Device_Avr();
 
     void init();
 
@@ -87,12 +87,12 @@ private:
     void _cs_assert();
     void _cs_release();
 };
-
+#if defined(SHAL_CORE_APM2)
 class CLCoreUrusSPI3Device_Avr : public NSCORE_URUS::CLCoreUrusSPIDevice {
 public:
     CLCoreUrusSPI3Device_Avr(SPIDesc &device_desc);
 
-    virtual ~CLCoreUrusSPI3Device_Avr();
+    ~CLCoreUrusSPI3Device_Avr();
 
     void init();
 
@@ -141,11 +141,14 @@ private:
     void _cs_release();
 
 };
+#endif
 
 class CLCoreUrusSPIDeviceManager_Avr : public NSCORE_URUS::CLCoreUrusSPIDeviceManager {
 public:
     friend class CLCoreUrusSPI0Device_Avr;
+#if defined(SHAL_CORE_APM2)
     friend class CLCoreUrusSPI3Device_Avr;
+#endif
 
     static CLCoreUrusSPIDeviceManager_Avr *from(AP_HAL::SPIDeviceManager *spi_mgr)
     {

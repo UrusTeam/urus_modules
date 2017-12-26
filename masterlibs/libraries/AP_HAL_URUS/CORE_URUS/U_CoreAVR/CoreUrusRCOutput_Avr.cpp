@@ -15,7 +15,7 @@ CLCoreUrusRCOutput_Avr::CLCoreUrusRCOutput_Avr() :
 
 void CLCoreUrusRCOutput_Avr::init()
 {
-
+#if defined(SHAL_CORE_APM2)
     hal.gpio->pinMode(12,HAL_GPIO_OUTPUT); // CH_1 (PB6/OC1B)
     hal.gpio->pinMode(11,HAL_GPIO_OUTPUT); // CH_2 (PB5/OC1A)
 
@@ -60,11 +60,28 @@ void CLCoreUrusRCOutput_Avr::init()
     // The TIMER5 registers are assumed to be setup already.
     hal.gpio->pinMode(45, HAL_GPIO_OUTPUT); // CH_10 (PL4/OC5B)
     hal.gpio->pinMode(44, HAL_GPIO_OUTPUT); // CH_11 (PL5/OC5C)
+#elif defined(SHAL_CORE_APM328)
+    // --------------------- TIMER0: CH_1 and CH_2 -----------------------
+    hal.gpio->pinMode(5,HAL_GPIO_OUTPUT); // CH_1 (PD5/OC0B)
+    hal.gpio->pinMode(6,HAL_GPIO_OUTPUT); // CH_2 (PD6/OC0A)
+
+    // WGM: 1 1 1 0. Clear Timer on Compare, TOP is ICR1.
+    // CS11: prescale by 8 => 0.5us tick
+    TCCR0A = (1<<WGM01)|(1<<WGM00);
+    TCCR0B = (1<<CS02) | (1<<CS00);
+    //ICR1 = 40000; // 0.5us tick => 50hz freq
+    OCR0A = 0xFF; // Init OCR registers to nil output signal
+    OCR0B = 0xFF;
+
+    // --------------- TIMER1: CH_3 ---------------------
+    hal.gpio->pinMode(10,HAL_GPIO_OUTPUT); // CH_3 (PB2/OC1B)
+#endif
 
 }
 
 void CLCoreUrusRCOutput_Avr::set_freq(uint32_t chmask, uint16_t freq_hz)
 {
+#if defined(SHAL_CORE_APM2)
     uint16_t icr = _timer_period(freq_hz);
     if ((chmask & ( _BV(CH_1) | _BV(CH_2))) != 0) {
         ICR1 = icr;
@@ -77,12 +94,14 @@ void CLCoreUrusRCOutput_Avr::set_freq(uint32_t chmask, uint16_t freq_hz)
     if ((chmask & ( _BV(CH_6) | _BV(CH_7) | _BV(CH_8))) != 0) {
         ICR3 = icr;
     }
+#endif
 }
 
 uint16_t CLCoreUrusRCOutput_Avr::get_freq(uint8_t ch)
 {
     uint16_t icr;
     switch (ch) {
+#if defined(SHAL_CORE_APM2)
         case CH_1:
         case CH_2:
             icr = ICR1;
@@ -103,6 +122,17 @@ uint16_t CLCoreUrusRCOutput_Avr::get_freq(uint8_t ch)
         case CH_11:
             icr = OCR5A;
             break;
+#elif defined(SHAL_CORE_APM328)
+        case CH_1:
+        case CH_2:
+            icr = OCR0A;
+            break;
+        /* CH_3 share TIMER1 with input capture.
+         * The period is specified in OCR1A rater than the ICR. */
+        case CH_3:
+            icr = ICR1;
+            break;
+#endif
         default:
             return 0;
     }
@@ -113,6 +143,7 @@ uint16_t CLCoreUrusRCOutput_Avr::get_freq(uint8_t ch)
 void CLCoreUrusRCOutput_Avr::enable_ch(uint8_t ch)
 {
     switch(ch) {
+#if defined(SHAL_CORE_APM2)
     case 0: TCCR1A |= (1<<COM1B1); break; // CH_1 : OC1B
     case 1: TCCR1A |= (1<<COM1A1); break; // CH_2 : OC1A
     case 2: TCCR4A |= (1<<COM4C1); break; // CH_3 : OC4C
@@ -123,12 +154,18 @@ void CLCoreUrusRCOutput_Avr::enable_ch(uint8_t ch)
     case 7: TCCR3A |= (1<<COM3A1); break; // CH_8 : OC3A
     case 9: TCCR5A |= (1<<COM5B1); break; // CH_10 : OC5B
     case 10: TCCR5A |= (1<<COM5C1); break; // CH_11 : OC5C
+#elif defined(SHAL_CORE_APM328)
+    case 0: TCCR0A |= (1<<COM0B1); break; // CH_1 : OC0B
+    case 1: TCCR0A |= (1<<COM0A1); break; // CH_2 : OC0A
+    case 2: TCCR1A |= (1<<COM1B1); break; // CH_3 : OC1B
+#endif
     }
 }
 
 void CLCoreUrusRCOutput_Avr::disable_ch(uint8_t ch)
 {
     switch(ch) {
+#if defined(SHAL_CORE_APM2)
     case 0: TCCR1A &= ~(1<<COM1B1); break; // CH_1 : OC1B
     case 1: TCCR1A &= ~(1<<COM1A1); break; // CH_2 : OC1A
     case 2: TCCR4A &= ~(1<<COM4C1); break; // CH_3 : OC4C
@@ -139,6 +176,11 @@ void CLCoreUrusRCOutput_Avr::disable_ch(uint8_t ch)
     case 7: TCCR3A &= ~(1<<COM3A1); break; // CH_8 : OC3A
     case 9: TCCR5A &= ~(1<<COM5B1); break; // CH_10 : OC5B
     case 10: TCCR5A &= ~(1<<COM5C1); break; // CH_11 : OC5C
+#elif defined(SHAL_CORE_APM328)
+    case 0: TCCR0A &= ~(1<<COM0B1); break; // CH_1 : OC0B
+    case 1: TCCR0A &= ~(1<<COM0A1); break; // CH_2 : OC0A
+    case 2: TCCR1A &= ~(1<<COM1B1); break; // CH_3 : OC1B
+#endif
     }
 }
 
@@ -156,6 +198,7 @@ void CLCoreUrusRCOutput_Avr::write(uint8_t ch, uint16_t period_us)
     uint16_t pwm = constrain_period(period_us) << 1;
     switch(ch)
     {
+#if defined(SHAL_CORE_APM2)
     case 0:  OCR1B=pwm; break;  // out1
     case 1:  OCR1A=pwm; break;  // out2
     case 2:  OCR4C=pwm; break;  // out3
@@ -166,6 +209,11 @@ void CLCoreUrusRCOutput_Avr::write(uint8_t ch, uint16_t period_us)
     case 7:  OCR3A=pwm; break;  // out8
     case 9:  OCR5B=pwm; break;  // out10
     case 10: OCR5C=pwm; break;  // out11
+#elif defined(SHAL_CORE_APM328)
+    case 0:  OCR0B=(pwm >> 7); break;   // out1
+    case 1:  OCR0A=(pwm >> 7); break;   // out2
+    case 2:  OCR1B=pwm; break;          // out3
+#endif
     }
 }
 
@@ -180,6 +228,7 @@ uint16_t CLCoreUrusRCOutput_Avr::read(uint8_t ch)
 {
     uint16_t pwm=0;
     switch(ch) {
+#if defined(SHAL_CORE_APM2)
     case 0:  pwm=OCR1B; break;      // out1
     case 1:  pwm=OCR1A; break;      // out2
     case 2:  pwm=OCR4C; break;      // out3
@@ -190,6 +239,11 @@ uint16_t CLCoreUrusRCOutput_Avr::read(uint8_t ch)
     case 7:  pwm=OCR3A; break;      // out8
     case 9:  pwm=OCR5B; break;      // out10
     case 10: pwm=OCR5C; break;      // out11
+#elif defined(SHAL_CORE_APM328)
+    case 0:  pwm=(uint16_t)(OCR0B << 7); break; // out1
+    case 1:  pwm=(uint16_t)(OCR0A << 7); break; // out2
+    case 2:  pwm=OCR1B; break;                  // out3
+#endif
     }
     /* scale from 0.5us resolution (timer units) to 1us units */
     return pwm>>1;

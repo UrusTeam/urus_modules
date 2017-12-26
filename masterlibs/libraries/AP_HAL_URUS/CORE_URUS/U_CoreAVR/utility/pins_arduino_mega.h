@@ -67,12 +67,25 @@ extern "C" {
 #define TIMER5B 16
 #define TIMER5C 17
 
-
+#if defined(SHAL_CORE_APM328)
+#define NUM_DIGITAL_PINS            20
+#define NUM_ANALOG_INPUTS           6
+#define analogInputToDigitalPin(p)  ((p < 6) ? (p) + 14 : -1)
+#if defined(__AVR_ATmega8__)
+#define digitalPinHasPWM(p)         ((p) == 9 || (p) == 10 || (p) == 11)
+#else
+#define digitalPinHasPWM(p)         ((p) == 3 || (p) == 5 || (p) == 6 || (p) == 9 || (p) == 10 || (p) == 11)
+#endif
+#elif defined(SHAL_CORE_APM2)
 #define NUM_DIGITAL_PINS            72
 #define NUM_ANALOG_INPUTS           16
 #define analogInputToDigitalPin(p)  ((p < 16) ? (p) + 54 : -1)
 #define digitalPinHasPWM(p)         (((p) >= 2 && (p) <= 13) || ((p) >= 44 && (p)<= 46))
+#else
+#error "UNKNOWN CORE BOARD FOR PINS!"
+#endif
 
+#if defined(SHAL_CORE_APM2)
 const static uint8_t SS   = 53;
 const static uint8_t MOSI = 51;
 const static uint8_t MISO = 50;
@@ -98,12 +111,33 @@ const static uint8_t A12 = 66;
 const static uint8_t A13 = 67;
 const static uint8_t A14 = 68;
 const static uint8_t A15 = 69;
+#elif defined(SHAL_CORE_APM328)
+static const uint8_t SS   = 10;
+static const uint8_t MOSI = 11;
+static const uint8_t MISO = 12;
+static const uint8_t SCK  = 13;
+
+static const uint8_t SDA = 18;
+static const uint8_t SCL = 19;
+static const uint8_t LED_BUILTIN = 13;
+
+static const uint8_t A0 = 14;
+static const uint8_t A1 = 15;
+static const uint8_t A2 = 16;
+static const uint8_t A3 = 17;
+static const uint8_t A4 = 18;
+static const uint8_t A5 = 19;
+static const uint8_t A6 = 20;
+static const uint8_t A7 = 21;
+#else
+#error "UNKNOWN CORE BOARD FOR PINS!"
+#endif
 
 // A majority of the pins are NOT PCINTs, SO BE WARNED (i.e. you cannot use them as receive pins)
 // Only pins available for RECEIVE (TRANSMIT can be on any pin):
 // (I've deliberately left out pin mapping to the Hardware USARTs - seems senseless to me)
 // Pins: 10, 11, 12, 13,  50, 51, 52, 53,  62, 63, 64, 65, 66, 67, 68, 69
-
+#if defined(SHAL_CORE_APM2)
 #define digitalPinToPCICR(p)    ( (((p) >= 10) && ((p) <= 13)) || \
                                   (((p) >= 50) && ((p) <= 53)) || \
                                   (((p) >= 62) && ((p) <= 69)) ? (&PCICR) : ((uint8_t *)0) )
@@ -123,7 +157,14 @@ const static uint8_t A15 = 69;
                                 ( ((p) == 53) ? 0 : \
                                 ( (((p) >= 62) && ((p) <= 69)) ? ((p) - 62) : \
                                 0 ) ) ) ) ) )
-
+#elif defined(SHAL_CORE_APM328)
+#define digitalPinToPCICR(p)    (((p) >= 0 && (p) <= 21) ? (&PCICR) : ((uint8_t *)0))
+#define digitalPinToPCICRbit(p) (((p) <= 7) ? 2 : (((p) <= 13) ? 0 : 1))
+#define digitalPinToPCMSK(p)    (((p) <= 7) ? (&PCMSK2) : (((p) <= 13) ? (&PCMSK0) : (((p) <= 21) ? (&PCMSK1) : ((uint8_t *)0))))
+#define digitalPinToPCMSKbit(p) (((p) <= 7) ? (p) : (((p) <= 13) ? ((p) - 8) : ((p) - 14)))
+#else
+#error "UNKNOWN CORE BOARD FOR PINS!"
+#endif
 // On the ATmega1280, the addresses of some of the port registers are
 // greater than 255, so we can't store them in uint8_t's.
 extern const uint16_t PROGMEM port_to_mode_PGM[];

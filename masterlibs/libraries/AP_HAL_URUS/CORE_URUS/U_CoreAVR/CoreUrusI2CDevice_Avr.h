@@ -13,7 +13,7 @@ class CLCoreUrusI2CDevice_Avr : public NSCORE_URUS::CLCoreUrusI2CDevice {
 public:
     CLCoreUrusI2CDevice_Avr(uint8_t bus, uint8_t address);
 
-    virtual ~CLCoreUrusI2CDevice_Avr() { }
+    ~CLCoreUrusI2CDevice_Avr() { }
 
     void begin() override;
     void end();

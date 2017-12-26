@@ -6,6 +6,12 @@
 #include "../CORE_URUS_NAMESPACE.h"
 #include "../CoreUrusGPIO.h"
 
+#if defined(SHAL_CORE_APM2)
+#define AVR_INT_NUM_PINS_MAX 1
+#elif defined(SHAL_CORE_APM328)
+#define AVR_INT_NUM_PINS_MAX 4
+#endif
+
 class CLCoreUrusGPIO_Avr : public NSCORE_URUS::CLCoreUrusGPIO {
 public:
     CLCoreUrusGPIO_Avr();
@@ -26,7 +32,7 @@ public:
     /* return true if USB cable is connected */
     bool    usb_connected(void);
 /* private-ish: only to be used from the appropriate interrupt */
-    static AP_HAL::Proc _interrupt_6;
+    static AP_HAL::Proc _interrupt_6[AVR_INT_NUM_PINS_MAX];
 };
 
 class CLCoreDigitalSource_Avr : public NSCORE_URUS::CLCoreUrusDigitalSource {
