@@ -36,16 +36,21 @@ extern const AP_HAL::HAL& hal;
   On Pixhawk this gives 724 waypoints, 50 rally points and 84 fence points
  */
 const StorageManager::StorageArea StorageManager::layout_default[STORAGE_NUM_AREAS] PROGMEM = {
+#if STORAGE_NUM_AREAS <= 1
+    { StorageParam,   0,     1023}, // 0x500 parameter bytes
+#endif
+#if STORAGE_NUM_AREAS >= 4
     { StorageParam,   0,     1280}, // 0x500 parameter bytes
     { StorageMission, 1280,  2506},
     { StorageRally,   3786,   150}, // 10 rally points
     { StorageFence,   3936,   160}, // 20 fence points
+#endif
 #if STORAGE_NUM_AREAS >= 8
     { StorageParam,   4096,  1280},
     { StorageRally,   5376,   300},
     { StorageFence,   5676,   256},
     { StorageMission, 5932,  2132},
-    { StorageKeys,    8064,    64}, 
+    { StorageKeys,    8064,    64},
 #endif
 #if STORAGE_NUM_AREAS >= 12
     { StorageParam,    8192,  1280},
@@ -57,16 +62,21 @@ const StorageManager::StorageArea StorageManager::layout_default[STORAGE_NUM_ARE
 
 
 /*
-  layout for copter. 
+  layout for copter.
   On APM2 this gives 161 waypoints, 6 fence points and 6 rally points
   On PX4v1 this gives 303 waypoints, 26 rally points and 38 fence points
   On Pixhawk this gives 718 waypoints, 46 rally points and 70 fence points
  */
 const StorageManager::StorageArea StorageManager::layout_copter[STORAGE_NUM_AREAS] PROGMEM = {
+#if STORAGE_NUM_AREAS <= 1
+    { StorageParam,   0,     1023}, // 0x500 parameter bytes
+#endif
+#if STORAGE_NUM_AREAS >= 4
     { StorageParam,   0,     1536}, // 0x600 param bytes
     { StorageMission, 1536,  2422},
     { StorageRally,   3958,    90}, // 6 rally points
     { StorageFence,   4048,    48}, // 6 fence points
+#endif
 #if STORAGE_NUM_AREAS >= 8
     { StorageParam,   4096,  1280},
     { StorageRally,   5376,   300},
@@ -104,14 +114,14 @@ void StorageManager::erase(void)
             hal.storage->write_block(offset + ofs, blk, n);
         }
     }
-    
+
 }
 
 /*
   constructor for StorageAccess
  */
-StorageAccess::StorageAccess(StorageManager::StorageType _type) : 
-    type(_type) 
+StorageAccess::StorageAccess(StorageManager::StorageType _type) :
+    type(_type)
 {
     // calculate available bytes
     total_size = 0;
