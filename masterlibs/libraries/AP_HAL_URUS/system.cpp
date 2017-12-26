@@ -9,6 +9,7 @@
 
 #include <stdio.h>
 
+extern const AP_HAL::HAL &hal;
 static const NSCORE_URUS::CLCORE_URUS& _urus_core = NSCORE_URUS::get_CORE();
 
 namespace AP_HAL {
@@ -19,7 +20,15 @@ void init()
     printf("system!\n");
 #endif
 }
-
+#if CONFIG_SHAL_CORE == SHAL_CORE_APM
+void panic(const prog_char_t* errormsg)
+{
+    /* Print the error message on both ports */
+    hal.uartA->println_P(errormsg);
+    /* Spin forever. */
+    for(;;);
+}
+#else
 void panic(const char *errormsg, ...)
 {
     va_list ap;
@@ -32,6 +41,7 @@ void panic(const char *errormsg, ...)
 
     for(;;);
 }
+#endif
 
 uint32_t micros()
 {
