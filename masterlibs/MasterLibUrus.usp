@@ -70,28 +70,33 @@
 				</Compiler>
 				<Linker>
 					<Add option="-s" />
-					<Add option="-maccumulate-args" />
 				</Linker>
 			</Target>
 		</Build>
+		<Unit filename="libraries/AC_PID/AC_HELI_PID.cpp" />
+		<Unit filename="libraries/AC_PID/AC_PID.cpp" />
 		<Unit filename="libraries/AP_AHRS/AP_AHRS.cpp" />
 		<Unit filename="libraries/AP_AHRS/AP_AHRS_DCM.cpp" />
-		<Unit filename="libraries/AP_AHRS/AP_AHRS_View.cpp" />
 		<Unit filename="libraries/AP_AccelCal/AP_AccelCal.cpp" />
 		<Unit filename="libraries/AP_AccelCal/AccelCalibrator.cpp" />
-		<Unit filename="libraries/AP_Airspeed/AP_Airspeed.cpp" />
 		<Unit filename="libraries/AP_Baro/AP_Baro.cpp" />
 		<Unit filename="libraries/AP_Baro/AP_Baro_Backend.cpp" />
+		<Unit filename="libraries/AP_Baro/AP_Baro_Glitch.cpp" />
+		<Unit filename="libraries/AP_Baro/AP_Baro_HIL.cpp" />
 		<Unit filename="libraries/AP_Baro/AP_Baro_MS5611.cpp" />
+		<Unit filename="libraries/AP_Baro/AP_Baro_URUS.cpp" />
 		<Unit filename="libraries/AP_BoardConfig/AP_BoardConfig.cpp" />
+		<Unit filename="libraries/AP_Common/AP_Common.cpp" />
 		<Unit filename="libraries/AP_Common/c++.cpp" />
 		<Unit filename="libraries/AP_Compass/AP_Compass.cpp" />
 		<Unit filename="libraries/AP_Compass/AP_Compass_Backend.cpp" />
 		<Unit filename="libraries/AP_Compass/AP_Compass_HMC5843.cpp" />
+		<Unit filename="libraries/AP_Compass/AP_Compass_URUS.cpp" />
 		<Unit filename="libraries/AP_Compass/CompassCalibrator.cpp" />
 		<Unit filename="libraries/AP_Compass/Compass_learn.cpp" />
 		<Unit filename="libraries/AP_Declination/AP_Declination.cpp" />
 		<Unit filename="libraries/AP_GPS/AP_GPS.cpp" />
+		<Unit filename="libraries/AP_GPS/AP_GPS_Glitch.cpp" />
 		<Unit filename="libraries/AP_GPS/AP_GPS_NMEA.cpp" />
 		<Unit filename="libraries/AP_GPS/AP_GPS_UBLOX.cpp" />
 		<Unit filename="libraries/AP_GPS/GPS_Backend.cpp" />
@@ -128,6 +133,7 @@
 		<Unit filename="libraries/AP_HAL_URUS/HAL_URUS_Class.cpp" />
 		<Unit filename="libraries/AP_HAL_URUS/dummy_libs/GCS_Mavlink.cpp" />
 		<Unit filename="libraries/AP_HAL_URUS/system.cpp" />
+		<Unit filename="libraries/AP_InertialNav/AP_InertialNav.cpp" />
 		<Unit filename="libraries/AP_InertialSensor/AP_InertialSensor.cpp" />
 		<Unit filename="libraries/AP_InertialSensor/AP_InertialSensor_Backend.cpp" />
 		<Unit filename="libraries/AP_InertialSensor/AP_InertialSensor_HIL.cpp" />
@@ -143,11 +149,19 @@
 		<Unit filename="libraries/AP_Math/quaternion.cpp" />
 		<Unit filename="libraries/AP_Math/vector2.cpp" />
 		<Unit filename="libraries/AP_Math/vector3.cpp" />
+		<Unit filename="libraries/AP_Menu/AP_Menu.cpp" />
+		<Unit filename="libraries/AP_Motors/AP_MotorsMatrix.cpp" />
+		<Unit filename="libraries/AP_Motors/AP_MotorsMulticopter.cpp" />
+		<Unit filename="libraries/AP_Motors/AP_Motors_Class.cpp" />
 		<Unit filename="libraries/AP_Notify/AP_BoardLED.cpp" />
 		<Unit filename="libraries/AP_Notify/AP_Notify.cpp" />
 		<Unit filename="libraries/AP_Notify/Buzzer.cpp" />
 		<Unit filename="libraries/AP_Notify/ExternalLED.cpp" />
 		<Unit filename="libraries/AP_Param/AP_Param.cpp" />
+		<Unit filename="libraries/AP_Param/AP_Param.h" />
+		<Unit filename="libraries/AP_RangeFinder/AP_RangeFinder_analog.cpp" />
+		<Unit filename="libraries/AP_RangeFinder/RangeFinder.cpp" />
+		<Unit filename="libraries/AP_RangeFinder/RangeFinder_Backend.cpp" />
 		<Unit filename="libraries/AP_Scheduler/AP_Scheduler.cpp" />
 		<Unit filename="libraries/AP_SerialManager/AP_SerialManager.cpp" />
 		<Unit filename="libraries/DataFlash/DataFlash.cpp" />
@@ -157,14 +171,15 @@
 		<Unit filename="libraries/Filter/DerivativeFilter.cpp" />
 		<Unit filename="libraries/Filter/LowPassFilter.cpp" />
 		<Unit filename="libraries/Filter/LowPassFilter2p.cpp" />
+		<Unit filename="libraries/RC_Channel/RC_Channel.cpp" />
+		<Unit filename="libraries/RC_Channel/RC_Channel.h" />
+		<Unit filename="libraries/RC_Channel/RC_Channels.cpp" />
 		<Unit filename="libraries/SRV_Channel/SRV_Channel.cpp" />
+		<Unit filename="libraries/SRV_Channel/SRV_Channel_aux.cpp" />
+		<Unit filename="libraries/SRV_Channel/SRV_Channels.cpp" />
 		<Unit filename="libraries/StorageManager/StorageManager.cpp" />
 		<Extensions>
-			<code_completion>
-				<search_path add="libraries" />
-				<search_path add="libraries\AP_HAL" />
-				<search_path add="libraries\AP_HAL_URUS" />
-			</code_completion>
+			<code_completion />
 			<envvars />
 			<debugger />
 		</Extensions>
