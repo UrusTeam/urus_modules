@@ -7,7 +7,7 @@
 		<Option pch_mode="2" />
 		<Option compiler="avr-gcc" />
 		<Build>
-			<Target title="Debug">
+			<Target title="APM2_Debug">
 				<Option output="build/bin/Debug/MasterLibUrus" prefix_auto="1" extension_auto="1" />
 				<Option working_dir="" />
 				<Option object_output="build/obj/Debug/" />
@@ -19,7 +19,61 @@
 					<Add option="-g" />
 				</Compiler>
 			</Target>
-			<Target title="Release">
+			<Target title="APM2_Release">
+				<Option output="build/bin/Release/MasterLibUrus" prefix_auto="1" extension_auto="1" />
+				<Option working_dir="" />
+				<Option object_output="build/obj/Release/" />
+				<Option type="2" />
+				<Option compiler="avr-gcc" />
+				<Option createDefFile="1" />
+				<Compiler>
+					<Add option="-mcall-prologues" />
+					<Add option="-Os" />
+					<Add option="-Wall" />
+					<Add option='-Wl,&quot;--gc-sections, --relax&quot;' />
+					<Add option="-std=gnu++11" />
+					<Add option="-ffunction-sections" />
+					<Add option="-fdata-sections" />
+					<Add option="-fno-exceptions" />
+					<Add option="-fsigned-char" />
+					<Add option="-fno-use-cxa-atexit" />
+					<Add option="-fpermissive" />
+					<Add option="-Wformat" />
+					<Add option="-Wshadow" />
+					<Add option="-Wpointer-arith" />
+					<Add option="-Wcast-align" />
+					<Add option="-Wwrite-strings" />
+					<Add option="-fno-threadsafe-statics" />
+					<Add option="-mmcu=atmega2560" />
+					<Add option="-Wno-unknown-pragmas" />
+					<Add option="-Wno-overflow" />
+					<Add option="-Wno-unused-parameter" />
+					<Add option="-D__STDC_FORMAT_MACROS=1" />
+					<Add option="-DWAF_BUILD=0" />
+					<Add option="-D_GNU_SOURCE=1" />
+					<Add option="-DF_CPU=16000000L" />
+					<Add option="-DSHAL_CORE_APM2=1" />
+					<Add option="-DCONFIG_HAL_BOARD_SUBTYPE=HAL_BOARD_SUBTYPE_NONE" />
+					<Add option="-DCONFIG_SHAL_CORE=SHAL_CORE_APM" />
+					<Add option="-DCONFIG_HAL_BOARD=HAL_BOARD_URUS" />
+					<Add option="-DHAVE_TYPE_TRAITS_H=0" />
+					<Add option="-DHAVE_CMATH_H=0" />
+					<Add option="-DHAVE_STD_NULLPTR_T=0" />
+					<Add option="-DHAVE_CMATH_ISNAN=1" />
+					<Add option="-DHAL_OS_POSIX_IO=0" />
+					<Add option="-DHAVE_STD_MOVE=0" />
+					<Add option="-DHAVE_STD_REMOVE_REFERENCE=0" />
+					<Add option="-DHAL_MINIMIZE_FEATURES=1" />
+					<Add option="-DHAL_MINIMIZE_FEATURES_AVR=1" />
+					<Add directory="libraries" />
+					<Add directory="libraries/AP_Common/missing" />
+				</Compiler>
+				<Linker>
+					<Add option="-s" />
+					<Add option="-mmcu=atmega2560" />
+				</Linker>
+			</Target>
+			<Target title="APM328_Release">
 				<Option output="build/bin/Release/MasterLibUrus" prefix_auto="1" extension_auto="1" />
 				<Option working_dir="" />
 				<Option object_output="build/obj/Release/" />
@@ -45,14 +99,15 @@
 					<Add option="-Wwrite-strings" />
 					<Add option="-Wno-unused-parameter" />
 					<Add option="-fno-threadsafe-statics" />
-					<Add option="-mmcu=atmega2560" />
+					<Add option="-mmcu=atmega328p" />
 					<Add option="-Wno-unknown-pragmas" />
 					<Add option="-Wno-overflow" />
+					<Add option="-MMD" />
 					<Add option="-D__STDC_FORMAT_MACROS=1" />
 					<Add option="-DWAF_BUILD=0" />
 					<Add option="-D_GNU_SOURCE=1" />
 					<Add option="-DF_CPU=16000000L" />
-					<Add option="-DSHAL_CORE_APM2=1" />
+					<Add option="-DSHAL_CORE_APM328=1" />
 					<Add option="-DCONFIG_HAL_BOARD_SUBTYPE=HAL_BOARD_SUBTYPE_NONE" />
 					<Add option="-DCONFIG_SHAL_CORE=SHAL_CORE_APM" />
 					<Add option="-DCONFIG_HAL_BOARD=HAL_BOARD_URUS" />
@@ -70,50 +125,132 @@
 				</Compiler>
 				<Linker>
 					<Add option="-s" />
+					<Add option="-mmcu=atmega328p" />
 				</Linker>
 			</Target>
 		</Build>
-		<Unit filename="libraries/AC_PID/AC_HELI_PID.cpp" />
-		<Unit filename="libraries/AC_PID/AC_PID.cpp" />
-		<Unit filename="libraries/AP_AHRS/AP_AHRS.cpp" />
-		<Unit filename="libraries/AP_AHRS/AP_AHRS_DCM.cpp" />
-		<Unit filename="libraries/AP_AccelCal/AP_AccelCal.cpp" />
-		<Unit filename="libraries/AP_AccelCal/AccelCalibrator.cpp" />
-		<Unit filename="libraries/AP_Baro/AP_Baro.cpp" />
-		<Unit filename="libraries/AP_Baro/AP_Baro_Backend.cpp" />
-		<Unit filename="libraries/AP_Baro/AP_Baro_Glitch.cpp" />
-		<Unit filename="libraries/AP_Baro/AP_Baro_HIL.cpp" />
-		<Unit filename="libraries/AP_Baro/AP_Baro_MS5611.cpp" />
-		<Unit filename="libraries/AP_Baro/AP_Baro_URUS.cpp" />
-		<Unit filename="libraries/AP_BoardConfig/AP_BoardConfig.cpp" />
-		<Unit filename="libraries/AP_Common/AP_Common.cpp" />
+		<Unit filename="libraries/AC_PID/AC_HELI_PID.cpp">
+			<Option target="APM2_Debug" />
+			<Option target="APM2_Release" />
+		</Unit>
+		<Unit filename="libraries/AC_PID/AC_PID.cpp">
+			<Option target="APM2_Debug" />
+			<Option target="APM2_Release" />
+		</Unit>
+		<Unit filename="libraries/AP_AHRS/AP_AHRS.cpp">
+			<Option target="APM2_Debug" />
+			<Option target="APM2_Release" />
+		</Unit>
+		<Unit filename="libraries/AP_AHRS/AP_AHRS_DCM.cpp">
+			<Option target="APM2_Debug" />
+			<Option target="APM2_Release" />
+		</Unit>
+		<Unit filename="libraries/AP_AccelCal/AP_AccelCal.cpp">
+			<Option target="APM2_Debug" />
+			<Option target="APM2_Release" />
+		</Unit>
+		<Unit filename="libraries/AP_AccelCal/AccelCalibrator.cpp">
+			<Option target="APM2_Debug" />
+			<Option target="APM2_Release" />
+		</Unit>
+		<Unit filename="libraries/AP_Baro/AP_Baro.cpp">
+			<Option target="APM2_Debug" />
+			<Option target="APM2_Release" />
+		</Unit>
+		<Unit filename="libraries/AP_Baro/AP_Baro_Backend.cpp">
+			<Option target="APM2_Debug" />
+			<Option target="APM2_Release" />
+		</Unit>
+		<Unit filename="libraries/AP_Baro/AP_Baro_Glitch.cpp">
+			<Option target="APM2_Debug" />
+			<Option target="APM2_Release" />
+		</Unit>
+		<Unit filename="libraries/AP_Baro/AP_Baro_HIL.cpp">
+			<Option target="APM2_Debug" />
+			<Option target="APM2_Release" />
+		</Unit>
+		<Unit filename="libraries/AP_Baro/AP_Baro_MS5611.cpp">
+			<Option target="APM2_Debug" />
+			<Option target="APM2_Release" />
+		</Unit>
+		<Unit filename="libraries/AP_Baro/AP_Baro_URUS.cpp">
+			<Option target="APM2_Debug" />
+			<Option target="APM2_Release" />
+		</Unit>
+		<Unit filename="libraries/AP_BoardConfig/AP_BoardConfig.cpp">
+			<Option target="APM2_Debug" />
+			<Option target="APM2_Release" />
+		</Unit>
+		<Unit filename="libraries/AP_Common/AP_Common.cpp">
+			<Option target="APM2_Debug" />
+			<Option target="APM2_Release" />
+		</Unit>
 		<Unit filename="libraries/AP_Common/c++.cpp" />
-		<Unit filename="libraries/AP_Compass/AP_Compass.cpp" />
-		<Unit filename="libraries/AP_Compass/AP_Compass_Backend.cpp" />
-		<Unit filename="libraries/AP_Compass/AP_Compass_HMC5843.cpp" />
-		<Unit filename="libraries/AP_Compass/AP_Compass_URUS.cpp" />
-		<Unit filename="libraries/AP_Compass/CompassCalibrator.cpp" />
-		<Unit filename="libraries/AP_Compass/Compass_learn.cpp" />
-		<Unit filename="libraries/AP_Declination/AP_Declination.cpp" />
-		<Unit filename="libraries/AP_GPS/AP_GPS.cpp" />
-		<Unit filename="libraries/AP_GPS/AP_GPS_Glitch.cpp" />
-		<Unit filename="libraries/AP_GPS/AP_GPS_NMEA.cpp" />
-		<Unit filename="libraries/AP_GPS/AP_GPS_UBLOX.cpp" />
-		<Unit filename="libraries/AP_GPS/GPS_Backend.cpp" />
+		<Unit filename="libraries/AP_Compass/AP_Compass.cpp">
+			<Option target="APM2_Debug" />
+			<Option target="APM2_Release" />
+		</Unit>
+		<Unit filename="libraries/AP_Compass/AP_Compass_Backend.cpp">
+			<Option target="APM2_Debug" />
+			<Option target="APM2_Release" />
+		</Unit>
+		<Unit filename="libraries/AP_Compass/AP_Compass_HMC5843.cpp">
+			<Option target="APM2_Debug" />
+			<Option target="APM2_Release" />
+		</Unit>
+		<Unit filename="libraries/AP_Compass/AP_Compass_URUS.cpp">
+			<Option target="APM2_Debug" />
+			<Option target="APM2_Release" />
+		</Unit>
+		<Unit filename="libraries/AP_Compass/CompassCalibrator.cpp">
+			<Option target="APM2_Debug" />
+			<Option target="APM2_Release" />
+		</Unit>
+		<Unit filename="libraries/AP_Compass/Compass_learn.cpp">
+			<Option target="APM2_Debug" />
+			<Option target="APM2_Release" />
+		</Unit>
+		<Unit filename="libraries/AP_Declination/AP_Declination.cpp">
+			<Option target="APM2_Debug" />
+			<Option target="APM2_Release" />
+		</Unit>
+		<Unit filename="libraries/AP_GPS/AP_GPS.cpp">
+			<Option target="APM2_Debug" />
+			<Option target="APM2_Release" />
+		</Unit>
+		<Unit filename="libraries/AP_GPS/AP_GPS_Glitch.cpp">
+			<Option target="APM2_Debug" />
+			<Option target="APM2_Release" />
+		</Unit>
+		<Unit filename="libraries/AP_GPS/AP_GPS_NMEA.cpp">
+			<Option target="APM2_Debug" />
+			<Option target="APM2_Release" />
+		</Unit>
+		<Unit filename="libraries/AP_GPS/AP_GPS_UBLOX.cpp">
+			<Option target="APM2_Debug" />
+			<Option target="APM2_Release" />
+		</Unit>
+		<Unit filename="libraries/AP_GPS/GPS_Backend.cpp">
+			<Option target="APM2_Debug" />
+			<Option target="APM2_Release" />
+		</Unit>
 		<Unit filename="libraries/AP_HAL/AP_HAL_Boards.h" />
 		<Unit filename="libraries/AP_HAL/HAL.cpp" />
 		<Unit filename="libraries/AP_HAL/UARTDriver.cpp" />
 		<Unit filename="libraries/AP_HAL/Util.cpp" />
+		<Unit filename="libraries/AP_HAL/Util.h" />
 		<Unit filename="libraries/AP_HAL/board/urus.h" />
+		<Unit filename="libraries/AP_HAL/utility/BetterStream.h" />
 		<Unit filename="libraries/AP_HAL/utility/Print.cpp" />
 		<Unit filename="libraries/AP_HAL/utility/ftoa_engine.cpp" />
-		<Unit filename="libraries/AP_HAL/utility/print_vprintf.cpp" />
+		<Unit filename="libraries/AP_HAL/utility/print_vprintf_PSTR.cpp" />
 		<Unit filename="libraries/AP_HAL/utility/utoa_invert.cpp" />
 		<Unit filename="libraries/AP_HAL_URUS/CORE_URUS/CORE_URUS.cpp" />
 		<Unit filename="libraries/AP_HAL_URUS/CORE_URUS/CoreUrusRCInput.cpp" />
 		<Unit filename="libraries/AP_HAL_URUS/CORE_URUS/CoreUrusRCOutput.cpp" />
 		<Unit filename="libraries/AP_HAL_URUS/CORE_URUS/CoreUrusScheduler.cpp" />
 		<Unit filename="libraries/AP_HAL_URUS/CORE_URUS/CoreUrusScheduler.h" />
+		<Unit filename="libraries/AP_HAL_URUS/CORE_URUS/CoreUrusStorage.h" />
 		<Unit filename="libraries/AP_HAL_URUS/CORE_URUS/U_CoreAVR/CORE_URUS_AVR.cpp" />
 		<Unit filename="libraries/AP_HAL_URUS/CORE_URUS/U_CoreAVR/CoreUrusAnalogIn_Avr.cpp" />
 		<Unit filename="libraries/AP_HAL_URUS/CORE_URUS/U_CoreAVR/CoreUrusGPIO_Avr.cpp" />
@@ -125,59 +262,196 @@
 		<Unit filename="libraries/AP_HAL_URUS/CORE_URUS/U_CoreAVR/CoreUrusScheduler_TimerAvr.cpp" />
 		<Unit filename="libraries/AP_HAL_URUS/CORE_URUS/U_CoreAVR/CoreUrusSemaphores_Avr.cpp" />
 		<Unit filename="libraries/AP_HAL_URUS/CORE_URUS/U_CoreAVR/CoreUrusStorage_Avr.cpp" />
+		<Unit filename="libraries/AP_HAL_URUS/CORE_URUS/U_CoreAVR/CoreUrusStorage_Avr.h" />
 		<Unit filename="libraries/AP_HAL_URUS/CORE_URUS/U_CoreAVR/CoreUrusTimers_Avr.cpp" />
 		<Unit filename="libraries/AP_HAL_URUS/CORE_URUS/U_CoreAVR/CoreUrusUARTDriver_Avr.cpp" />
 		<Unit filename="libraries/AP_HAL_URUS/CORE_URUS/U_CoreAVR/CoreUrusUtil_Avr.cpp" />
 		<Unit filename="libraries/AP_HAL_URUS/CORE_URUS/U_CoreAVR/utility/ISRRegistry.cpp" />
 		<Unit filename="libraries/AP_HAL_URUS/CORE_URUS/U_CoreAVR/utility/pins_arduino_mega.cpp" />
 		<Unit filename="libraries/AP_HAL_URUS/HAL_URUS_Class.cpp" />
-		<Unit filename="libraries/AP_HAL_URUS/dummy_libs/GCS_Mavlink.cpp" />
+		<Unit filename="libraries/AP_HAL_URUS/dummy_libs/GCS_Mavlink.cpp">
+			<Option target="APM2_Debug" />
+			<Option target="APM2_Release" />
+		</Unit>
 		<Unit filename="libraries/AP_HAL_URUS/system.cpp" />
-		<Unit filename="libraries/AP_InertialNav/AP_InertialNav.cpp" />
-		<Unit filename="libraries/AP_InertialSensor/AP_InertialSensor.cpp" />
-		<Unit filename="libraries/AP_InertialSensor/AP_InertialSensor_Backend.cpp" />
-		<Unit filename="libraries/AP_InertialSensor/AP_InertialSensor_HIL.cpp" />
-		<Unit filename="libraries/AP_InertialSensor/AP_InertialSensor_Invensense.cpp" />
-		<Unit filename="libraries/AP_InertialSensor/AuxiliaryBus.cpp" />
-		<Unit filename="libraries/AP_Math/AP_GeodesicGrid.cpp" />
-		<Unit filename="libraries/AP_Math/AP_Math.cpp" />
-		<Unit filename="libraries/AP_Math/location.cpp" />
-		<Unit filename="libraries/AP_Math/matrix3.cpp" />
-		<Unit filename="libraries/AP_Math/matrixN.cpp" />
-		<Unit filename="libraries/AP_Math/matrix_alg.cpp" />
-		<Unit filename="libraries/AP_Math/polygon.cpp" />
-		<Unit filename="libraries/AP_Math/quaternion.cpp" />
-		<Unit filename="libraries/AP_Math/vector2.cpp" />
-		<Unit filename="libraries/AP_Math/vector3.cpp" />
-		<Unit filename="libraries/AP_Menu/AP_Menu.cpp" />
-		<Unit filename="libraries/AP_Motors/AP_MotorsMatrix.cpp" />
-		<Unit filename="libraries/AP_Motors/AP_MotorsMulticopter.cpp" />
-		<Unit filename="libraries/AP_Motors/AP_Motors_Class.cpp" />
-		<Unit filename="libraries/AP_Notify/AP_BoardLED.cpp" />
-		<Unit filename="libraries/AP_Notify/AP_Notify.cpp" />
-		<Unit filename="libraries/AP_Notify/Buzzer.cpp" />
-		<Unit filename="libraries/AP_Notify/ExternalLED.cpp" />
-		<Unit filename="libraries/AP_Param/AP_Param.cpp" />
-		<Unit filename="libraries/AP_Param/AP_Param.h" />
-		<Unit filename="libraries/AP_RangeFinder/AP_RangeFinder_analog.cpp" />
-		<Unit filename="libraries/AP_RangeFinder/RangeFinder.cpp" />
-		<Unit filename="libraries/AP_RangeFinder/RangeFinder_Backend.cpp" />
-		<Unit filename="libraries/AP_Scheduler/AP_Scheduler.cpp" />
-		<Unit filename="libraries/AP_SerialManager/AP_SerialManager.cpp" />
-		<Unit filename="libraries/DataFlash/DataFlash.cpp" />
-		<Unit filename="libraries/DataFlash/DataFlash_APM2.cpp" />
-		<Unit filename="libraries/DataFlash/DataFlash_Block.cpp" />
-		<Unit filename="libraries/DataFlash/LogFile.cpp" />
-		<Unit filename="libraries/Filter/DerivativeFilter.cpp" />
-		<Unit filename="libraries/Filter/LowPassFilter.cpp" />
-		<Unit filename="libraries/Filter/LowPassFilter2p.cpp" />
-		<Unit filename="libraries/RC_Channel/RC_Channel.cpp" />
-		<Unit filename="libraries/RC_Channel/RC_Channel.h" />
-		<Unit filename="libraries/RC_Channel/RC_Channels.cpp" />
-		<Unit filename="libraries/SRV_Channel/SRV_Channel.cpp" />
-		<Unit filename="libraries/SRV_Channel/SRV_Channel_aux.cpp" />
-		<Unit filename="libraries/SRV_Channel/SRV_Channels.cpp" />
+		<Unit filename="libraries/AP_InertialNav/AP_InertialNav.cpp">
+			<Option target="APM2_Debug" />
+			<Option target="APM2_Release" />
+		</Unit>
+		<Unit filename="libraries/AP_InertialSensor/AP_InertialSensor.cpp">
+			<Option target="APM2_Debug" />
+			<Option target="APM2_Release" />
+		</Unit>
+		<Unit filename="libraries/AP_InertialSensor/AP_InertialSensor_Backend.cpp">
+			<Option target="APM2_Debug" />
+			<Option target="APM2_Release" />
+		</Unit>
+		<Unit filename="libraries/AP_InertialSensor/AP_InertialSensor_HIL.cpp">
+			<Option target="APM2_Debug" />
+			<Option target="APM2_Release" />
+		</Unit>
+		<Unit filename="libraries/AP_InertialSensor/AP_InertialSensor_Invensense.cpp">
+			<Option target="APM2_Debug" />
+			<Option target="APM2_Release" />
+		</Unit>
+		<Unit filename="libraries/AP_InertialSensor/AuxiliaryBus.cpp">
+			<Option target="APM2_Debug" />
+			<Option target="APM2_Release" />
+		</Unit>
+		<Unit filename="libraries/AP_Math/AP_GeodesicGrid.cpp">
+			<Option target="APM2_Debug" />
+			<Option target="APM2_Release" />
+		</Unit>
+		<Unit filename="libraries/AP_Math/AP_Math.cpp">
+			<Option target="APM2_Debug" />
+			<Option target="APM2_Release" />
+		</Unit>
+		<Unit filename="libraries/AP_Math/location.cpp">
+			<Option target="APM2_Debug" />
+			<Option target="APM2_Release" />
+		</Unit>
+		<Unit filename="libraries/AP_Math/matrix3.cpp">
+			<Option target="APM2_Debug" />
+			<Option target="APM2_Release" />
+		</Unit>
+		<Unit filename="libraries/AP_Math/matrixN.cpp">
+			<Option target="APM2_Debug" />
+			<Option target="APM2_Release" />
+		</Unit>
+		<Unit filename="libraries/AP_Math/matrix_alg.cpp">
+			<Option target="APM2_Debug" />
+			<Option target="APM2_Release" />
+		</Unit>
+		<Unit filename="libraries/AP_Math/polygon.cpp">
+			<Option target="APM2_Debug" />
+			<Option target="APM2_Release" />
+		</Unit>
+		<Unit filename="libraries/AP_Math/quaternion.cpp">
+			<Option target="APM2_Debug" />
+			<Option target="APM2_Release" />
+		</Unit>
+		<Unit filename="libraries/AP_Math/vector2.cpp">
+			<Option target="APM2_Debug" />
+			<Option target="APM2_Release" />
+		</Unit>
+		<Unit filename="libraries/AP_Math/vector3.cpp">
+			<Option target="APM2_Debug" />
+			<Option target="APM2_Release" />
+		</Unit>
+		<Unit filename="libraries/AP_Menu/AP_Menu.cpp">
+			<Option target="APM2_Debug" />
+			<Option target="APM2_Release" />
+		</Unit>
+		<Unit filename="libraries/AP_Motors/AP_MotorsMatrix.cpp">
+			<Option target="APM2_Debug" />
+			<Option target="APM2_Release" />
+		</Unit>
+		<Unit filename="libraries/AP_Motors/AP_MotorsMulticopter.cpp">
+			<Option target="APM2_Debug" />
+			<Option target="APM2_Release" />
+		</Unit>
+		<Unit filename="libraries/AP_Motors/AP_Motors_Class.cpp">
+			<Option target="APM2_Debug" />
+			<Option target="APM2_Release" />
+		</Unit>
+		<Unit filename="libraries/AP_Notify/AP_BoardLED.cpp">
+			<Option target="APM2_Debug" />
+			<Option target="APM2_Release" />
+		</Unit>
+		<Unit filename="libraries/AP_Notify/AP_Notify.cpp">
+			<Option target="APM2_Debug" />
+			<Option target="APM2_Release" />
+		</Unit>
+		<Unit filename="libraries/AP_Notify/Buzzer.cpp">
+			<Option target="APM2_Debug" />
+			<Option target="APM2_Release" />
+		</Unit>
+		<Unit filename="libraries/AP_Notify/ExternalLED.cpp">
+			<Option target="APM2_Debug" />
+			<Option target="APM2_Release" />
+		</Unit>
+		<Unit filename="libraries/AP_Param/AP_Param.cpp">
+			<Option target="APM2_Debug" />
+			<Option target="APM2_Release" />
+		</Unit>
+		<Unit filename="libraries/AP_Param/AP_Param.h">
+			<Option target="APM2_Debug" />
+			<Option target="APM2_Release" />
+		</Unit>
+		<Unit filename="libraries/AP_RangeFinder/AP_RangeFinder_analog.cpp">
+			<Option target="APM2_Debug" />
+			<Option target="APM2_Release" />
+		</Unit>
+		<Unit filename="libraries/AP_RangeFinder/RangeFinder.cpp">
+			<Option target="APM2_Debug" />
+			<Option target="APM2_Release" />
+		</Unit>
+		<Unit filename="libraries/AP_RangeFinder/RangeFinder_Backend.cpp">
+			<Option target="APM2_Debug" />
+			<Option target="APM2_Release" />
+		</Unit>
+		<Unit filename="libraries/AP_Scheduler/AP_Scheduler.cpp">
+			<Option target="APM2_Debug" />
+			<Option target="APM2_Release" />
+		</Unit>
+		<Unit filename="libraries/AP_SerialManager/AP_SerialManager.cpp">
+			<Option target="APM2_Debug" />
+			<Option target="APM2_Release" />
+		</Unit>
+		<Unit filename="libraries/DataFlash/DataFlash.cpp">
+			<Option target="APM2_Debug" />
+			<Option target="APM2_Release" />
+		</Unit>
+		<Unit filename="libraries/DataFlash/DataFlash_APM2.cpp">
+			<Option target="APM2_Debug" />
+			<Option target="APM2_Release" />
+		</Unit>
+		<Unit filename="libraries/DataFlash/DataFlash_Block.cpp">
+			<Option target="APM2_Debug" />
+			<Option target="APM2_Release" />
+		</Unit>
+		<Unit filename="libraries/DataFlash/LogFile.cpp">
+			<Option target="APM2_Debug" />
+			<Option target="APM2_Release" />
+		</Unit>
+		<Unit filename="libraries/Filter/DerivativeFilter.cpp">
+			<Option target="APM2_Debug" />
+			<Option target="APM2_Release" />
+		</Unit>
+		<Unit filename="libraries/Filter/LowPassFilter.cpp">
+			<Option target="APM2_Debug" />
+			<Option target="APM2_Release" />
+		</Unit>
+		<Unit filename="libraries/Filter/LowPassFilter2p.cpp">
+			<Option target="APM2_Debug" />
+			<Option target="APM2_Release" />
+		</Unit>
+		<Unit filename="libraries/RC_Channel/RC_Channel.cpp">
+			<Option target="APM2_Debug" />
+			<Option target="APM2_Release" />
+		</Unit>
+		<Unit filename="libraries/RC_Channel/RC_Channel.h">
+			<Option target="APM2_Debug" />
+			<Option target="APM2_Release" />
+		</Unit>
+		<Unit filename="libraries/RC_Channel/RC_Channels.cpp">
+			<Option target="APM2_Debug" />
+			<Option target="APM2_Release" />
+		</Unit>
+		<Unit filename="libraries/SRV_Channel/SRV_Channel.cpp">
+			<Option target="APM2_Debug" />
+			<Option target="APM2_Release" />
+		</Unit>
+		<Unit filename="libraries/SRV_Channel/SRV_Channel_aux.cpp">
+			<Option target="APM2_Debug" />
+			<Option target="APM2_Release" />
+		</Unit>
+		<Unit filename="libraries/SRV_Channel/SRV_Channels.cpp">
+			<Option target="APM2_Debug" />
+			<Option target="APM2_Release" />
+		</Unit>
 		<Unit filename="libraries/StorageManager/StorageManager.cpp" />
+		<Unit filename="libraries/StorageManager/StorageManager.h" />
 		<Extensions>
 			<code_completion />
 			<envvars />
