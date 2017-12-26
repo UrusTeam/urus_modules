@@ -10,7 +10,11 @@ namespace AP_HAL {
 
 void init();
 
+#if CONFIG_SHAL_CORE == SHAL_CORE_APM
+void panic(const prog_char_t *errormsg) NORETURN;
+#else
 void panic(const char *errormsg, ...) FMT_PRINTF(1, 2) NORETURN;
+#endif
 
 uint32_t micros();
 uint32_t millis();
