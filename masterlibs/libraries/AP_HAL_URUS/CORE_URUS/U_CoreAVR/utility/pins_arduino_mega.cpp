@@ -7,7 +7,13 @@
 
 const uint16_t PROGMEM port_to_mode_PGM[] = {
 	NOT_A_PORT,
-	(uint16_t) &DDRA,
+#if defined(SHAL_CORE_APM328)
+	NOT_A_PORT,
+	(uint16_t) &DDRB,
+	(uint16_t) &DDRC,
+	(uint16_t) &DDRD,
+#elif defined(SHAL_CORE_APM2)
+    (uint16_t) &DDRA,
 	(uint16_t) &DDRB,
 	(uint16_t) &DDRC,
 	(uint16_t) &DDRD,
@@ -19,10 +25,19 @@ const uint16_t PROGMEM port_to_mode_PGM[] = {
 	(uint16_t) &DDRJ,
 	(uint16_t) &DDRK,
 	(uint16_t) &DDRL,
+#else
+#error "UNKNOWN CORE BOARD FOR PINS!"
+#endif
 };
 
 const uint16_t PROGMEM port_to_output_PGM[] = {
 	NOT_A_PORT,
+#if defined(SHAL_CORE_APM328)
+	NOT_A_PORT,
+	(uint16_t) &PORTB,
+	(uint16_t) &PORTC,
+	(uint16_t) &PORTD,
+#elif defined(SHAL_CORE_APM2)
 	(uint16_t) &PORTA,
 	(uint16_t) &PORTB,
 	(uint16_t) &PORTC,
@@ -35,10 +50,19 @@ const uint16_t PROGMEM port_to_output_PGM[] = {
 	(uint16_t) &PORTJ,
 	(uint16_t) &PORTK,
 	(uint16_t) &PORTL,
+#else
+#error "UNKNOWN CORE BOARD FOR PINS!"
+#endif
 };
 
 const uint16_t PROGMEM port_to_input_PGM[] = {
 	NOT_A_PIN,
+#if defined(SHAL_CORE_APM328)
+	NOT_A_PORT,
+	(uint16_t) &PINB,
+	(uint16_t) &PINC,
+	(uint16_t) &PIND,
+#elif defined(SHAL_CORE_APM2)
 	(uint16_t) &PINA,
 	(uint16_t) &PINB,
 	(uint16_t) &PINC,
@@ -51,11 +75,36 @@ const uint16_t PROGMEM port_to_input_PGM[] = {
 	(uint16_t) &PINJ,
 	(uint16_t) &PINK,
 	(uint16_t) &PINL,
+#else
+#error "UNKNOWN CORE BOARD FOR PINS!"
+#endif
 };
 
 const uint8_t PROGMEM digital_pin_to_port_PGM[] = {
 	// PORTLIST
 	// -------------------------------------------
+#if defined(SHAL_CORE_APM328)
+	PD, /* 0 */
+	PD,
+	PD,
+	PD,
+	PD,
+	PD,
+	PD,
+	PD,
+	PB, /* 8 */
+	PB,
+	PB,
+	PB,
+	PB,
+	PB,
+	PC, /* 14 */
+	PC,
+	PC,
+	PC,
+	PC,
+	PC,
+#elif defined(SHAL_CORE_APM2)
 	PE	, // PE 0 ** 0 ** USART0_RX
 	PE	, // PE 1 ** 1 ** USART0_TX
 	PE	, // PE 4 ** 2 ** PWM2
@@ -128,11 +177,36 @@ const uint8_t PROGMEM digital_pin_to_port_PGM[] = {
 	PK	, // PK 7 ** 69 ** A15
 	PE	, // PE 6 ** 70 ** APM only
 	PJ	, // PJ 2 ** 71 ** USART3 SPI SCK
+#else
+#error "UNKNOWN CORE BOARD FOR PINS!"
+#endif
 };
 
 const uint8_t PROGMEM digital_pin_to_bit_mask_PGM[] = {
 	// PIN IN PORT
 	// -------------------------------------------
+#if defined(SHAL_CORE_APM328)
+	_BV(0), /* 0, port D */
+	_BV(1),
+	_BV(2),
+	_BV(3),
+	_BV(4),
+	_BV(5),
+	_BV(6),
+	_BV(7),
+	_BV(0), /* 8, port B */
+	_BV(1),
+	_BV(2),
+	_BV(3),
+	_BV(4),
+	_BV(5),
+	_BV(0), /* 14, port C */
+	_BV(1),
+	_BV(2),
+	_BV(3),
+	_BV(4),
+	_BV(5),
+#elif defined(SHAL_CORE_APM2)
 	_BV( 0 )	, // PE 0 ** 0 ** USART0_RX
 	_BV( 1 )	, // PE 1 ** 1 ** USART0_TX
 	_BV( 4 )	, // PE 4 ** 2 ** PWM2
@@ -205,13 +279,51 @@ const uint8_t PROGMEM digital_pin_to_bit_mask_PGM[] = {
 	_BV( 7 )	, // PK 7 ** 69 ** A15
     _BV( 6 )	, // PE 6 ** 70 ** APM only
 	_BV( 2 )	, // PJ 2 ** 71 ** USART3 SPI SCK
+#else
+#error "UNKNOWN CORE BOARD FOR PINS!"
+#endif
 };
 
 const uint8_t PROGMEM digital_pin_to_timer_PGM[] = {
 	// TIMERS
 	// -------------------------------------------
-	NOT_ON_TIMER	, // PE 0 ** 0 ** USART0_RX
-	NOT_ON_TIMER	, // PE 1 ** 1 ** USART0_TX
+	NOT_ON_TIMER	, // atmega2560 PE 0 ** 0 ** USART0_RX
+	NOT_ON_TIMER	, // atmega2560 PE 1 ** 1 ** USART0_TX
+#if defined(SHAL_CORE_APM328)
+	NOT_ON_TIMER,
+	// on the ATmega168, digital pin 3 has hardware pwm
+#if defined(__AVR_ATmega8__)
+	NOT_ON_TIMER,
+#else
+	TIMER2B,
+#endif
+	NOT_ON_TIMER,
+	// on the ATmega168, digital pins 5 and 6 have hardware pwm
+#if defined(__AVR_ATmega8__)
+	NOT_ON_TIMER,
+	NOT_ON_TIMER,
+#else
+	TIMER0B,
+	TIMER0A,
+#endif
+	NOT_ON_TIMER,
+	NOT_ON_TIMER, /* 8 - port B */
+	TIMER1A,
+	TIMER1B,
+#if defined(__AVR_ATmega8__)
+	TIMER2,
+#else
+	TIMER2A,
+#endif
+	NOT_ON_TIMER,
+	NOT_ON_TIMER,
+	NOT_ON_TIMER,
+	NOT_ON_TIMER, /* 14 - port C */
+	NOT_ON_TIMER,
+	NOT_ON_TIMER,
+	NOT_ON_TIMER,
+	NOT_ON_TIMER,
+#elif defined(SHAL_CORE_APM2)
 	TIMER3B	, // PE 4 ** 2 ** PWM2
 	TIMER3C	, // PE 5 ** 3 ** PWM3
 	TIMER0B	, // PG 5 ** 4 ** PWM4
@@ -282,6 +394,9 @@ const uint8_t PROGMEM digital_pin_to_timer_PGM[] = {
 	NOT_ON_TIMER	, // PK 7 ** 69 ** A15
     NOT_ON_TIMER	, // PE 6 ** 70 ** APM only
     NOT_ON_TIMER	, // PJ 2 ** 71 ** USART3 SPI SCK
+#else
+#error "UNKNOWN CORE BOARD FOR PINS!"
+#endif
 };
 
 #endif  // CONFIG_SHAL_CORE == SHAL_CORE_APM

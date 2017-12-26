@@ -32,11 +32,14 @@
 #include "../CoreUrusUARTDriver.h"
 #include "CoreUrusUARTDriver_Avr.h"
 
+#if defined(SHAL_CORE_APM2)
 #define FS_MAX_PORTS 4
+#elif defined(SHAL_CORE_APM328)
+#define FS_MAX_PORTS 1
+#endif
+
 CLCoreUrusUARTDriver_Avr::Buffer __CLCoreUrusUARTDriver_Avr__rxBuffer[FS_MAX_PORTS];
 CLCoreUrusUARTDriver_Avr::Buffer __CLCoreUrusUARTDriver_Avr__txBuffer[FS_MAX_PORTS];
-
-const uint16_t CLCoreUrusUARTDriver_Avr::_max_buffer_size = 256;
 
 /* CLCoreUrusUARTDriver_Avr method implementations */
 

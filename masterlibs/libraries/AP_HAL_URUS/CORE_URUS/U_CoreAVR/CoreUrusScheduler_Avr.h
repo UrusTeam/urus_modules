@@ -13,7 +13,11 @@
 
 #include "utility/ISRRegistry.h"
 
+#if defined(SHAL_CORE_APM2)
 #define URUS_SCHEDULER_MAX_TIMER_PROCS 5
+#else
+#define URUS_SCHEDULER_MAX_TIMER_PROCS 3
+#endif
 
 /* Scheduler implementation: */
 class CLCoreUrusScheduler_Avr : public NSCORE_URUS::CLCoreUrusScheduler {
@@ -35,8 +39,6 @@ public:
     void suspend_timer_procs();
     void resume_timer_procs();
 
-    bool in_timerprocess() override;
-
     void register_timer_failsafe(AP_HAL::Proc cb, uint32_t period_us);
 
     void system_initialized();
@@ -45,7 +47,6 @@ public:
 
     void timer_event() override {
         _run_timer_procs(true);
-        //_run_io_procs(true);
     }
 
     bool in_main_thread() const override;
@@ -57,26 +58,24 @@ private:
     static AP_HAL::Proc _failsafe;
 
     static void _run_timer_procs(bool called_from_isr);
-    static void _run_io_procs(bool called_from_isr);
 
     static void _fire_isr_sched();
 
     static volatile bool _timer_suspended;
     static volatile bool _timer_event_missed;
     static AP_HAL::MemberProc _timer_proc[URUS_SCHEDULER_MAX_TIMER_PROCS];
-    //static AP_HAL::MemberProc _io_proc[URUS_SCHEDULER_MAX_TIMER_PROCS];
-    static uint8_t _num_timer_procs;
-    //static uint8_t _num_io_procs;
-    static bool _in_timer_proc;
 
-    void stop_clock(uint64_t time_usec);
+    static uint8_t _num_timer_procs;
+    static bool _in_timer_proc;
 
     bool _initialized;
 
     uint32_t now_micros;
+#if defined(SHAL_CORE_APM2)
     uint16_t dt_micros;
     uint16_t centinel_micros;
     uint16_t ms_cb;
+#endif
     uint32_t start;
 
     static volatile bool _isr_sched_running;

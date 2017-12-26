@@ -16,6 +16,43 @@
 #include <avr/io.h>
 #include <avr/interrupt.h>
 
+#if defined(SHAL_CORE_APM2)
+#define  AVR_TIMER_OVF_VECT     TIMER5_OVF_vect
+#define  AVR_TIMER_TCNT         TCNT5
+#define  AVR_TIMER_TIFR         TIFR5
+#define  AVR_TIMER_TCCRA        TCCR5A
+#define  AVR_TIMER_TCCRB        TCCR5B
+#define  AVR_TIMER_OCRA         OCR5A
+#define  AVR_TIMER_TIMSK        TIMSK5
+#define  AVR_TIMER_TOIE         TOIE5
+#define  AVR_TIMER_WGM0         WGM50
+#define  AVR_TIMER_WGM1         WGM51
+#define  AVR_TIMER_WGM2         WGM52
+#define  AVR_TIMER_WGM3         WGM53
+#define  AVR_TIMER_CS1          CS51
+#define  AVR_TIMER_ICR          ICR5
+#define  AVR_TIMER_ICE          ICE5
+#define  AVR_TIMER_ICES         ICES5
+#define  AVR_TIMER_ICIE         ICIE1
+#elif defined(SHAL_CORE_APM328)
+#define  AVR_TIMER_OVF_VECT     TIMER1_OVF_vect
+#define  AVR_TIMER_TCNT         TCNT1
+#define  AVR_TIMER_TIFR         TIFR1
+#define  AVR_TIMER_TCCRA        TCCR1A
+#define  AVR_TIMER_TCCRB        TCCR1B
+#define  AVR_TIMER_OCRA         OCR1A
+#define  AVR_TIMER_TIMSK        TIMSK1
+#define  AVR_TIMER_TOIE         TOIE1
+#define  AVR_TIMER_WGM0         WGM10
+#define  AVR_TIMER_WGM1         WGM11
+#define  AVR_TIMER_WGM2         WGM12
+#define  AVR_TIMER_WGM3         WGM13
+#define  AVR_TIMER_CS1          CS11
+#define  AVR_TIMER_ICR          ICR1
+#define  AVR_TIMER_ICES         ICES1
+#define  AVR_TIMER_ICIE         ICIE1
+#endif
+
 extern const AP_HAL::HAL& hal;
 
 CLCoreUrusRCInput_Avr::CLCoreUrusRCInput_Avr() :
@@ -32,7 +69,8 @@ void CLCoreUrusRCInput_Avr::_timer5_capt_cb(void) {
     static uint16_t icr5_prev;
     static uint8_t  channel_ctr;
 
-    const uint16_t icr5_current = ICR5;
+    const uint16_t icr5_current = AVR_TIMER_ICR;
+
     uint16_t pulse_width;
     if (icr5_current < icr5_prev) {
         /* ICR5 rolls over at TOP=40000 */
@@ -63,14 +101,23 @@ void CLCoreUrusRCInput_Avr::_timer5_capt_cb(void) {
 
 void CLCoreUrusRCInput_Avr::init() {
     ISRRegistry& isrregistry = CORE_AVR::isrregistry;
+#if defined(SHAL_CORE_APM2)
     isrregistry.register_signal(ISR_REGISTRY_TIMER5_CAPT, _timer5_capt_cb);
+#elif defined(SHAL_CORE_APM328)
+    isrregistry.register_signal(ISR_REGISTRY_TIMER1_CAPT, _timer5_capt_cb);
+#endif
 
     /* initialize overrides */
     clear_overrides();
+#if defined(SHAL_CORE_APM2)
     /* Arduino pin 48 is ICP5 / PL1,  timer 5 input capture */
     hal.gpio->pinMode(48, HAL_GPIO_INPUT);
+#else
+    /* Arduino pin 8 is ICP1 / PB0,  timer 1 input capture */
+    hal.gpio->pinMode(8, HAL_GPIO_INPUT);
+#endif
     /**
-     * WGM: 1 1 1 1. Fast WPM, TOP is in OCR5A
+     * WGM: 1 1 1 1. Fast WPM, TOP is in OCR5A (APM2) OCR1A (328P)
      * COM all disabled
      * CS51: prescale by 8 => 0.5us tick
      * ICES5: input capture on rising edge
@@ -82,10 +129,10 @@ void CLCoreUrusRCInput_Avr::init() {
     cli();
 
     /* Set timer 8x prescaler fast PWM mode toggle compare at OCRA with rising edge input capture */
-    TCCR5B |= _BV(WGM53) | _BV(WGM52) | _BV(CS51) | _BV(ICES5);
+    AVR_TIMER_TCCRB |= _BV(AVR_TIMER_WGM3) | _BV(AVR_TIMER_WGM2) | _BV(AVR_TIMER_CS1) | _BV(AVR_TIMER_ICES);
 
     /* Enable input capture interrupt */
-    TIMSK5 |= _BV(ICIE5);
+    AVR_TIMER_TIMSK |= _BV(AVR_TIMER_ICES);
 
     SREG = oldSREG;
 }

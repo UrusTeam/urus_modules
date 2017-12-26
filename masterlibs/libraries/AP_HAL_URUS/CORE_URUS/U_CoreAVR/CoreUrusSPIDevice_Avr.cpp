@@ -18,31 +18,35 @@ extern const AP_HAL::HAL& hal;
 #define SPI0_SPSR_8MHz   _BV(SPI2X)
 #define SPI0_SPCR_500kHz _BV(SPR1)
 #define SPI0_SPSR_500kHz _BV(SPI2X)
-
-#define SPI0_MISO_PIN_50   50
-#define SPI0_MOSI_PIN_51   51
-#define SPI0_SCK_PIN_52    52
-
+#if defined(SHAL_CORE_APM328)
+#define SPI0_MISO_PIN   12
+#define SPI0_MOSI_PIN   11
+#define SPI0_SCK_PIN    13
+#define SPI0_CS_PIN_10  10
+#elif defined(SHAL_CORE_APM2)
+#define SPI0_MISO_PIN   50
+#define SPI0_MOSI_PIN   51
+#define SPI0_SCK_PIN    52
 //INS on APM2
-#define SPI0_CS_PIN_53     53
-
+#define SPI0_CS_PIN_53  53
 //baro on APM2
-#define SPI0_CS_PIN_40     40
-
+#define SPI0_CS_PIN_40  40
 //optflow on APM2
-#define SPI0_CS_PIN_57     57
-
-#define SPI3_MOSI_PIN_14   14
-#define SPI3_MISO_PIN_15   15
-#define SPI3_SCK_PIN_71    71 // PJ 2 ** 71 ** USART3 SPI SCK
-#define SPI3_CS_PIN_28     28
+#define SPI0_CS_PIN_57  57
+#define SPI3_MOSI_PIN   14
+#define SPI3_MISO_PIN   15
+#define SPI3_SCK_PIN    71 // PJ 2 ** 71 ** USART3 SPI SCK
+#define SPI3_CS_PIN_28  28
+#endif
 
 #define MASTER_SPI  0
 #define SLAVE_SPI   1
 
 bool CLCoreUrusSPI0Device_Avr::_force_low_speed;
 CLCoreUrusSemaphore_Avr CLCoreUrusSPI0Device_Avr::_semaphore;
+#if defined(SHAL_CORE_APM2)
 CLCoreUrusSemaphore_Avr CLCoreUrusSPI3Device_Avr::_semaphore;
+#endif
 
 volatile bool spi0_transferflag = false;
 
@@ -56,12 +60,16 @@ volatile bool spi0_transferflag = false;
 
 SPIDesc CLCoreUrusSPIDeviceManager_Avr::device_table[] = {
     SPIDesc("**dummy**", 0, 0, 0, 0, 0, 0),
+#if defined(SHAL_CORE_APM328)
+    SPIDesc("URUS_Cape", 0, 0, SPI0_CS_PIN_10, MASTER_SPI, SPI0_SPCR_500kHz, SPI0_SPCR_8MHz),
+#elif defined(SHAL_CORE_APM2)
     SPIDesc("URUS_Cape", 0, 0, SPI0_CS_PIN_53, MASTER_SPI, SPI0_SPCR_500kHz, SPI0_SPCR_8MHz),
     SPIDesc("SPI0_M", 0, 0, SPI0_CS_PIN_53, MASTER_SPI, SPI0_SPCR_500kHz, SPI0_SPCR_8MHz),
     SPIDesc("SPI0_S", 3, 0, SPI0_CS_PIN_53, SLAVE_SPI, SPI0_SPCR_500kHz, SPI0_SPCR_8MHz),
     SPIDesc("FLASH_SPI3", 3, 0, SPI3_CS_PIN_28, MASTER_SPI, 0, 0),
     SPIDesc("MPU60XX_SPI0", 0, 0, SPI0_CS_PIN_53, MASTER_SPI, SPI0_SPCR_500kHz, SPI0_SPCR_8MHz),
     SPIDesc("MS5611_SPI0", 0, 0, SPI0_CS_PIN_40, MASTER_SPI, SPI0_SPCR_500kHz, SPI0_SPCR_8MHz),
+#endif
 };
 
 #ifndef URUS_SPI_DEVICE_NUM_DEVICES
@@ -106,18 +114,19 @@ void CLCoreUrusSPI0Device_Avr::init()
     _cs_pin = new CLCoreDigitalSource_Avr(_device_desc.cs_pin);
 
     if (_device_desc.mode == MASTER_SPI) {
-        hal.gpio->pinMode(SPI0_MISO_PIN_50, HAL_GPIO_INPUT);
-        hal.gpio->pinMode(SPI0_MOSI_PIN_51, HAL_GPIO_OUTPUT);
-        hal.gpio->pinMode(SPI0_SCK_PIN_52, HAL_GPIO_OUTPUT);
+        hal.gpio->pinMode(SPI0_MISO_PIN, HAL_GPIO_INPUT);
+        hal.gpio->pinMode(SPI0_MOSI_PIN, HAL_GPIO_OUTPUT);
+        hal.gpio->pinMode(SPI0_SCK_PIN, HAL_GPIO_OUTPUT);
 
         _cs_pin->mode(HAL_GPIO_OUTPUT);
         _cs_pin->write(1);
-
+#if defined(SHAL_CORE_APM2)
         hal.gpio->pinMode(SPI0_CS_PIN_40, HAL_GPIO_OUTPUT);
         hal.gpio->write(SPI0_CS_PIN_40, 1);
 
         hal.gpio->pinMode(SPI0_CS_PIN_57, HAL_GPIO_OUTPUT);
         hal.gpio->write(SPI0_CS_PIN_57, 1);
+#endif
 
         /* Enable the SPI0 peripheral as a master */
 
@@ -237,6 +246,7 @@ bool CLCoreUrusSPI0Device_Avr::set_chip_select(bool set)
     return false;
 }
 
+#if defined(SHAL_CORE_APM2)
 // CONSTRUCTOR FOR SPI-3
 CLCoreUrusSPI3Device_Avr::CLCoreUrusSPI3Device_Avr(SPIDesc &device_desc):
     NSCORE_URUS::CLCoreUrusSPIDevice(),
@@ -410,6 +420,7 @@ void CLCoreUrusSPI3Device_Avr::_cs_release()
 {
     _cs_pin->write(1);
 }
+#endif
 
 uint8_t CLCoreUrusSPIDeviceManager_Avr::get_count() {
    return _n_device_desc;
@@ -449,12 +460,13 @@ CLCoreUrusSPIDeviceManager_Avr::get_device(const char *name)
             dev = AP_HAL::OwnPtr<AP_HAL::SPIDevice>(new CLCoreUrusSPI0Device_Avr(desc));
             break;
         }
-
+#if defined(SHAL_CORE_APM2)
         case 3:
         {
             dev = AP_HAL::OwnPtr<AP_HAL::SPIDevice>(new CLCoreUrusSPI3Device_Avr(desc));
             break;
         }
+#endif
     }
 
     return dev;

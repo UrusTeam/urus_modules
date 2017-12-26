@@ -65,9 +65,11 @@ void CORE_AVR::init_core() const
      */
     coreUARTA_Driver.begin(115200, 32, 128);
 
+#if defined(SHAL_CORE_APM2)
     PORTE |= _BV(0);
-    PORTD |= _BV(2);
     PORTH |= _BV(0);
+#endif
+    PORTD |= _BV(2);
 }
 
 NSCORE_URUS::CLCoreUrusScheduler* NSCORE_URUS::get_scheduler()
@@ -82,12 +84,20 @@ NSCORE_URUS::CLCoreUrusUARTDriver* NSCORE_URUS::get_uartA_Driver()
 
 NSCORE_URUS::CLCoreUrusUARTDriver* NSCORE_URUS::get_uartB_Driver()
 {
+#if defined(SHAL_CORE_APM2)
     return &coreUARTB_Driver;
+#else
+    return nullptr;
+#endif
 }
 
 NSCORE_URUS::CLCoreUrusUARTDriver* NSCORE_URUS::get_uartC_Driver()
 {
+#if defined(SHAL_CORE_APM2)
     return &coreUARTC_Driver;
+#else
+    return nullptr;
+#endif
 }
 
 NSCORE_URUS::CLCoreUrusUARTDriver* NSCORE_URUS::get_uartD_Driver()
