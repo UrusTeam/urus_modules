@@ -18,7 +18,9 @@
 
 #include <AP_HAL/AP_HAL.h>
 #include <AP_Common/AP_Common.h>
+#if HAL_CPU_CLASS > HAL_CPU_CLASS_16
 #include <GCS_MAVLink/GCS.h>
+#endif
 #include "AP_BoardConfig.h"
 #include <stdio.h>
 
@@ -220,7 +222,9 @@ void AP_BoardConfig::sensor_config_error(const char *reason)
     */
     while (true) {
         printf("Sensor failure: %s\n", reason);
+        #if HAL_CPU_CLASS > HAL_CPU_CLASS_16
         gcs().send_text(MAV_SEVERITY_ERROR, "Check BRD_TYPE: %s", reason);
+        #endif
         hal.scheduler->delay(3000);
     }
 }
