@@ -34,11 +34,18 @@ HAL_URUS::HAL_URUS() :
     scheduler = NSCORE_URUS::get_scheduler();
     uartA = NSCORE_URUS::get_uartA_Driver();
     console = uartA;
+
+#if CONFIG_SHAL_CORE == SHAL_CORE_APM && defined(SHAL_CORE_APM2) \
+    || CONFIG_SHAL_CORE == SHAL_CORE_CYGWIN
+
     uartB = NSCORE_URUS::get_uartB_Driver();
     uartC = NSCORE_URUS::get_uartC_Driver();
     uartD = NSCORE_URUS::get_uartD_Driver();
     uartE = NSCORE_URUS::get_uartE_Driver();
     uartF = NSCORE_URUS::get_uartF_Driver();
+
+#endif
+
     i2c_mgr = NSCORE_URUS::get_I2CDeviceManager();
     spi = NSCORE_URUS::get_SPIDeviceManager();
     analogin = NSCORE_URUS::get_AnalogIn();
@@ -51,7 +58,12 @@ HAL_URUS::HAL_URUS() :
 
 void HAL_URUS::run(int argc, char * const argv[], Callbacks* callbacks) const
 {
+#if CONFIG_SHAL_CORE == SHAL_CORE_APM && defined(SHAL_CORE_APM2) \
+    || CONFIG_SHAL_CORE == SHAL_CORE_CYGWIN
+
     assert(callbacks);
+
+#endif
 
     _urus_core.init_core();
 
@@ -63,7 +75,7 @@ void HAL_URUS::run(int argc, char * const argv[], Callbacks* callbacks) const
     rcin->init();
 
     analogin->init();
-    
+
     callbacks->setup();
 
     for (;;) {
