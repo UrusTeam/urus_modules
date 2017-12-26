@@ -164,8 +164,8 @@ void AP_Baro::calibrate(bool save)
         do {
             update();
             if (AP_HAL::millis() - tstart > 500) {
-                AP_HAL::panic("PANIC: AP_Baro::read unsuccessful "
-                        "for more than 500ms in AP_Baro::calibrate [2]\r\n");
+                AP_HAL::panic(PSTR("PANIC: AP_Baro::read unsuccessful "
+                        "for more than 500ms in AP_Baro::calibrate [2]\r\n"));
             }
             hal.scheduler->delay(10);
         } while (!healthy());
@@ -184,8 +184,8 @@ void AP_Baro::calibrate(bool save)
         do {
             update();
             if (AP_HAL::millis() - tstart > 500) {
-                AP_HAL::panic("PANIC: AP_Baro::read unsuccessful "
-                        "for more than 500ms in AP_Baro::calibrate [3]\r\n");
+                AP_HAL::panic(PSTR("PANIC: AP_Baro::read unsuccessful "
+                        "for more than 500ms in AP_Baro::calibrate [3]\r\n"));
             }
         } while (!healthy());
         for (uint8_t i=0; i<_num_sensors; i++) {
@@ -215,7 +215,7 @@ void AP_Baro::calibrate(bool save)
             return;
         }
     }
-    AP_HAL::panic("AP_Baro: all sensors uncalibrated");
+    AP_HAL::panic(PSTR("AP_Baro: all sensors uncalibrated"));
 }
 
 /*
@@ -359,7 +359,7 @@ bool AP_Baro::_add_backend(AP_Baro_Backend *backend)
         return false;
     }
     if (_num_drivers >= BARO_MAX_DRIVERS) {
-        AP_HAL::panic("Too many barometer drivers");
+        AP_HAL::panic(PSTR("Too many barometer drivers"));
     }
     drivers[_num_drivers++] = backend;
     return true;
@@ -589,7 +589,7 @@ void AP_Baro::accumulate(void)
 uint8_t AP_Baro::register_sensor(void)
 {
     if (_num_sensors >= BARO_MAX_INSTANCES) {
-        AP_HAL::panic("Too many barometers");
+        AP_HAL::panic(PSTR("Too many barometers"));
     }
     return _num_sensors++;
 }

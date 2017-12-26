@@ -31,7 +31,8 @@ void setup()
 
 void loop()
 {
-    hal.scheduler->delay(1000);
+    hal.scheduler->delay(20);
+    board_led.update();
 }
 
 AP_HAL_MAIN();

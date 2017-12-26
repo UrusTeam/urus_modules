@@ -284,12 +284,12 @@ void CLCoreUrusSPI3Device_Avr::init()
      * with AVRDigitalSource. UPDATE: This pin was added
      * on the arduino gpio table. */
 
-    _spi3_sck = new CLCoreDigitalSource_Avr(SPI3_SCK_PIN_71);
+    _spi3_sck = new CLCoreDigitalSource_Avr(SPI3_SCK_PIN);
     _spi3_sck->mode(HAL_GPIO_OUTPUT);
     _spi3_sck->write(1);
 
-    hal.gpio->pinMode(SPI3_MOSI_PIN_14, HAL_GPIO_OUTPUT);
-    hal.gpio->pinMode(SPI3_MISO_PIN_15, HAL_GPIO_INPUT);
+    hal.gpio->pinMode(SPI3_MOSI_PIN, HAL_GPIO_OUTPUT);
+    hal.gpio->pinMode(SPI3_MISO_PIN, HAL_GPIO_INPUT);
 
     _cs_pin = new CLCoreDigitalSource_Avr(_device_desc.cs_pin);
     _cs_pin->mode(HAL_GPIO_OUTPUT);

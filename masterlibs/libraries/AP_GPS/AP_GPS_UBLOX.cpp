@@ -660,7 +660,7 @@ AP_GPS_UBLOX::_parse_gps(void)
                 Debug("Changed speed to 5Mhzfor SPI-driven UBlox\n");
                 break;
             default:
-                hal.console->printf("Wrong Ublox' Hardware Version%u\n", hardware_generation);
+                hal.console->printf_PS(PSTR("Wrong Ublox' Hardware Version%u\n"), hardware_generation);
                 break;
         };
         /* We don't need that anymore */

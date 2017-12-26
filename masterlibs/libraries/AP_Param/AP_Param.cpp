@@ -1175,16 +1175,16 @@ void AP_Param::show(const AP_Param *ap, const char *s,
 {
     switch (type) {
     case AP_PARAM_INT8:
-        port->printf(("%s: %d\n"), s, (int)((AP_Int8 *)ap)->get());
+        port->printf_PS(PSTR("%s: %d\n"), s, (int)((AP_Int8 *)ap)->get());
         break;
     case AP_PARAM_INT16:
-        port->printf(("%s: %d\n"), s, (int)((AP_Int16 *)ap)->get());
+        port->printf_PS(PSTR("%s: %d\n"), s, (int)((AP_Int16 *)ap)->get());
         break;
     case AP_PARAM_INT32:
-        port->printf(("%s: %ld\n"), s, (long)((AP_Int32 *)ap)->get());
+        port->printf_PS(PSTR("%s: %ld\n"), s, (long)((AP_Int32 *)ap)->get());
         break;
     case AP_PARAM_FLOAT:
-        port->printf(("%s: %f\n"), s, (double)((AP_Float *)ap)->get());
+        port->printf_PS(PSTR("%s: %f\n"), s, (double)((AP_Float *)ap)->get());
         break;
     default:
         break;
@@ -1244,7 +1244,7 @@ void AP_Param::convert_old_parameter(const struct ConversionInfo *info)
     AP_Param *ap2;
     ap2 = find_P((const prog_char_t *)&info->new_name[0], &ptype);
     if (ap2 == NULL) {
-        hal.console->printf(("Unknown conversion '%s'\n"), info->new_name);
+        hal.console->printf_PS(PSTR("Unknown conversion '%s'\n"), info->new_name);
         return;
     }
 
@@ -1274,7 +1274,7 @@ void AP_Param::convert_old_parameter(const struct ConversionInfo *info)
         }
     } else {
         // can't do vector<->scalar conversion, or different vector types
-        hal.console->printf(("Bad conversion type '%s'\n"), info->new_name);
+        hal.console->printf_PS(PSTR("Bad conversion type '%s'\n"), info->new_name);
     }
 }
 #pragma GCC diagnostic pop

@@ -86,7 +86,7 @@ AP_Notify::AP_Notify()
 {
 	AP_Param::setup_object_defaults(this, var_info);
     if (_instance != nullptr) {
-        AP_HAL::panic("AP_Notify must be singleton");
+        AP_HAL::panic(PSTR("AP_Notify must be singleton"));
     }
     _instance = this;
 }

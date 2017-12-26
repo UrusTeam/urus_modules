@@ -87,7 +87,7 @@ bool AP_Baro_MS56XX::_init()
     hal.scheduler->suspend_timer_procs();
 
     if (!_dev->get_semaphore()->take(10)) {
-        AP_HAL::panic("PANIC: AP_Baro_MS56XX: failed to take serial semaphore for init");
+        AP_HAL::panic(PSTR("PANIC: AP_Baro_MS56XX: failed to take serial semaphore for init"));
         return false;
     }
 
