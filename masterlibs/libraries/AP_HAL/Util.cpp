@@ -44,7 +44,11 @@ int AP_HAL::Util::snprintf(char* str, size_t size, const char *format, ...)
 int AP_HAL::Util::vsnprintf(char* str, size_t size, const char *format, va_list ap)
 {
     BufferPrinter buf(str, size);
+#if CONFIG_SHAL_CORE == SHAL_CORE_APM
+    print_vprintf(&buf, 0, format, ap);
+#else
     print_vprintf(&buf, format, ap);
+#endif // CONFIG_SHAL_CORE
     // null terminate if possible
     int ret = buf._offs;
     buf.write(0);
@@ -58,6 +62,7 @@ uint64_t AP_HAL::Util::get_system_clock_ms() const
 
 void AP_HAL::Util::get_system_clock_utc(int32_t &hour, int32_t &min, int32_t &sec, int32_t &ms) const
 {
+#if HAL_CPU_CLASS > HAL_CPU_CLASS_16
      // get time of day in ms
     uint32_t time_ms = AP_HAL::millis();
 
@@ -71,12 +76,14 @@ void AP_HAL::Util::get_system_clock_utc(int32_t &hour, int32_t &min, int32_t &se
     sec = sec_ms / 1000;
     min = min_ms / (60 * 1000);
     hour = hour_ms / (60 * 60 * 1000);
+#endif
 }
 
 // get milliseconds from now to a target time of day expressed as hour, min, sec, ms
 // match starts from first value that is not -1. I.e. specifying hour=-1, minutes=10 will ignore the hour and return time until 10 minutes past 12am (utc)
 uint32_t AP_HAL::Util::get_time_utc(int32_t hour, int32_t min, int32_t sec, int32_t ms) const
 {
+#if HAL_CPU_CLASS > HAL_CPU_CLASS_16
     // determine highest value specified (0=none, 1=ms, 2=sec, 3=min, 4=hour)
     int8_t largest_element = 0;
     if (hour != -1) {
@@ -131,4 +138,7 @@ uint32_t AP_HAL::Util::get_time_utc(int32_t hour, int32_t min, int32_t sec, int3
 
     // total delay in milliseconds
     return static_cast<uint32_t>(total_delay_ms);
+#else
+    return 0;
+#endif
 }
