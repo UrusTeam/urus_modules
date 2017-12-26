@@ -7,6 +7,8 @@
 #include "AP_HAL_Namespace.h"
 #include "utility/BetterStream.h"
 
+#include <AP_Progmem/AP_Progmem.h>
+
 /* Pure virtual UARTDriver class */
 class AP_HAL::UARTDriver : public AP_HAL::BetterStream {
 public:
@@ -59,4 +61,11 @@ public:
      */
     void printf(const char *s, ...) FMT_PRINTF(2, 3);
     void vprintf(const char *s, va_list ap);
+
+    void print_P(const prog_char_t *s);
+    void println_P(const prog_char_t *s);
+    void _printf_P(const prog_char *s, ...) FMT_PRINTF(2, 3);
+#define printf_PS(fmt, ...) _printf_P((const prog_char *)fmt, ## __VA_ARGS__)
+
+    void vprintf_P(const prog_char *s, va_list ap);
 };
