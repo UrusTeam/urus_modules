@@ -814,7 +814,7 @@ void AP_InertialSensor_Invensense::_set_filter_register(void)
     if (enable_fast_sampling(_accel_instance)) {
         _fast_sampling = (_mpu_type != Invensense_MPU6000 && _dev->bus_type() == AP_HAL::Device::BUS_TYPE_SPI);
         if (_fast_sampling) {
-            hal.console->printf("MPU[%u]: enabled fast sampling\n", _accel_instance);
+            hal.console->printf_PS(PSTR("MPU[%u]: enabled fast sampling\n"), _accel_instance);
 
             // for logging purposes set the oversamping rate
             _set_accel_oversampling(_accel_instance, MPU_FIFO_DOWNSAMPLE_COUNT/2);
@@ -960,7 +960,7 @@ bool AP_InertialSensor_Invensense::_hardware_init(void)
     _dev->get_semaphore()->give();
 
     if (tries == 5) {
-        hal.console->printf("Failed to boot Invensense 5 times\n");
+        hal.console->printf_PS(PSTR("Failed to boot Invensense 5 times\n"));
         return false;
     }
 

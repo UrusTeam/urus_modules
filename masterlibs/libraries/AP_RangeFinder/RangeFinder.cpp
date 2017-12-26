@@ -589,7 +589,7 @@ bool RangeFinder::_add_backend(AP_RangeFinder_Backend *backend)
         return false;
     }
     if (num_instances == RANGEFINDER_MAX_INSTANCES) {
-        AP_HAL::panic("Too many RANGERS backends");
+        AP_HAL::panic(PSTR("Too many RANGERS backends"));
     }
 
     drivers[num_instances++] = backend;

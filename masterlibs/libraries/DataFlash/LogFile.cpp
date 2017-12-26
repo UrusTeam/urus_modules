@@ -30,7 +30,7 @@ void DataFlash_Class::Init(const struct LogStructure *structure, uint8_t num_typ
     backend = new DataFlash_Empty(*this);
 #endif
     if (backend == NULL) {
-        AP_HAL::panic("Unable to open dataflash");
+        AP_HAL::panic(PSTR("Unable to open dataflash"));
     }
     backend->Init(structure, num_types);
 }
@@ -53,7 +53,7 @@ void DataFlash_Backend::_print_log_entry(uint8_t msg_type,
         }
     }
     if (i == _num_types) {
-        port->printf("UNKN, %u\n", (unsigned)msg_type);
+        port->printf_PS(PSTR("UNKN, %u\n"), (unsigned)msg_type);
         return;
     }
 
@@ -64,66 +64,66 @@ void DataFlash_Backend::_print_log_entry(uint8_t msg_type,
     }
 
     strncpy_P(pkt_tmp.name, &_structures[i].name[0], sizeof(pkt_tmp.name));
-    port->printf("%s, ", pkt_tmp.name);
+    port->printf_PS(PSTR("%s, "), pkt_tmp.name);
     for (uint8_t ofs=0, fmt_ofs=0; ofs<msg_len; fmt_ofs++) {
         char fmt = PGM_UINT8(&_structures[i].format[fmt_ofs]);
         switch (fmt) {
         case 'b': {
-            port->printf("%d", (int)pkt[ofs]);
+            port->printf_PS(PSTR("%d"), (int)pkt[ofs]);
             ofs += 1;
             break;
         }
         case 'B': {
-            port->printf("%u", (unsigned)pkt[ofs]);
+            port->printf_PS(PSTR("%u"), (unsigned)pkt[ofs]);
             ofs += 1;
             break;
         }
         case 'h': {
             int16_t v;
             memcpy(&v, &pkt[ofs], sizeof(v));
-            port->printf("%d", (int)v);
+            port->printf_PS(PSTR("%d"), (int)v);
             ofs += sizeof(v);
             break;
         }
         case 'H': {
             uint16_t v;
             memcpy(&v, &pkt[ofs], sizeof(v));
-            port->printf("%u", (unsigned)v);
+            port->printf_PS(PSTR("%u"), (unsigned)v);
             ofs += sizeof(v);
             break;
         }
         case 'i': {
             int32_t v;
             memcpy(&v, &pkt[ofs], sizeof(v));
-            port->printf("%ld", (long)v);
+            port->printf_PS(PSTR("%ld"), (long)v);
             ofs += sizeof(v);
             break;
         }
         case 'I': {
             uint32_t v;
             memcpy(&v, &pkt[ofs], sizeof(v));
-            port->printf("%lu", (unsigned long)v);
+            port->printf_PS(PSTR("%lu"), (unsigned long)v);
             ofs += sizeof(v);
             break;
         }
         case 'q': {
             int64_t v;
             memcpy(&v, &pkt[ofs], sizeof(v));
-            port->printf("%lld", (long long)v);
+            port->printf_PS(PSTR("%lld"), (long long)v);
             ofs += sizeof(v);
             break;
         }
         case 'Q': {
             uint64_t v;
             memcpy(&v, &pkt[ofs], sizeof(v));
-            port->printf("%llu", (unsigned long long)v);
+            port->printf_PS(PSTR("%llu"), (unsigned long long)v);
             ofs += sizeof(v);
             break;
         }
         case 'f': {
             float v;
             memcpy(&v, &pkt[ofs], sizeof(v));
-            port->printf("%f", (double)v);
+            port->printf_PS(PSTR("%f"), (double)v);
             ofs += sizeof(v);
             break;
         }
@@ -133,35 +133,35 @@ void DataFlash_Backend::_print_log_entry(uint8_t msg_type,
             // note that %f here *really* means a single-precision
             // float, so we lose precision printing this double out
             // dtoa_engine needed....
-            port->printf("%f", (double)v);
+            port->printf_PS(PSTR("%f"), (double)v);
             ofs += sizeof(v);
             break;
         }
         case 'c': {
             int16_t v;
             memcpy(&v, &pkt[ofs], sizeof(v));
-            port->printf("%.2f", (double)(0.01f*v));
+            port->printf_PS(PSTR("%.2f"), (double)(0.01f*v));
             ofs += sizeof(v);
             break;
         }
         case 'C': {
             uint16_t v;
             memcpy(&v, &pkt[ofs], sizeof(v));
-            port->printf("%.2f", (double)(0.01f*v));
+            port->printf_PS(PSTR("%.2f"), (double)(0.01f*v));
             ofs += sizeof(v);
             break;
         }
         case 'e': {
             int32_t v;
             memcpy(&v, &pkt[ofs], sizeof(v));
-            port->printf("%.2f", (double)(0.01f*v));
+            port->printf_PS(PSTR("%.2f"), (double)(0.01f*v));
             ofs += sizeof(v);
             break;
         }
         case 'E': {
             uint32_t v;
             memcpy(&v, &pkt[ofs], sizeof(v));
-            port->printf("%.2f", (double)(0.01f*v));
+            port->printf_PS(PSTR("%.2f"), (double)(0.01f*v));
             ofs += sizeof(v);
             break;
         }
@@ -176,7 +176,7 @@ void DataFlash_Backend::_print_log_entry(uint8_t msg_type,
             char v[5];
             memcpy(&v, &pkt[ofs], sizeof(v));
             v[sizeof(v)-1] = 0;
-            port->printf("%s", v);
+            port->printf_PS(PSTR("%s"), v);
             ofs += sizeof(v)-1;
             break;
         }
@@ -184,7 +184,7 @@ void DataFlash_Backend::_print_log_entry(uint8_t msg_type,
             char v[17];
             memcpy(&v, &pkt[ofs], sizeof(v));
             v[sizeof(v)-1] = 0;
-            port->printf("%s", v);
+            port->printf_PS(PSTR("%s"), v);
             ofs += sizeof(v)-1;
             break;
         }
@@ -192,7 +192,7 @@ void DataFlash_Backend::_print_log_entry(uint8_t msg_type,
             char v[65];
             memcpy(&v, &pkt[ofs], sizeof(v));
             v[sizeof(v)-1] = 0;
-            port->printf("%s", v);
+            port->printf_PS(PSTR("%s"), v);
             ofs += sizeof(v)-1;
             break;
         }
@@ -206,10 +206,10 @@ void DataFlash_Backend::_print_log_entry(uint8_t msg_type,
             break;
         }
         if (ofs < msg_len) {
-            port->printf(", ");
+            port->printf_PS(PSTR(", "));
         }
     }
-    port->printf("\n");
+    port->printf_PS(PSTR("\n"));
 
 }
 
@@ -257,7 +257,7 @@ void DataFlash_Block::_print_log_formats(AP_HAL::BetterStream *port)
         strncpy_P(pkt.name, &s->name[0], sizeof(pkt.name));
         strncpy_P(pkt.format, s->format, sizeof(pkt.format));
         strncpy_P(pkt.labels, s->labels, sizeof(pkt.labels));
-        port->printf("FMT, %u, %u, %s, %s, %s\n",
+        port->printf_PS(PSTR("FMT, %u, %u, %s, %s, %s\n"),
                         (unsigned)PGM_UINT8(&s->msg_type),
                         (unsigned)PGM_UINT8(&s->msg_len),
                         pkt.name, pkt.format, pkt.labels);
@@ -274,10 +274,10 @@ void DataFlash_Block::ShowDeviceInfo(AP_HAL::BetterStream *port)
         return;
     }
     ReadManufacturerID();
-    port->printf("Manufacturer: 0x%02x   Device: 0x%04x\n",
+    port->printf_PS(PSTR("Manufacturer: 0x%02x   Device: 0x%04x\n"),
                     (unsigned)df_manufacturer,
                     (unsigned)df_device);
-    port->printf("NumPages: %u  PageSize: %u\n",
+    port->printf_PS(PSTR("NumPages: %u  PageSize: %u\n"),
                    (unsigned)df_NumPages+1,
                    (unsigned)df_PageSize);
 }

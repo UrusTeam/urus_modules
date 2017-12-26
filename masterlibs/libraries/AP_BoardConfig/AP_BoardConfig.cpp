@@ -221,7 +221,7 @@ void AP_BoardConfig::sensor_config_error(const char *reason)
       particular BRD_TYPE if needed)
     */
     while (true) {
-        printf("Sensor failure: %s\n", reason);
+        hal.console->printf_PS(PSTR("Sensor failure: %s\n"), reason);
         #if HAL_CPU_CLASS > HAL_CPU_CLASS_16
         gcs().send_text(MAV_SEVERITY_ERROR, "Check BRD_TYPE: %s", reason);
         #endif

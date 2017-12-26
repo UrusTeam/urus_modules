@@ -93,7 +93,7 @@ void AP_AccelCal::update()
                             fail();
                             return;
                     }
-                    hal.console->printf("Place vehicle %s and press any key.\n", msg);
+                    hal.console->printf_PS(PSTR("Place vehicle %s and press any key.\n"), msg);
                  }
 
                 gcs_vehicle_position((float)step);
@@ -151,11 +151,11 @@ void AP_AccelCal::update()
         switch (_last_result) {
             case ACCEL_CAL_SUCCESS:
                 gcs_vehicle_position(ACCELCAL_VEHICLE_POS_SUCCESS);
-                hal.console->printf("POS SUCCESS\n");
+                hal.console->printf_PS(PSTR("POS SUCCESS\n"));
                 break;
             case ACCEL_CAL_FAILED:
                 gcs_vehicle_position(ACCELCAL_VEHICLE_POS_FAILED);
-                hal.console->printf("POS FAILED\n");
+                hal.console->printf_PS(PSTR("POS FAILED\n"));
                 break;
             default:
                 // should never hit this state
@@ -194,7 +194,7 @@ void AP_AccelCal::start(AP_HAL::UARTDriver *gcs)
 
 void AP_AccelCal::success()
 {
-    hal.console->printf("Cal successful\n");
+    hal.console->printf_PS(PSTR("Cal successful\n"));
 
     for(uint8_t i=0 ; i < _num_clients ; i++) {
         _clients[i]->_acal_event_success();
@@ -207,7 +207,7 @@ void AP_AccelCal::success()
 
 void AP_AccelCal::cancel()
 {
-    hal.console->printf("Cal cancelled\n");
+    hal.console->printf_PS(PSTR("Cal cancelled\n"));
 
     for(uint8_t i=0 ; i < _num_clients ; i++) {
         _clients[i]->_acal_event_cancellation();
@@ -220,7 +220,7 @@ void AP_AccelCal::cancel()
 
 void AP_AccelCal::fail()
 {
-    hal.console->printf("Cal FAILED\n");
+    hal.console->printf_PS(PSTR("Cal FAILED\n"));
 
     for(uint8_t i=0 ; i < _num_clients ; i++) {
         _clients[i]->_acal_event_failure();
@@ -257,7 +257,7 @@ void AP_AccelCal::collect_sample()
 
     for(uint8_t i=0; i<_num_clients; i++) {
         if (client_active(i) && !_clients[i]->_acal_get_ready_to_sample()) {
-            hal.console->printf("Not ready to sample\n");
+            hal.console->printf_PS(PSTR("Not ready to sample\n"));
             return;
         }
     }

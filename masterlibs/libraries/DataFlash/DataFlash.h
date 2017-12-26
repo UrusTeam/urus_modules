@@ -46,7 +46,7 @@ public:
         {
             //AP_Param::setup_object_defaults(this, var_info);
             if (_instance != nullptr) {
-                AP_HAL::panic("DataFlash must be singleton");
+                AP_HAL::panic(PSTR("DataFlash must be singleton"));
             }
             _instance = this;
         }

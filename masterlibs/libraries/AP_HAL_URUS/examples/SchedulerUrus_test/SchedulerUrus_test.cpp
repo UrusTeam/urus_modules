@@ -36,7 +36,7 @@ static SchedTest schedtest;
   often they should be called (in 20ms units) and the maximum time
   they are expected to take (in microseconds)
  */
-const AP_Scheduler::Task SchedTest::scheduler_tasks[] = {
+const AP_Scheduler::Task SchedTest::scheduler_tasks[] PROGMEM = {
     SCHED_TASK(ins_update,             50,   1000),
     SCHED_TASK(one_hz_print,            1,   1000),
     SCHED_TASK(five_second_call,      0.2,   1800),
@@ -81,7 +81,7 @@ void SchedTest::ins_update(void)
  */
 void SchedTest::one_hz_print(void)
 {
-    hal.console->printf("one_hz: t=%lu\n", (unsigned long)AP_HAL::millis());
+    hal.console->printf_PS(PSTR("one_hz: t=%lu\n"), (unsigned long)AP_HAL::millis());
 }
 
 /*
@@ -89,7 +89,7 @@ void SchedTest::one_hz_print(void)
  */
 void SchedTest::five_second_call(void)
 {
-    hal.console->printf("five_seconds: t=%lu ins_counter=%u\n", (unsigned long)AP_HAL::millis(), ins_counter);
+    hal.console->printf_PS(PSTR("five_seconds: t=%lu ins_counter=%lu\n"), (unsigned long)AP_HAL::millis(), ins_counter);
 }
 
 /*

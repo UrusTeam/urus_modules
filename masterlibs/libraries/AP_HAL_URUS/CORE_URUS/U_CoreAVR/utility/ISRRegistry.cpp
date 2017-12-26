@@ -38,6 +38,11 @@ extern "C" ISR(TIMER1_CAPT_vect) {
          ISRRegistry::_registry[ISR_REGISTRY_TIMER1_CAPT]();
 }
 #elif defined(SHAL_CORE_APM2)
+extern "C" ISR(TIMER2_OVF_vect) {
+    if ( ISRRegistry::_registry[ISR_REGISTRY_TIMER2_OVF] != NULL)
+         ISRRegistry::_registry[ISR_REGISTRY_TIMER2_OVF]();
+}
+
 extern "C" ISR(TIMER4_CAPT_vect) {
     if ( ISRRegistry::_registry[ISR_REGISTRY_TIMER4_CAPT] != NULL)
          ISRRegistry::_registry[ISR_REGISTRY_TIMER4_CAPT]();

@@ -458,7 +458,7 @@ AP_InertialSensor::AP_InertialSensor() :
     _startup_ms(0)
 {
     if (_s_instance) {
-        AP_HAL::panic("Too many inertial sensors");
+        AP_HAL::panic(PSTR("Too many inertial sensors"));
     }
     _s_instance = this;
     AP_Param::setup_object_defaults(this, var_info);
@@ -515,7 +515,7 @@ uint8_t AP_InertialSensor::register_gyro(uint16_t raw_sample_rate_hz,
                                          uint32_t id)
 {
     if (_gyro_count == INS_MAX_INSTANCES) {
-        AP_HAL::panic("Too many gyros");
+        AP_HAL::panic(PSTR("Too many gyros"));
     }
 
     _gyro_raw_sample_rates[_gyro_count] = raw_sample_rate_hz;
@@ -548,7 +548,7 @@ uint8_t AP_InertialSensor::register_accel(uint16_t raw_sample_rate_hz,
                                           uint32_t id)
 {
     if (_accel_count == INS_MAX_INSTANCES) {
-        AP_HAL::panic("Too many accels");
+        AP_HAL::panic(PSTR("Too many accels"));
     }
 
     _accel_raw_sample_rates[_accel_count] = raw_sample_rate_hz;
@@ -592,7 +592,7 @@ void AP_InertialSensor::_start_backends()
     }
 
     if (_gyro_count == 0 || _accel_count == 0) {
-        AP_HAL::panic("INS needs at least 1 gyro and 1 accel");
+        AP_HAL::panic(PSTR("INS needs at least 1 gyro and 1 accel"));
     }
 }
 
@@ -660,7 +660,7 @@ bool AP_InertialSensor::_add_backend(AP_InertialSensor_Backend *backend)
         return false;
     }
     if (_backend_count == INS_MAX_BACKENDS) {
-        AP_HAL::panic("Too many INS backends");
+        AP_HAL::panic(PSTR("Too many INS backends"));
     }
     _backends[_backend_count++] = backend;
     return true;
@@ -815,7 +815,7 @@ AP_InertialSensor::detect_backends(void)
 #endif
 
     if (_backend_count == 0) {
-        AP_HAL::panic("No INS backends available");
+        AP_HAL::panic(PSTR("No INS backends available"));
     }
 }
 
@@ -830,10 +830,10 @@ bool AP_InertialSensor::_calculate_trim(const Vector3f &accel_sample, float& tri
     trim_roll = atan2f(-accel_sample.y, -accel_sample.z);
     if (fabsf(trim_roll) > radians(10) ||
         fabsf(trim_pitch) > radians(10)) {
-        hal.console->printf("trim over maximum of 10 degrees\n");
+        hal.console->printf_PS(PSTR("trim over maximum of 10 degrees\n"));
         return false;
     }
-    hal.console->printf("Trim OK: roll=%.2f pitch=%.2f\n",
+    hal.console->printf_PS(PSTR("Trim OK: roll=%.2f pitch=%.2f\n"),
                           (double)degrees(trim_roll),
                           (double)degrees(trim_pitch));
     return true;
@@ -1045,7 +1045,7 @@ AP_InertialSensor::_init_gyro()
     AP_Notify::flags.initialising = true;
 
     // cold start
-    hal.console->printf("Init Gyro");
+    hal.console->printf_PS(PSTR("Init Gyro"));
 
     /*
       we do the gyro calibration with no board rotation. This avoids
@@ -1084,7 +1084,7 @@ AP_InertialSensor::_init_gyro()
 
         memset(diff_norm, 0, sizeof(diff_norm));
 
-        hal.console->printf("*");
+        hal.console->printf_PS(PSTR("*"));
 
         for (uint8_t k=0; k<num_gyros; k++) {
             gyro_sum[k].zero();
@@ -1137,10 +1137,10 @@ AP_InertialSensor::_init_gyro()
 
     // we've kept the user waiting long enough - use the best pair we
     // found so far
-    hal.console->printf("\n");
+    hal.console->printf_PS(PSTR("\n"));
     for (uint8_t k=0; k<num_gyros; k++) {
         if (!converged[k]) {
-            hal.console->printf("gyro[%u] did not converge: diff=%f dps (expected < %f)\n",
+            hal.console->printf_PS(PSTR("gyro[%u] did not converge: diff=%f dps (expected < %f)\n"),
                                 (unsigned)k,
                                 (double)ToDeg(best_diff[k]),
                                 (double)GYRO_INIT_MAX_DIFF_DPS);
@@ -1693,7 +1693,7 @@ void AP_InertialSensor::_acal_save_calibrations()
 
     if (fabsf(_trim_roll) > radians(10) ||
         fabsf(_trim_pitch) > radians(10)) {
-        hal.console->printf("ERR: Trim over maximum of 10 degrees!!");
+        hal.console->printf_PS(PSTR("ERR: Trim over maximum of 10 degrees!!"));
         _new_trim = false;  //we have either got faulty level during acal or highly misaligned accelerometers
     }
 
@@ -1786,7 +1786,7 @@ MAV_RESULT AP_InertialSensor::simple_accel_cal(AP_AHRS &ahrs)
     // flash leds to tell user to keep the IMU still
     AP_Notify::flags.initialising = true;
 
-    hal.console->printf("Simple accel cal");
+    hal.console->printf_PS(PSTR("Simple accel cal"));
 
     /*
       we do the accel calibration with no board rotation. This avoids
@@ -1833,7 +1833,7 @@ MAV_RESULT AP_InertialSensor::simple_accel_cal(AP_AHRS &ahrs)
 
         memset(diff_norm, 0, sizeof(diff_norm));
 
-        hal.console->printf("*");
+        hal.console->printf_PS(PSTR("*"));
 
         for (uint8_t k=0; k<num_accels; k++) {
             accel_sum[k].zero();
@@ -1881,7 +1881,7 @@ MAV_RESULT AP_InertialSensor::simple_accel_cal(AP_AHRS &ahrs)
     _board_orientation = saved_orientation;
 
     if (result == MAV_RESULT_ACCEPTED) {
-        hal.console->printf("\nPASSED\n");
+        hal.console->printf_PS(PSTR("\nPASSED\n"));
         for (uint8_t k=0; k<num_accels; k++) {
             // remove rotated gravity
             new_accel_offset[k] -= rotated_gravity;
@@ -1894,7 +1894,7 @@ MAV_RESULT AP_InertialSensor::simple_accel_cal(AP_AHRS &ahrs)
         // force trim to zero
         ahrs.set_trim(Vector3f(0, 0, 0));
     } else {
-        hal.console->printf("\nFAILED\n");
+        hal.console->printf_PS(PSTR("\nFAILED\n"));
         // restore old values
         for (uint8_t k=0; k<num_accels; k++) {
             _accel_offset[k] = saved_offsets[k];

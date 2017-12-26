@@ -8,7 +8,7 @@
 #include <GCS_MAVLink/GCS_Dummy.h>
 #include <stdio.h>
 
-extern const AP_HAL::HAL& hal;
+const AP_HAL::HAL& hal = AP_HAL::get_HAL();
 
 #define LOG_TEST_MSG 1
 
@@ -18,14 +18,12 @@ struct PACKED log_Test {
     int32_t  l1, l2;
 };
 
-static const struct LogStructure log_structure[] = {
+static const struct LogStructure log_structure[] PROGMEM = {
     LOG_COMMON_STRUCTURES,
     { LOG_TEST_MSG, sizeof(log_Test),
       "TEST",
       "HHHHii",
-      "V1,V2,V3,V4,L1,L2",
-      "------",
-      "------"
+      "V1,V2,V3,V4,L1,L2"
     }
 };
 
@@ -54,15 +52,22 @@ void DataFlashTest::setup(void)
     log_bitmask = (uint32_t)-1;
     dataflash.Init(log_structure, ARRAY_SIZE(log_structure));
     dataflash.set_vehicle_armed(true);
-    dataflash.Log_Write_Message("DataFlash Test");
+    //dataflash.Log_Write_Message("DataFlash Test");
 
     // Test
     hal.scheduler->delay(20);
     dataflash.ShowDeviceInfo(hal.console);
 
+    if (dataflash.NeedErase()) {
+        hal.console->println("Erasing...");
+        dataflash.EraseAll();
+    }
+
     // We start to write some info (sequentialy) starting from page 1
     // This is similar to what we will do...
-    log_num = dataflash.find_last_log();
+    //log_num = dataflash.find_last_log();
+    log_num = dataflash.StartNewLog();
+    dataflash.Log_Write_Message("DataFlash Test");
     hal.console->printf("Using log number %u\n", log_num);
     hal.console->printf("After testing perform erase before using DataFlash for logging!\n");
     hal.console->printf("\n");
@@ -134,10 +139,10 @@ void loop()
 {
     dataflashtest.loop();
 }
-
+/*
 const struct AP_Param::GroupInfo        GCS_MAVLINK::var_info[] = {
     AP_GROUPEND
 };
 GCS_Dummy _gcs;
-
+*/
 AP_HAL_MAIN();
