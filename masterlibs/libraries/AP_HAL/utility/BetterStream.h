@@ -25,6 +25,7 @@
 #include <AP_HAL/AP_HAL_Namespace.h>
 
 #include "Stream.h"
+#include <AP_Progmem/AP_Progmem.h>
 
 class AP_HAL::BetterStream : public AP_HAL::Stream {
 public:
@@ -32,4 +33,10 @@ public:
 
     virtual void printf(const char *, ...) FMT_PRINTF(2, 3) = 0;
     virtual void vprintf(const char *, va_list) = 0;
+
+    /* No format checking on printf_P: can't currently support that on AVR */
+    virtual void _printf_P(const prog_char *, ...) = 0;
+    virtual void print_P(const prog_char_t *) = 0;
+    virtual void println_P(const prog_char_t *) = 0;
+    virtual void vprintf_P(const prog_char *, va_list) = 0;
 };
