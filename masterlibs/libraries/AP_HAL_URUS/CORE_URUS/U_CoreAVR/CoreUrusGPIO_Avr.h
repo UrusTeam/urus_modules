@@ -7,7 +7,7 @@
 #include "../CoreUrusGPIO.h"
 
 #if defined(SHAL_CORE_APM2)
-#define AVR_INT_NUM_PINS_MAX 1
+#define AVR_INT_NUM_PINS_MAX 9
 #elif defined(SHAL_CORE_APM328)
 #define AVR_INT_NUM_PINS_MAX 4
 #endif
@@ -15,6 +15,7 @@
 class CLCoreUrusGPIO_Avr : public NSCORE_URUS::CLCoreUrusGPIO {
 public:
     CLCoreUrusGPIO_Avr();
+
     void    init();
     void    pinMode(uint8_t pin, uint8_t output);
     int8_t  analogPinToDigitalPin(uint8_t pin);

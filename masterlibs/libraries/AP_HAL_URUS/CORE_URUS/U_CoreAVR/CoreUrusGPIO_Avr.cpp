@@ -30,7 +30,8 @@
 extern const AP_HAL::HAL& hal;
 
 AP_HAL::Proc CLCoreUrusGPIO_Avr::_interrupt_6[AVR_INT_NUM_PINS_MAX] = {nullptr};
-static volatile uint8_t PCintLast;
+static volatile uint8_t PCintLast = 0;
+static volatile bool PCintInProc = false;
 
 #if defined(SHAL_CORE_APM2)
 SIGNAL(INT6_vect) {
@@ -38,14 +39,85 @@ SIGNAL(INT6_vect) {
         CLCoreUrusGPIO_Avr::_interrupt_6[0]();
     }
 }
-#elif defined(SHAL_CORE_APM328)
+
 ISR(PCINT2_vect) {
+
+    if (PCintInProc) {
+        return;
+    }
+
+    PCintInProc = true;
 	uint8_t mask;
 	uint8_t pin;
 
-	pin = PIND;             // PINK indicates the state of each PIN for the arduino port dealing with [A8-A15] digital pins (8 bits variable)
-	mask = pin ^ PCintLast;   // doing a ^ between the current interruption and the last one indicates wich pin changed
-	PCintLast = pin;          // we memorize the current state of all PINs [D0-D7]
+	pin = PINK;                 // PINK indicates the state of each PIN for the arduino port dealing with [A8-A15] digital pins (8 bits variable)
+	mask = pin ^ PCintLast;     // doing a ^ between the current interruption and the last one indicates wich pin changed
+	PCintLast = pin;            // we memorize the current state of all PINs.
+
+	if (mask & (1 << PCINT16)) {
+        if (CLCoreUrusGPIO_Avr::_interrupt_6[1]) {
+            CLCoreUrusGPIO_Avr::_interrupt_6[1]();
+        }
+	}
+
+	if (mask & (1 << PCINT17)) {
+        if (CLCoreUrusGPIO_Avr::_interrupt_6[2]) {
+            CLCoreUrusGPIO_Avr::_interrupt_6[2]();
+        }
+	}
+
+	if (mask & (1 << PCINT18)) {
+        if (CLCoreUrusGPIO_Avr::_interrupt_6[3]) {
+            CLCoreUrusGPIO_Avr::_interrupt_6[3]();
+        }
+	}
+
+	if (mask & (1 << PCINT19)) {
+        if (CLCoreUrusGPIO_Avr::_interrupt_6[4]) {
+            CLCoreUrusGPIO_Avr::_interrupt_6[4]();
+        }
+	}
+
+	if (mask & (1 << PCINT20)) {
+        if (CLCoreUrusGPIO_Avr::_interrupt_6[5]) {
+            CLCoreUrusGPIO_Avr::_interrupt_6[5]();
+        }
+	}
+
+	if (mask & (1 << PCINT21)) {
+        if (CLCoreUrusGPIO_Avr::_interrupt_6[6]) {
+            CLCoreUrusGPIO_Avr::_interrupt_6[6]();
+        }
+	}
+
+	if (mask & (1 << PCINT22)) {
+        if (CLCoreUrusGPIO_Avr::_interrupt_6[7]) {
+            CLCoreUrusGPIO_Avr::_interrupt_6[7]();
+        }
+	}
+
+	if (mask & (1 << PCINT23)) {
+        if (CLCoreUrusGPIO_Avr::_interrupt_6[8]) {
+            CLCoreUrusGPIO_Avr::_interrupt_6[8]();
+        }
+	}
+
+    PCintInProc = false;
+}
+
+#elif defined(SHAL_CORE_APM328)
+ISR(PCINT2_vect) {
+    if (PCintInProc) {
+        return;
+    }
+
+    PCintInProc = true;
+	uint8_t mask;
+	uint8_t pin;
+
+	pin = PIND;                 // PIND indicates the state of each PIN for the arduino port dealing with [A8-A15] digital pins (8 bits variable)
+	mask = pin ^ PCintLast;     // doing a ^ between the current interruption and the last one indicates wich pin changed
+	PCintLast = pin;            // we memorize the current state of all PINs.
 
 	if (mask & (1 << PCINT18)) {
         if (CLCoreUrusGPIO_Avr::_interrupt_6[0]) {
@@ -70,7 +142,7 @@ ISR(PCINT2_vect) {
             CLCoreUrusGPIO_Avr::_interrupt_6[3]();
         }
 	}
-
+    PCintInProc = false;
 }
 #endif
 
@@ -184,19 +256,75 @@ bool CLCoreUrusGPIO_Avr::attach_interrupt(uint8_t interrupt_num, AP_HAL::Proc p,
           (mode == HAL_GPIO_INTERRUPT_FALLING)||
           (mode == HAL_GPIO_INTERRUPT_RISING))) return false;
 #if defined(SHAL_CORE_APM2)
-    if (interrupt_num == 6) {
-        uint8_t oldSREG = SREG;
-        cli();
-        _interrupt_6[0] = p;
-        /* Set the ISC60 and ICS61 bits in EICRB according to the value
-         * of mode. */
-        EICRB = (EICRB & ~((1 << ISC60) | (1 << ISC61))) | (mode << ISC60);
-        EIMSK |= (1 << INT6);
-        SREG = oldSREG;
-        return true;
-    } else {
-        return false;
+    bool ret = false;
+    uint8_t oldSREG = SREG;
+    cli();
+    switch (interrupt_num)
+    {
+    case 6:
+            _interrupt_6[0] = p;
+            /* Set the ISC60 and ICS61 bits in EICRB according to the value
+             * of mode. */
+            EICRB = (EICRB & ~((1 << ISC60) | (1 << ISC61))) | (mode << ISC60);
+            EIMSK |= (1 << INT6);
+            ret = true;
+            break;
+    case GPIO_INT1:
+            _interrupt_6[1] = p;
+            PORTK   |= (1 << PCINT16);
+            PCMSK2  |= (1 << PCINT16);
+            ret = true;
+            break;
+    case GPIO_INT2:
+            _interrupt_6[2] = p;
+            PORTK   |= (1 << PCINT17);
+            PCMSK2  |= (1 << PCINT17);
+            ret = true;
+            break;
+    case GPIO_INT3:
+            _interrupt_6[3] = p;
+            PORTK   |= (1 << PCINT18);
+            PCMSK2  |= (1 << PCINT18);
+            ret = true;
+            break;
+    case GPIO_INT4:
+            _interrupt_6[4] = p;
+            PORTK   |= (1 << PCINT19);
+            PCMSK2  |= (1 << PCINT19);
+            ret = true;
+            break;
+    case GPIO_INT5:
+            _interrupt_6[5] = p;
+            PORTK   |= (1 << PCINT20);
+            PCMSK2  |= (1 << PCINT20);
+            ret = true;
+            break;
+    case GPIO_INT6:
+            _interrupt_6[6] = p;
+            PORTK   |= (1 << PCINT21);
+            PCMSK2  |= (1 << PCINT21);
+            ret = true;
+            break;
+    case GPIO_INT7:
+            _interrupt_6[7] = p;
+            PORTK   |= (1 << PCINT22);
+            PCMSK2  |= (1 << PCINT22);
+            ret = true;
+            break;
+    case GPIO_INT8:
+            _interrupt_6[8] = p;
+            PORTK   |= (1 << PCINT23);
+            PCMSK2  |= (1 << PCINT23);
+            ret = true;
+            break;
+    default:
+        ret = false;
+        break;
     }
+    PCICR   |= (1 << PCIE2); // PCINT2 Interrupt enable
+    SREG = oldSREG;
+
+    return ret;
 #elif defined(SHAL_CORE_APM328)
     if ((interrupt_num == 2) || (interrupt_num == 3) ||
         (interrupt_num == 4) || (interrupt_num == 5)){
