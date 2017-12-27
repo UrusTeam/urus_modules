@@ -12,6 +12,17 @@
 #define HAL_GPIO_INTERRUPT_FALLING 2
 #define HAL_GPIO_INTERRUPT_RISING 3
 
+enum GPIO_INT {
+    GPIO_INT1 = 8,
+    GPIO_INT2,
+    GPIO_INT3,
+    GPIO_INT4,
+    GPIO_INT5,
+    GPIO_INT6,
+    GPIO_INT7,
+    GPIO_INT8
+};
+
 class AP_HAL::DigitalSource {
 public:
     virtual void    mode(uint8_t output) = 0;
@@ -23,6 +34,7 @@ public:
 class AP_HAL::GPIO {
 public:
     GPIO() {}
+
     virtual void    init() = 0;
     virtual void    pinMode(uint8_t pin, uint8_t output) = 0;
 
