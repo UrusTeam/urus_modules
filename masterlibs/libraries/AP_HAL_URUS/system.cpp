@@ -24,7 +24,9 @@ void init()
 void panic(const prog_char_t* errormsg)
 {
     /* Print the error message on both ports */
+#if !defined(SHAL_CORE_APM16U)
     hal.uartA->println_P(errormsg);
+#endif
     /* Spin forever. */
     for(;;);
 }

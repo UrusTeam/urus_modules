@@ -32,8 +32,13 @@ HAL_URUS::HAL_URUS() :
         nullptr) /* can */
 {
     scheduler = NSCORE_URUS::get_scheduler();
+#if CONFIG_SHAL_CORE == SHAL_CORE_APM && (defined(SHAL_CORE_APM2) \
+    || CONFIG_SHAL_CORE == SHAL_CORE_CYGWIN \
+    || defined(SHAL_CORE_APM328))
+
     uartA = NSCORE_URUS::get_uartA_Driver();
     console = uartA;
+#endif
 
 #if CONFIG_SHAL_CORE == SHAL_CORE_APM && defined(SHAL_CORE_APM2) \
     || CONFIG_SHAL_CORE == SHAL_CORE_CYGWIN
@@ -45,15 +50,19 @@ HAL_URUS::HAL_URUS() :
     uartF = NSCORE_URUS::get_uartF_Driver();
 
 #endif
+#if CONFIG_SHAL_CORE == SHAL_CORE_APM && (defined(SHAL_CORE_APM2) \
+    || CONFIG_SHAL_CORE == SHAL_CORE_CYGWIN \
+    || defined(SHAL_CORE_APM328))
 
     i2c_mgr = NSCORE_URUS::get_I2CDeviceManager();
     spi = NSCORE_URUS::get_SPIDeviceManager();
     analogin = NSCORE_URUS::get_AnalogIn();
     util = NSCORE_URUS::get_Util();
     storage = NSCORE_URUS::get_Storage();
-    gpio = NSCORE_URUS::get_GPIO();
     rcin = NSCORE_URUS::get_RCInput();
     rcout = NSCORE_URUS::get_RCOutput();
+#endif
+    gpio = NSCORE_URUS::get_GPIO();
 }
 
 void HAL_URUS::run(int argc, char * const argv[], Callbacks* callbacks) const
@@ -67,15 +76,17 @@ void HAL_URUS::run(int argc, char * const argv[], Callbacks* callbacks) const
 
     _urus_core.init_core();
 
-    scheduler->init();
-    uartA->begin(115200);
-
     gpio->init();
+#if CONFIG_SHAL_CORE == SHAL_CORE_APM && (defined(SHAL_CORE_APM2) \
+    || CONFIG_SHAL_CORE == SHAL_CORE_CYGWIN \
+    || defined(SHAL_CORE_APM328))
+
     rcout->init();
     rcin->init();
 
     analogin->init();
 
+#endif
     callbacks->setup();
 
     for (;;) {
