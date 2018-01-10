@@ -41,6 +41,7 @@ public:
         AP_HAL::CANManager** _can_mgr)
 #endif
         :
+#if !defined(SHAL_CORE_APM16U)
         uartA(_uartA),
         uartB(_uartB),
         uartC(_uartC),
@@ -52,12 +53,17 @@ public:
         analogin(_analogin),
         storage(_storage),
         console(_console),
+#endif
         gpio(_gpio),
+#if !defined(SHAL_CORE_APM16U)
         rcin(_rcin),
         rcout(_rcout),
         scheduler(_scheduler),
         util(_util),
         opticalflow(_opticalflow)
+#else
+        scheduler(_scheduler)
+#endif
     {
 #if HAL_WITH_UAVCAN
         if (_can_mgr == nullptr) {
@@ -90,6 +96,7 @@ public:
 
     virtual void run(int argc, char * const argv[], Callbacks* callbacks) const = 0;
 
+#if !defined(SHAL_CORE_APM16U)
     AP_HAL::UARTDriver* uartA;
     AP_HAL::UARTDriver* uartB;
     AP_HAL::UARTDriver* uartC;
@@ -101,15 +108,20 @@ public:
     AP_HAL::AnalogIn*   analogin;
     AP_HAL::Storage*    storage;
     AP_HAL::UARTDriver* console;
+#endif
     AP_HAL::GPIO*       gpio;
+#if !defined(SHAL_CORE_APM16U)
     AP_HAL::RCInput*    rcin;
     AP_HAL::RCOutput*   rcout;
+#endif
     AP_HAL::Scheduler*  scheduler;
+#if !defined(SHAL_CORE_APM16U)
     AP_HAL::Util        *util;
     AP_HAL::OpticalFlow *opticalflow;
 #if HAL_WITH_UAVCAN
     AP_HAL::CANManager* can_mgr[MAX_NUMBER_OF_CAN_DRIVERS];
 #else
     AP_HAL::CANManager** can_mgr;
+#endif
 #endif
 };
