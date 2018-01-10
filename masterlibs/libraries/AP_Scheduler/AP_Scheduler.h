@@ -19,9 +19,10 @@
  *
  */
 #pragma once
-
+#if !defined(SHAL_CORE_APM16U)
 #include <AP_Param/AP_Param.h>
 #include <AP_HAL/Util.h>
+#endif
 
 #define AP_SCHEDULER_NAME_INITIALIZER(_name) .name = #_name,
 
@@ -75,8 +76,10 @@ public:
     // return the number of microseconds available for the current task
     uint16_t time_available_usec(void);
 
+#if !defined(SHAL_CORE_APM16U)
     // return debug parameter
     uint8_t debug(void) { return _debug; }
+#endif
 
     // return load average, as a number between 0 and 1. 1 means
     // 100% load. Calculated from how much spare time we have at the
@@ -98,11 +101,15 @@ public:
     static int8_t current_task;
 
 private:
+#if !defined(SHAL_CORE_APM16U)
     // used to enable scheduler debugging
     AP_Int8 _debug;
 
     // overall scheduling rate in Hz
     AP_Int16 _loop_rate_hz;  // The value of this variable can be changed with the non-initialization. (Ex. Tuning by GDB)
+#else
+    uint16_t _loop_rate_hz;
+#endif
 
     // progmem list of tasks to run
     const struct Task *_tasks;

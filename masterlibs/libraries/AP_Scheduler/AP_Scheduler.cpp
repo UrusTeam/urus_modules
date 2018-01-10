@@ -21,8 +21,10 @@
 #include "AP_Scheduler.h"
 
 #include <AP_HAL/AP_HAL.h>
+#if !defined(SHAL_CORE_APM16U)
 #include <AP_Param/AP_Param.h>
 #include <stdio.h>
+#endif
 
 #if APM_BUILD_TYPE(APM_BUILD_ArduCopter) || APM_BUILD_TYPE(APM_BUILD_ArduSub)
 #define SCHEDULER_DEFAULT_LOOP_RATE 400
@@ -35,7 +37,7 @@
 extern const AP_HAL::HAL& hal;
 
 int8_t AP_Scheduler::current_task = -1;
-
+#if !defined(SHAL_CORE_APM16U)
 const AP_Param::GroupInfo AP_Scheduler::var_info[] PROGMEM = {
     // @Param: DEBUG
     // @DisplayName: Scheduler debug level
@@ -54,10 +56,12 @@ const AP_Param::GroupInfo AP_Scheduler::var_info[] PROGMEM = {
 
     AP_GROUPEND
 };
+#endif
 
 // constructor
 AP_Scheduler::AP_Scheduler(void)
 {
+#if !defined(SHAL_CORE_APM16U)
     _loop_rate_hz.set(SCHEDULER_DEFAULT_LOOP_RATE);
     AP_Param::setup_object_defaults(this, var_info);
 
@@ -67,6 +71,9 @@ AP_Scheduler::AP_Scheduler(void)
     } else if (_loop_rate_hz > 400) {
         _loop_rate_hz.set(400);
     }
+#else
+    _loop_rate_hz = SCHEDULER_DEFAULT_LOOP_RATE;
+#endif
 }
 
 // initialise the scheduler
