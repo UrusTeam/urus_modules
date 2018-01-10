@@ -20,7 +20,14 @@
 #include "CoreUrusSemaphores_Avr.h"
 
 #include "utility/ISRRegistry.h"
+#include <avr/wdt.h>
 
+#if defined(SHAL_CORE_APM16U)
+ISRRegistry CORE_AVR::isrregistry;
+static CLCoreUrusTimers_Avr coreTimers;
+static CLCoreUrusScheduler_Avr coreScheduler;
+static CLCoreUrusGPIO_Avr coreGPIO;
+#else
 CLCoreUrusUARTDriver_AvrISRs(0);
 #if defined(SHAL_CORE_APM2)
 CLCoreUrusUARTDriver_AvrISRs(1);
@@ -32,9 +39,7 @@ CLCoreUrusUARTDriver_AvrInstance(coreUARTA_Driver, 0);
 CLCoreUrusUARTDriver_AvrInstance(coreUARTB_Driver, 1);
 CLCoreUrusUARTDriver_AvrInstance(coreUARTC_Driver, 2);
 #endif
-
 ISRRegistry CORE_AVR::isrregistry;
-
 static CLCoreUrusTimers_Avr coreTimers;
 static CLCoreUrusScheduler_Avr coreScheduler;
 static CLCoreUrusGPIO_Avr coreGPIO;
@@ -45,6 +50,7 @@ static CLCoreUrusI2CDeviceManager_Avr coreI2C_mgr;
 static CLCoreUrusUtil_Avr coreUtil;
 static CLCoreUrusEEStorage_Avr coreStorage;
 static CLCoreUrusSPIDeviceManager_Avr coreSPI_mgr;
+#endif
 
 CORE_AVR::CORE_AVR() :
     NSCORE_URUS::CLCORE_URUS(
@@ -54,6 +60,9 @@ CORE_AVR::CORE_AVR() :
 
 void CORE_AVR::init_core() const
 {
+	wdt_reset();
+	MCUSR &= ~(1 << WDRF);
+	wdt_disable();
 
     /* Enable the pullups on the RX pins of the 3 UARTs This is important when
      * the RX line is high-Z: capacitive coupling between input and output pins
@@ -63,7 +72,10 @@ void CORE_AVR::init_core() const
      * PD2 : RX1 (uartB)
      * PH0 : RX2 (uartC)
      */
-    coreUARTA_Driver.begin(115200, 32, 128);
+    coreScheduler.init();
+#if defined(SHAL_CORE_APM2) || defined(SHAL_CORE_APM328)
+    coreUARTA_Driver.begin(115200, 32, 32);
+#endif
 
 #if defined(SHAL_CORE_APM2)
     PORTE |= _BV(0);
@@ -79,7 +91,11 @@ NSCORE_URUS::CLCoreUrusScheduler* NSCORE_URUS::get_scheduler()
 
 NSCORE_URUS::CLCoreUrusUARTDriver* NSCORE_URUS::get_uartA_Driver()
 {
+#if defined(SHAL_CORE_APM2) || defined(SHAL_CORE_APM328)
     return &coreUARTA_Driver;
+#else
+    return nullptr;
+#endif
 }
 
 NSCORE_URUS::CLCoreUrusUARTDriver* NSCORE_URUS::get_uartB_Driver()
@@ -117,12 +133,20 @@ NSCORE_URUS::CLCoreUrusUARTDriver* NSCORE_URUS::get_uartF_Driver()
 
 NSCORE_URUS::CLCoreUrusI2CDeviceManager* NSCORE_URUS::get_I2CDeviceManager()
 {
+#if defined(SHAL_CORE_APM2) || defined(SHAL_CORE_APM328)
     return &coreI2C_mgr;
+#else
+    return nullptr;
+#endif
 }
 
 NSCORE_URUS::CLCoreUrusSPIDeviceManager* NSCORE_URUS::get_SPIDeviceManager()
 {
+#if defined(SHAL_CORE_APM2) || defined(SHAL_CORE_APM328)
     return &coreSPI_mgr;
+#else
+    return nullptr;
+#endif
 }
 
 NSCORE_URUS::CLCoreUrusAnalogSource* NSCORE_URUS::get_AnalogSource()
@@ -132,17 +156,29 @@ NSCORE_URUS::CLCoreUrusAnalogSource* NSCORE_URUS::get_AnalogSource()
 
 NSCORE_URUS::CLCoreUrusAnalogIn* NSCORE_URUS::get_AnalogIn()
 {
+#if defined(SHAL_CORE_APM2) || defined(SHAL_CORE_APM328)
     return &coreAnalogIn;
+#else
+    return nullptr;
+#endif
 }
 
 NSCORE_URUS::CLCoreUrusUtil* NSCORE_URUS::get_Util()
 {
+#if defined(SHAL_CORE_APM2) || defined(SHAL_CORE_APM328)
     return &coreUtil;
+#else
+    return nullptr;
+#endif
 }
 
 NSCORE_URUS::CLCoreUrusEEStorage* NSCORE_URUS::get_Storage()
 {
+#if defined(SHAL_CORE_APM2) || defined(SHAL_CORE_APM328)
     return &coreStorage;
+#else
+    return nullptr;
+#endif
 }
 
 NSCORE_URUS::CLCoreUrusGPIO* NSCORE_URUS::get_GPIO()
@@ -152,12 +188,20 @@ NSCORE_URUS::CLCoreUrusGPIO* NSCORE_URUS::get_GPIO()
 
 NSCORE_URUS::CLCoreUrusRCInput* NSCORE_URUS::get_RCInput()
 {
+#if defined(SHAL_CORE_APM2) || defined(SHAL_CORE_APM328)
     return &coreRCInput;
+#else
+    return nullptr;
+#endif
 }
 
 NSCORE_URUS::CLCoreUrusRCOutput* NSCORE_URUS::get_RCOutput()
 {
+#if defined(SHAL_CORE_APM2) || defined(SHAL_CORE_APM328)
     return &coreRCOutput;
+#else
+    return nullptr;
+#endif
 }
 
 const NSCORE_URUS::CLCORE_URUS& NSCORE_URUS::get_CORE()

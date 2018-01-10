@@ -15,6 +15,8 @@
 
 #if defined(SHAL_CORE_APM2)
 #define URUS_SCHEDULER_MAX_TIMER_PROCS 5
+#elif defined(SHAL_CORE_APM16U)
+#define URUS_SCHEDULER_MAX_TIMER_PROCS 1
 #else
 #define URUS_SCHEDULER_MAX_TIMER_PROCS 3
 #endif
@@ -78,7 +80,6 @@ private:
 #endif
     uint32_t start;
 
-    static volatile bool _isr_sched_running;
     static volatile uint8_t _timer_reset_value;
 
 };

@@ -52,6 +52,12 @@ extern "C" ISR(TIMER5_CAPT_vect) {
     if ( ISRRegistry::_registry[ISR_REGISTRY_TIMER5_CAPT] != NULL)
          ISRRegistry::_registry[ISR_REGISTRY_TIMER5_CAPT]();
 }
+#elif defined(SHAL_CORE_APM16U)
+extern "C" ISR(TIMER0_OVF_vect) {
+    if ( ISRRegistry::_registry[ISR_REGISTRY_TIMER0_OVF] != NULL)
+         ISRRegistry::_registry[ISR_REGISTRY_TIMER0_OVF]();
+}
+
 #endif
 
 

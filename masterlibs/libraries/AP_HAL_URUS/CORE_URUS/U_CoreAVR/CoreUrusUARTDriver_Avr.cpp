@@ -36,6 +36,8 @@
 #define FS_MAX_PORTS 4
 #elif defined(SHAL_CORE_APM328)
 #define FS_MAX_PORTS 1
+#elif defined(SHAL_CORE_APM16U)
+#define FS_MAX_PORTS 1
 #endif
 
 CLCoreUrusUARTDriver_Avr::Buffer __CLCoreUrusUARTDriver_Avr__rxBuffer[FS_MAX_PORTS];
@@ -60,7 +62,7 @@ CLCoreUrusUARTDriver_Avr::CLCoreUrusUARTDriver_Avr(
 			_txBuffer(&__CLCoreUrusUARTDriver_Avr__txBuffer[portNumber])
 {
 	_initialized = true;
-	//begin(57600);
+	begin(57600);
 }
 
 void CLCoreUrusUARTDriver_Avr::begin(uint32_t baud, uint16_t rxSpace, uint16_t txSpace)

@@ -30,7 +30,6 @@ uint8_t CLCoreUrusScheduler_Avr::_num_timer_procs = 0;
 bool CLCoreUrusScheduler_Avr::_in_timer_proc = false;
 
 volatile uint8_t CLCoreUrusScheduler_Avr::_timer_reset_value = (256 - 124);
-volatile bool CLCoreUrusScheduler_Avr::_isr_sched_running = false;
 
 CLCoreUrusScheduler_Avr::CLCoreUrusScheduler_Avr() :
     NSCORE_URUS::CLCoreUrusScheduler(),
@@ -54,7 +53,7 @@ void CLCoreUrusScheduler_Avr::init()
 #endif
 
     CLCoreUrusTimers_Avr::avr_timer.init();
-
+#if defined(SHAL_CORE_APM2) || defined(SHAL_CORE_APM328)
     /* TIMER2: Setup the overflow interrupt to occur at 1khz. */
     TIMSK2 = 0;                     /* Disable timer interrupt */
     TCCR2A = 0;                     /* Normal counting mode */
@@ -65,6 +64,18 @@ void CLCoreUrusScheduler_Avr::init()
     /* Register _fire_isr_sched to trigger on overflow */
     isrregistry.register_signal(ISR_REGISTRY_TIMER2_OVF, _fire_isr_sched);
     /* Turn on global interrupt flag, AVR interupt system will start from this point */
+#elif defined(SHAL_CORE_APM16U)
+    /* TIMER0: Setup the overflow interrupt to occur at 1khz. */
+    TIMSK0 = 0;                     /* Disable timer interrupt */
+    TCCR0A = 0;                     /* Normal counting mode */
+    TCCR0B = _BV(CS02); /* Prescaler to clk/256 */
+    TCNT0 = _timer_reset_value;     /* Set count to timer reset value  */
+    TIFR0 = _BV(TOV0);              /* Clear pending interrupts */
+    TIMSK0 = _BV(TOIE0);            /* Enable overflow interrupt*/
+    /* Register _fire_isr_sched to trigger on overflow */
+    isrregistry.register_signal(ISR_REGISTRY_TIMER0_OVF, _fire_isr_sched);
+    /* Turn on global interrupt flag, AVR interupt system will start from this point */
+#endif
 
     sei();
 #if defined(SHAL_CORE_APM2)
@@ -74,7 +85,11 @@ void CLCoreUrusScheduler_Avr::init()
 
 void CLCoreUrusScheduler_Avr::_fire_isr_sched()
 {
+#if defined(SHAL_CORE_APM2) || defined(SHAL_CORE_APM328)
     TCNT2 = _timer_reset_value;
+#elif defined(SHAL_CORE_APM16U)
+    TCNT0 = _timer_reset_value;
+#endif
     sei();
     _run_timer_procs(true);
 }
@@ -185,8 +200,12 @@ void CLCoreUrusScheduler_Avr::resume_timer_procs()
 void CLCoreUrusScheduler_Avr::system_initialized()
 {
     if (_initialized) {
+#if !defined(SHAL_CORE_APM16U)
         AP_HAL::panic(
             PSTR("PANIC: scheduler system initialized called more than once"));
+#endif
+        _initialized = false;
+        return;
     }
 
     _initialized = true;
@@ -194,8 +213,10 @@ void CLCoreUrusScheduler_Avr::system_initialized()
 
 void CLCoreUrusScheduler_Avr::reboot(bool hold_in_bootloader)
 {
+#if !defined(SHAL_CORE_APM16U)
     hal.uartA->printf_PS(PSTR("GOING DOWN FOR A REBOOT\r\n"));
     hal.scheduler->delay(100);
+#endif
 #if defined(SHAL_CORE_APM2)
     /* The APM2 bootloader will reset the watchdog shortly after
      * starting, so we can use the watchdog to force a reboot
@@ -213,7 +234,6 @@ void CLCoreUrusScheduler_Avr::reboot(bool hold_in_bootloader)
     fn();
     for(;;);
 #endif
-
 }
 
 void CLCoreUrusScheduler_Avr::_run_timer_procs(bool called_from_isr)

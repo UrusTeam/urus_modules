@@ -15,6 +15,9 @@
 #elif defined(SHAL_CORE_APM328)
 #define AVR_RC_INPUT_NUM_CHANNELS 8
 #define AVR_RC_INPUT_MIN_CHANNELS 4     // for ppm sum we allow less than 4 channels to make up a valid packet
+#else
+#define AVR_RC_INPUT_NUM_CHANNELS 8
+#define AVR_RC_INPUT_MIN_CHANNELS 4     // for ppm sum we allow less than 4 channels to make up a valid packet
 #endif
 
 #define AVR_RC_INPUT_MIN_SYNC_PULSE_WIDTH 2700

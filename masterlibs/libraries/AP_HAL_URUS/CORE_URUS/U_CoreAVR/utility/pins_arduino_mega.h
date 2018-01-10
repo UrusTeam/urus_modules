@@ -81,6 +81,19 @@ extern "C" {
 #define NUM_ANALOG_INPUTS           16
 #define analogInputToDigitalPin(p)  ((p < 16) ? (p) + 54 : -1)
 #define digitalPinHasPWM(p)         (((p) >= 2 && (p) <= 13) || ((p) >= 44 && (p)<= 46))
+#elif defined(SHAL_CORE_APM16U)
+#define NUM_DIGITAL_PINS  30
+#define NUM_ANALOG_INPUTS 12
+//	__AVR_ATmega32U4__ has an unusual mapping of pins to channels
+/*
+extern const uint8_t PROGMEM analog_pin_to_channel_PGM[];
+#define analogInputToDigitalPin(P)  ( pgm_read_byte( analog_pin_to_channel_PGM + (P) ) )
+#define TX_RX_LED_INIT	DDRD |= (1<<5), DDRB |= (1<<0)
+#define TXLED0			PORTD |= (1<<5)
+#define TXLED1			PORTD &= ~(1<<5)
+#define RXLED0			PORTB |= (1<<0)
+#define RXLED1			PORTB &= ~(1<<0)
+*/
 #else
 #error "UNKNOWN CORE BOARD FOR PINS!"
 #endif
@@ -129,6 +142,29 @@ static const uint8_t A4 = 18;
 static const uint8_t A5 = 19;
 static const uint8_t A6 = 20;
 static const uint8_t A7 = 21;
+#elif defined(SHAL_CORE_APM16U)
+static const uint8_t SDA = 2;
+static const uint8_t SCL = 3;
+#define LED_BUILTIN 13
+// Map SPI port to 'new' pins D14..D17
+static const uint8_t SS   = 17;
+static const uint8_t MOSI = 16;
+static const uint8_t MISO = 14;
+static const uint8_t SCK  = 15;
+// Mapping of analog pins as digital I/O
+// A6-A11 share with digital pins
+static const uint8_t A0 = 18;
+static const uint8_t A1 = 19;
+static const uint8_t A2 = 20;
+static const uint8_t A3 = 21;
+static const uint8_t A4 = 22;
+static const uint8_t A5 = 23;
+static const uint8_t A6 = 24;	// D4
+static const uint8_t A7 = 25;	// D6
+static const uint8_t A8 = 26;	// D8
+static const uint8_t A9 = 27;	// D9
+static const uint8_t A10 = 28;	// D10
+static const uint8_t A11 = 29;	// D12
 #else
 #error "UNKNOWN CORE BOARD FOR PINS!"
 #endif
@@ -162,8 +198,6 @@ static const uint8_t A7 = 21;
 #define digitalPinToPCICRbit(p) (((p) <= 7) ? 2 : (((p) <= 13) ? 0 : 1))
 #define digitalPinToPCMSK(p)    (((p) <= 7) ? (&PCMSK2) : (((p) <= 13) ? (&PCMSK0) : (((p) <= 21) ? (&PCMSK1) : ((uint8_t *)0))))
 #define digitalPinToPCMSKbit(p) (((p) <= 7) ? (p) : (((p) <= 13) ? ((p) - 8) : ((p) - 14)))
-#else
-#error "UNKNOWN CORE BOARD FOR PINS!"
 #endif
 // On the ATmega1280, the addresses of some of the port registers are
 // greater than 255, so we can't store them in uint8_t's.
