@@ -10,6 +10,10 @@
 #define AVR_INT_NUM_PINS_MAX 9
 #elif defined(SHAL_CORE_APM328)
 #define AVR_INT_NUM_PINS_MAX 4
+#elif defined(SHAL_CORE_APM16U)
+#define AVR_INT_NUM_PINS_MAX 1
+#else
+#error "UNKNOWN AVR_INT_NUM_PINS_MAX CORE BOARD FOR PINS!"
 #endif
 
 class CLCoreUrusGPIO_Avr : public NSCORE_URUS::CLCoreUrusGPIO {

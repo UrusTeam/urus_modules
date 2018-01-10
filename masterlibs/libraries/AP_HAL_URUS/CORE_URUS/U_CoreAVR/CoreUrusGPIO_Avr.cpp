@@ -183,7 +183,11 @@ void CLCoreUrusGPIO_Avr::pinMode(uint8_t pin, uint8_t output)
 
 int8_t CLCoreUrusGPIO_Avr::analogPinToDigitalPin(uint8_t pin)
 {
+#if defined(SHAL_CORE_APM2) || defined(SHAL_CORE_APM328)
     return analogInputToDigitalPin(pin);
+#else
+    return 0;
+#endif
 }
 
 uint8_t CLCoreUrusGPIO_Avr::read(uint8_t pin) {
@@ -362,6 +366,8 @@ bool CLCoreUrusGPIO_Avr::attach_interrupt(uint8_t interrupt_num, AP_HAL::Proc p,
     } else {
         return false;
     }
+#elif defined(SHAL_CORE_APM16U)
+    return false;
 #endif
 }
 

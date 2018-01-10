@@ -7,7 +7,7 @@
 
 const uint16_t PROGMEM port_to_mode_PGM[] = {
 	NOT_A_PORT,
-#if defined(SHAL_CORE_APM328)
+#if defined(SHAL_CORE_APM328) || defined(SHAL_CORE_APM16U)
 	NOT_A_PORT,
 	(uint16_t) &DDRB,
 	(uint16_t) &DDRC,
@@ -32,7 +32,7 @@ const uint16_t PROGMEM port_to_mode_PGM[] = {
 
 const uint16_t PROGMEM port_to_output_PGM[] = {
 	NOT_A_PORT,
-#if defined(SHAL_CORE_APM328)
+#if defined(SHAL_CORE_APM328)  || defined(SHAL_CORE_APM16U)
 	NOT_A_PORT,
 	(uint16_t) &PORTB,
 	(uint16_t) &PORTC,
@@ -57,7 +57,7 @@ const uint16_t PROGMEM port_to_output_PGM[] = {
 
 const uint16_t PROGMEM port_to_input_PGM[] = {
 	NOT_A_PIN,
-#if defined(SHAL_CORE_APM328)
+#if defined(SHAL_CORE_APM328)  || defined(SHAL_CORE_APM16U)
 	NOT_A_PORT,
 	(uint16_t) &PINB,
 	(uint16_t) &PINC,
@@ -177,6 +177,31 @@ const uint8_t PROGMEM digital_pin_to_port_PGM[] = {
 	PK	, // PK 7 ** 69 ** A15
 	PE	, // PE 6 ** 70 ** APM only
 	PJ	, // PJ 2 ** 71 ** USART3 SPI SCK
+#elif defined(SHAL_CORE_APM16U)
+	PD, /* 0 */
+	PD,
+	PD,
+	PD,
+	PD,
+	PD,
+	PD,
+	PD,
+	PB, /* 8 */
+	PB,
+	PB,
+	PB,
+	PB,
+	PB,
+	PB,
+	PB,
+	PC, /* 16 */
+	PC,
+	PC,
+	PC,
+	PC,
+	PC,
+	PC,
+	PC,
 #else
 #error "UNKNOWN CORE BOARD FOR PINS!"
 #endif
@@ -279,17 +304,69 @@ const uint8_t PROGMEM digital_pin_to_bit_mask_PGM[] = {
 	_BV( 7 )	, // PK 7 ** 69 ** A15
     _BV( 6 )	, // PE 6 ** 70 ** APM only
 	_BV( 2 )	, // PJ 2 ** 71 ** USART3 SPI SCK
+#elif defined(SHAL_CORE_APM16U)
+	_BV(0), /* 0, port D */
+	_BV(1), /* 1, port D */
+	_BV(2), /* 2, port D */
+	_BV(3), /* 3, port D */
+	_BV(4), /* 4, port D */
+	_BV(5), /* 5, port D */
+	_BV(6), /* 6, port D */
+	_BV(7), /* 7, port D */
+	_BV(0), /* 8, port B */
+	_BV(1), /* 9, port B */
+	_BV(2), /* 10, port B */
+	_BV(3), /* 11, port B */
+	_BV(4), /* 13, port B */
+	_BV(5), /* 14, port B */
+	_BV(6), /* 15, port B */
+	_BV(7), /* 16, port B */
+	_BV(0), /* 17, port C */
+	_BV(1), /* 18, port C */
+	_BV(2), /* 19, port C */
+	_BV(3), /* 20, port C */
+	_BV(4), /* 21, port C */
+	_BV(5), /* 22, port C */
+	_BV(6), /* 23, port C */
+	_BV(7), /* 24, port C */
 #else
 #error "UNKNOWN CORE BOARD FOR PINS!"
 #endif
 };
-
+#if defined(SHAL_CORE_ENABLE_PIN_TO_TIMER)
 const uint8_t PROGMEM digital_pin_to_timer_PGM[] = {
 	// TIMERS
 	// -------------------------------------------
+#if !defined(SHAL_CORE_APM16U)
 	NOT_ON_TIMER	, // atmega2560 PE 0 ** 0 ** USART0_RX
 	NOT_ON_TIMER	, // atmega2560 PE 1 ** 1 ** USART0_TX
-#if defined(SHAL_CORE_APM328)
+#endif
+#if defined(SHAL_CORE_APM16U)
+	TIMER0B,
+	NOT_ON_TIMER,
+	NOT_ON_TIMER,
+	NOT_ON_TIMER,
+	NOT_ON_TIMER,
+	NOT_ON_TIMER,
+	NOT_ON_TIMER,
+	NOT_ON_TIMER,
+	NOT_ON_TIMER, /* 8 - port B */
+	NOT_ON_TIMER,
+	NOT_ON_TIMER,
+	NOT_ON_TIMER,
+	NOT_ON_TIMER,
+	NOT_ON_TIMER,
+	NOT_ON_TIMER,
+    TIMER0A,
+	NOT_ON_TIMER, /* 16 - port C */
+	NOT_ON_TIMER,
+	NOT_ON_TIMER,
+	NOT_ON_TIMER,
+	NOT_ON_TIMER,
+	TIMER1B,
+	TIMER1A,
+	NOT_ON_TIMER,
+#elif defined(SHAL_CORE_APM328)
 	NOT_ON_TIMER,
 	// on the ATmega168, digital pin 3 has hardware pwm
 #if defined(__AVR_ATmega8__)
@@ -398,5 +475,22 @@ const uint8_t PROGMEM digital_pin_to_timer_PGM[] = {
 #error "UNKNOWN CORE BOARD FOR PINS!"
 #endif
 };
+#endif
+
+#if defined(SHAL_CORE_APM16U)
+/*
+ * This is only for ATMEGA8/16/32 U Variants.
+ */
+/*
+const uint8_t PROGMEM analog_pin_to_channel_PGM[] = {
+	1,	// A0				PD1
+	2,	// A1				PD2
+	4,	// A3				PD4
+	5,	// A4				PD5
+	6,	// A5				PD6
+	7,	// A6				PD7
+};
+*/
+#endif
 
 #endif  // CONFIG_SHAL_CORE == SHAL_CORE_APM

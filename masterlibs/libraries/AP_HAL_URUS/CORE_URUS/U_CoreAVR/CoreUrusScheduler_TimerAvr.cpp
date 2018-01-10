@@ -44,7 +44,7 @@
 #define  AVR_TIMER_WGM2         WGM52
 #define  AVR_TIMER_WGM3         WGM53
 #define  AVR_TIMER_CS1          CS51
-#elif defined(SHAL_CORE_APM328)
+#elif defined(SHAL_CORE_APM328) || defined(SHAL_CORE_APM16U)
 #define  AVR_TIMER_OVF_VECT     TIMER1_OVF_vect
 #define  AVR_TIMER_TCNT         TCNT1
 #define  AVR_TIMER_TIFR         TIFR1
@@ -94,17 +94,20 @@ void AVRTimer::init()
     // 16 MHz / 128 = 125 KHz, inside the desired 50-200 KHz range.
     // XXX: this will not work properly for other clock speeds, and
     // this code should use F_CPU to determine the prescale factor.
+#if defined(ADCSRA)
     sbi(ADCSRA, ADPS2);
     sbi(ADCSRA, ADPS1);
     sbi(ADCSRA, ADPS0);
 
     // enable a2d conversions
     sbi(ADCSRA, ADEN);
-
+#endif
     // the bootloader connects pins 0 and 1 to the USART; disconnect them
     // here so they can be used as normal digital i/o; they will be
     // reconnected in Serial.begin()
+#if defined(UCSR0B)
     UCSR0B = 0;
+#endif
 
     // OCR5B and OCR5C will be used by RCOutput_APM2. Init to 0xFFFF to prevent premature PWM output
     AVR_TIMER_OCRB  = 0xFFFF;
