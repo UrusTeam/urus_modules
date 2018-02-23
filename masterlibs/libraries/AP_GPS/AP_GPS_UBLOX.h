@@ -27,7 +27,7 @@
 #include "AP_GPS.h"
 
 /*
- *  try to put a UBlox into binary mode. This is in two parts. 
+ *  try to put a UBlox into binary mode. This is in two parts.
  *
  * First we send a ubx binary message that enables the NAV_SOL message
  * at rate 1. Then we send a NMEA message to set the baud rate to our
@@ -308,7 +308,7 @@ private:
         ubx_rxm_raw rxm_raw;
         ubx_rxm_rawx rxm_rawx;
 #endif
-        uint8_t bytes[];
+        uint8_t bytes[0];
     } _buffer;
 
     enum ubs_protocol_bytes {

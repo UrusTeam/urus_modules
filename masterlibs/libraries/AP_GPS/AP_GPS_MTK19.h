@@ -78,7 +78,7 @@ private:
     // Receive buffer
     union {
         diyd_mtk_msg msg;
-        uint8_t bytes[];
+        uint8_t bytes[0];
     } _buffer;
 };
 
