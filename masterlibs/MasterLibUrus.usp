@@ -8,9 +8,9 @@
 		<Option compiler="avr-gcc" />
 		<Build>
 			<Target title="APM2_Release">
-				<Option output="build/bin/Release/MasterLibUrus" prefix_auto="1" extension_auto="1" />
+				<Option output="../../../build/apm2/lib/Release/MasterLibUrus" prefix_auto="1" extension_auto="1" />
 				<Option working_dir="" />
-				<Option object_output="build/obj/Release/" />
+				<Option object_output="../../../build/apm2/lib/obj/Release/" />
 				<Option type="2" />
 				<Option compiler="avr-gcc" />
 				<Option createDefFile="1" />
@@ -56,17 +56,20 @@
 					<Add directory="libraries" />
 					<Add directory="libraries/AP_Common/missing" />
 					<Add directory="libraries/AP_HAL" />
-					<Add directory="../../../build/uruscygwin/libraries/GCS_MAVLink" />
+					<Add directory="../../../build/sitl/libraries/GCS_MAVLink" />
 				</Compiler>
 				<Linker>
 					<Add option="-s" />
 					<Add option="-mmcu=atmega2560" />
 				</Linker>
+				<ExtraCommands>
+					<Add before="sh -c &apos;cd ../../../ &amp;&amp; ./waf configure --board sitl --static &amp;&amp; ./waf --target=mavlink&apos;" />
+				</ExtraCommands>
 			</Target>
 			<Target title="APM328_Release">
-				<Option output="build/bin/Release/MasterLibUrus" prefix_auto="1" extension_auto="1" />
+				<Option output="../../../build/apm2/lib/Release/MasterLibUrus" prefix_auto="1" extension_auto="1" />
 				<Option working_dir="" />
-				<Option object_output="build/obj/Release/" />
+				<Option object_output="../../../build/apm2/lib/obj/Release" />
 				<Option type="2" />
 				<Option compiler="avr-gcc" />
 				<Option createDefFile="1" />
@@ -111,17 +114,20 @@
 					<Add directory="libraries" />
 					<Add directory="libraries/AP_Common/missing" />
 					<Add directory="libraries/AP_HAL" />
-					<Add directory="../../../build/uruscygwin/libraries/GCS_MAVLink" />
+					<Add directory="../../../build/sitl/libraries/GCS_MAVLink" />
 				</Compiler>
 				<Linker>
 					<Add option="-s" />
 					<Add option="-mmcu=atmega328p" />
 				</Linker>
+				<ExtraCommands>
+					<Add before="sh -c &apos;cd ../../../ &amp;&amp; ./waf configure --board sitl --static &amp;&amp; ./waf --target=mavlink&apos;" />
+				</ExtraCommands>
 			</Target>
 			<Target title="APM16U_Release">
-				<Option output="build/bin/Release/MasterLibUrus" prefix_auto="1" extension_auto="1" />
+				<Option output="../../../build/apm2/lib/Release/MasterLibUrus" prefix_auto="1" extension_auto="1" />
 				<Option working_dir="" />
-				<Option object_output="build/obj/Release/" />
+				<Option object_output="../../../build/apm2/lib/obj/Release" />
 				<Option type="2" />
 				<Option compiler="avr-gcc" />
 				<Option createDefFile="1" />
@@ -167,7 +173,6 @@
 					<Add directory="libraries" />
 					<Add directory="libraries/AP_Common/missing" />
 					<Add directory="libraries/AP_HAL" />
-					<Add directory="modules/URUS_Protocol/libraries" />
 				</Compiler>
 				<Linker>
 					<Add option="-s" />
