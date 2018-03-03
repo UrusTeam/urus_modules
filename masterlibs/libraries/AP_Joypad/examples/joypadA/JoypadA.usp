@@ -81,7 +81,6 @@
 					<Add option="-fdata-sections" />
 					<Add option="-fno-exceptions" />
 					<Add option="-fsigned-char" />
-					<Add option="-fno-use-cxa-atexit" />
 					<Add option="-fpermissive" />
 					<Add option="-Wformat" />
 					<Add option="-Wshadow" />
@@ -90,9 +89,9 @@
 					<Add option="-Wwrite-strings" />
 					<Add option="-Wno-unused-parameter" />
 					<Add option="-fno-threadsafe-statics" />
-					<Add option="-mmcu=atmega328p" />
 					<Add option="-Wno-unknown-pragmas" />
 					<Add option="-Wno-overflow" />
+					<Add option="-mmcu=atmega328p" />
 					<Add option="-D__STDC_FORMAT_MACROS=1" />
 					<Add option="-DWAF_BUILD=0" />
 					<Add option="-D_GNU_SOURCE=1" />
