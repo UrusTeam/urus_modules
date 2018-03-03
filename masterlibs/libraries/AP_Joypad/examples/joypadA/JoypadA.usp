@@ -8,9 +8,9 @@
 		<Option compiler="avr-gcc" />
 		<Build>
 			<Target title="apm2_rel">
-				<Option output="../../../../build/bin/Release/joypadA.elf" prefix_auto="1" extension_auto="0" />
+				<Option output="../../../../build/apm2/Release/joypadA.elf" prefix_auto="1" extension_auto="0" />
 				<Option working_dir="" />
-				<Option object_output="../../../../build/obj/Release/" />
+				<Option object_output="../../../../build/apm2/obj/Release/" />
 				<Option type="5" />
 				<Option compiler="avr-gcc" />
 				<Compiler>
@@ -57,7 +57,7 @@
 					<Add option="-s" />
 					<Add option="-mmcu=atmega2560" />
 					<Add library="MasterLibUrus" />
-					<Add directory="../../../../build/bin/Release" />
+					<Add directory="../../../../build/apm2/lib/Release/" />
 				</Linker>
 				<ExtraCommands>
 					<Add after="avr-size --mcu=atmega2560 --format=avr $(TARGET_OUTPUT_FILE)" />
@@ -67,9 +67,9 @@
 				</ExtraCommands>
 			</Target>
 			<Target title="apm328p_rel">
-				<Option output="../../../../build/bin/Release/joypadA.elf" prefix_auto="1" extension_auto="0" />
+				<Option output="../../../../build/apm2/Release/joypadA.elf" prefix_auto="1" extension_auto="0" />
 				<Option working_dir="" />
-				<Option object_output="../../../../build/obj/Release/" />
+				<Option object_output="../../../../build/apm2/obj/Release/" />
 				<Option type="5" />
 				<Option compiler="avr-gcc" />
 				<Compiler>
@@ -116,7 +116,7 @@
 					<Add option="-s" />
 					<Add option="-mmcu=atmega328p" />
 					<Add library="MasterLibUrus" />
-					<Add directory="../../../../build/bin/Release" />
+					<Add directory="../../../../build/apm2/lib/Release/" />
 				</Linker>
 				<ExtraCommands>
 					<Add after="avr-size --mcu=atmega328p --format=avr $(TARGET_OUTPUT_FILE)" />
@@ -126,9 +126,9 @@
 				</ExtraCommands>
 			</Target>
 			<Target title="apm16u2_rel">
-				<Option output="../../../../build/bin/Release/joypadA.elf" prefix_auto="1" extension_auto="0" />
+				<Option output="../../../../build/apm2/Release/joypadA.elf" prefix_auto="1" extension_auto="0" />
 				<Option working_dir="" />
-				<Option object_output="../../../../build/obj/Release/" />
+				<Option object_output="../../../../build/apm2/obj/Release/" />
 				<Option type="5" />
 				<Option compiler="avr-gcc" />
 				<Compiler>
@@ -176,7 +176,7 @@
 					<Add option="-s" />
 					<Add option="-mmcu=atmega16u2" />
 					<Add library="MasterLibUrus" />
-					<Add directory="../../../../build/bin/Release" />
+					<Add directory="../../../../build/apm2/lib/Release/" />
 				</Linker>
 				<ExtraCommands>
 					<Add after="avr-size --mcu=atmega16u2 --format=avr $(TARGET_OUTPUT_FILE)" />
