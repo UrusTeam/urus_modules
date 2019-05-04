@@ -164,8 +164,12 @@ void AP_Baro::calibrate(bool save)
         do {
             update();
             if (AP_HAL::millis() - tstart > 500) {
+#if !HAL_MINIMIZE_FEATURES_AVR
                 AP_HAL::panic(PSTR("PANIC: AP_Baro::read unsuccessful "
                         "for more than 500ms in AP_Baro::calibrate [2]\r\n"));
+#else
+                AP_HAL::panic(PSTR("PNC! Baro::cal [2]\r\n"));
+#endif
             }
             hal.scheduler->delay(10);
         } while (!healthy());
@@ -184,8 +188,12 @@ void AP_Baro::calibrate(bool save)
         do {
             update();
             if (AP_HAL::millis() - tstart > 500) {
+#if !HAL_MINIMIZE_FEATURES_AVR
                 AP_HAL::panic(PSTR("PANIC: AP_Baro::read unsuccessful "
                         "for more than 500ms in AP_Baro::calibrate [3]\r\n"));
+#else
+                AP_HAL::panic(PSTR("PNC! Baro::cal [3]\r\n"));
+#endif
             }
         } while (!healthy());
         for (uint8_t i=0; i<_num_sensors; i++) {
@@ -215,7 +223,11 @@ void AP_Baro::calibrate(bool save)
             return;
         }
     }
+#if !HAL_MINIMIZE_FEATURES_AVR
     AP_HAL::panic(PSTR("AP_Baro: all sensors uncalibrated"));
+#else
+    AP_HAL::panic(PSTR("Baro: uncal"));
+#endif
 }
 
 /*
@@ -265,7 +277,6 @@ float AP_Baro::get_altitude_difference(float base_pressure, float pressure) cons
 #endif
     return ret;
 }
-
 
 // return current scale factor that converts from equivalent to true airspeed
 // valid for altitudes up to 10km AMSL
@@ -359,7 +370,11 @@ bool AP_Baro::_add_backend(AP_Baro_Backend *backend)
         return false;
     }
     if (_num_drivers >= BARO_MAX_DRIVERS) {
+#if !HAL_MINIMIZE_FEATURES_AVR
         AP_HAL::panic(PSTR("Too many barometer drivers"));
+#else
+        AP_HAL::panic(PSTR("many baro drvs"));
+#endif
     }
     drivers[_num_drivers++] = backend;
     return true;
@@ -492,14 +507,17 @@ void AP_Baro::init(void)
 
         ADD_BACKEND(AP_Baro_KellerLD::probe(*this,
                                           std::move(hal.i2c_mgr->get_device(_ext_bus, HAL_BARO_KELLERLD_I2C_ADDR))));
-#elif HAL_BARO_DEFAULT != HAL_BARO_URUS && HAL_BARO_DEFAULT != HAL_BARO_HIL
+#elif HAL_BARO_DEFAULT != HAL_BARO_URUS && HAL_BARO_DEFAULT != HAL_BARO_HIL && HAL_BARO_DEFAULT != HAL_BARO_BMP085 \
+    && HAL_BARO_DEFAULT != HAL_BARO_MS5611_SPI
         ADD_BACKEND(AP_Baro_MS56XX::probe(*this,
                                           std::move(hal.i2c_mgr->get_device(_ext_bus, HAL_BARO_MS5611_I2C_ADDR))));
 #endif
     }
 
     if (_num_drivers == 0 || _num_sensors == 0 || drivers[0] == nullptr) {
+#if !HAL_MINIMIZE_FEATURES_AVR
         AP_BoardConfig::sensor_config_error("Baro: unable to initialise driver");
+#endif
     }
 }
 
@@ -531,13 +549,13 @@ void AP_Baro::update(void)
                 sensors[i].ground_pressure = sensors[i].pressure;
             }
             float altitude = sensors[i].altitude;
+            float pressure = sensors[i].pressure + sensors[i].p_correction;
             if (sensors[i].type == BARO_TYPE_AIR) {
-                float pressure = sensors[i].pressure + sensors[i].p_correction;
                 altitude = get_altitude_difference(sensors[i].ground_pressure, pressure);
             } else if (sensors[i].type == BARO_TYPE_WATER) {
                 //101325Pa is sea level air pressure, 9800 Pascal/ m depth in water.
                 //No temperature or depth compensation for density of water.
-                altitude = (sensors[i].ground_pressure - sensors[i].pressure) / 9800.0f / _specific_gravity;
+                altitude = (sensors[i].ground_pressure - pressure) / 9800.0f / _specific_gravity;
             }
             // sanity check altitude
             sensors[i].alt_ok = !(isnan(altitude) || isinf(altitude));
@@ -589,7 +607,11 @@ void AP_Baro::accumulate(void)
 uint8_t AP_Baro::register_sensor(void)
 {
     if (_num_sensors >= BARO_MAX_INSTANCES) {
+#if !HAL_MINIMIZE_FEATURES_AVR
         AP_HAL::panic(PSTR("Too many barometers"));
+#else
+        AP_HAL::panic(PSTR("many baros"));
+#endif
     }
     return _num_sensors++;
 }
