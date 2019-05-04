@@ -67,15 +67,16 @@ void AP_HAL::Util::get_system_clock_utc(int32_t &hour, int32_t &min, int32_t &se
     uint32_t time_ms = AP_HAL::millis();
 
     // separate time into ms, sec, min, hour and days but all expressed in milliseconds
-    ms = time_ms % 1000;
-    uint32_t sec_ms = (time_ms % (60 * 1000)) - ms;
-    uint32_t min_ms = (time_ms % (60 * 60 * 1000)) - sec_ms - ms;
-    uint32_t hour_ms = (time_ms % (24 * 60 * 60 * 1000)) - min_ms - sec_ms - ms;
+    time_ms = time_ms / 1000;
+    ms = time_ms % 1;
+    uint32_t sec_ms = (time_ms % (60)) - ms;
+    uint32_t min_ms = (time_ms % (60 * 60)) - sec_ms - ms;
+    uint32_t hour_ms = (time_ms % (24 * 60 * 60)) - min_ms - sec_ms - ms;
 
     // convert times as milliseconds into appropriate units
-    sec = sec_ms / 1000;
-    min = min_ms / (60 * 1000);
-    hour = hour_ms / (60 * 60 * 1000);
+    sec = sec_ms;
+    min = min_ms / (60);
+    hour = hour_ms / (60 * 60);
 #endif
 }
 
