@@ -44,7 +44,11 @@ AP_Baro_BMP085::AP_Baro_BMP085(AP_Baro &baro, AP_HAL::OwnPtr<AP_HAL::I2CDevice> 
 
     // take i2c bus sempahore
     if (!sem->take(HAL_SEMAPHORE_BLOCK_FOREVER)) {
+#if defined(SHAL_CORE_APM2) || defined(SHAL_CORE_MEGA02) || defined(SHAL_CORE_APM328)
+        AP_HAL::panic(PSTR("BMP085: unable to get semaphore"));
+#else
         AP_HAL::panic("BMP085: unable to get semaphore");
+#endif
     }
 
     if (BMP085_EOC >= 0) {
@@ -54,7 +58,11 @@ AP_Baro_BMP085::AP_Baro_BMP085(AP_Baro &baro, AP_HAL::OwnPtr<AP_HAL::I2CDevice> 
 
     // We read the calibration data registers
     if (!_dev->read_registers(0xAA, buff, sizeof(buff))) {
+#if defined(SHAL_CORE_APM2) || defined(SHAL_CORE_MEGA02) || defined(SHAL_CORE_APM328)
+        AP_HAL::panic(PSTR("BMP085: bad calibration registers"));
+#else
         AP_HAL::panic("BMP085: bad calibration registers");
+#endif
     }
 
     ac1 = ((int16_t)buff[0] << 8) | buff[1];
@@ -113,9 +121,11 @@ void AP_Baro_BMP085::_timer(void)
  */
 void AP_Baro_BMP085::update(void)
 {
+    hal.scheduler->suspend_timer_procs();
     if (_sem->take_nonblocking()) {
         if (!_has_sample) {
             _sem->give();
+            hal.scheduler->resume_timer_procs();
             return;
         }
 
@@ -125,6 +135,7 @@ void AP_Baro_BMP085::update(void)
         _copy_to_frontend(_instance, pressure, temperature);
         _sem->give();
     }
+    hal.scheduler->resume_timer_procs();
 }
 
 // Send command to Read Pressure
