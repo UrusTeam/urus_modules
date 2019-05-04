@@ -46,6 +46,9 @@ public:
     virtual void    toggle(uint8_t pin) = 0;
     virtual int8_t  analogPinToDigitalPin(uint8_t pin) = 0;
 
+    virtual void    write_port(uint8_t portnr, uint8_t value) = 0;
+    virtual uint8_t read_port(uint8_t portnr) = 0;
+
     /* Alternative interface: */
     virtual AP_HAL::DigitalSource* channel(uint16_t n) = 0;
 
