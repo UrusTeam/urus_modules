@@ -7,6 +7,13 @@
 #define SHAL_CORE_ANDROID   2
 #define SHAL_CORE_APM       3
 
+#ifndef ENABLED
+#define ENABLED 1
+#endif // ENABLED
+#ifndef DISABLED
+#define DISABLED 0
+#endif // DISABLED
+
 #ifndef HIGH
 #define HIGH 1
 #endif
@@ -106,7 +113,9 @@
 #define HAL_GPIO_LED_ON         LOW
 #define HAL_GPIO_LED_OFF        HIGH
 #define HAL_GPIO_USB_MUX_PIN -1
-#define HIL_SUPPORT 1
+#define HIL_SUPPORT 0
+#define CONFIG_SHAL_CORE_I2C        ENABLED
+#define CONFIG_SHAL_CORE_UTIL       ENABLED
 #elif (CONFIG_SHAL_CORE == SHAL_CORE_APM) && defined(SHAL_CORE_APM328)
 #define HAL_CPU_CLASS HAL_CPU_CLASS_16
 #define HAL_STORAGE_SIZE            1024
