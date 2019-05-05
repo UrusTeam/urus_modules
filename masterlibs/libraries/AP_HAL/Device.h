@@ -120,7 +120,9 @@ public:
     {
         uint8_t buf[2] = { reg, val };
         if (checked) {
+#if !HAL_MINIMIZE_FEATURES
             set_checked_register(reg, val);
+#endif // HAL_MINIMIZE_FEATURES
         }
         return transfer(buf, sizeof(buf), nullptr, 0);
     }
