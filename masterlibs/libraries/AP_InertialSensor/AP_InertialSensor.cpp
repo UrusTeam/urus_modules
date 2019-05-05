@@ -37,7 +37,7 @@ extern const AP_HAL::HAL& hal;
 #define DEFAULT_GYRO_FILTER  4
 #define DEFAULT_ACCEL_FILTER 10
 #define DEFAULT_STILL_THRESH 0.1f
-#elif defined(SHAL_CORE_APM2)
+#elif defined(SHAL_CORE_APM2) || defined(SHAL_CORE_MEGA02)
 #define DEFAULT_GYRO_FILTER  20
 #define DEFAULT_ACCEL_FILTER 20
 #define DEFAULT_STILL_THRESH 0.1f
