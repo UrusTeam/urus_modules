@@ -129,6 +129,7 @@ public:
     // Get the type (Air or Water) of a particular instance
     baro_type_t get_type(uint8_t instance) { return sensors[instance].type; };
 
+#if !HAL_MINIMIZE_FEATURES_AVR
     // HIL variables
     struct {
         float pressure;
@@ -140,6 +141,7 @@ public:
         bool have_alt:1;
         bool have_last_update:1;
     } _hil;
+#endif
 
     // register a new sensor, claiming a sensor slot. If we are out of
     // slots it will panic
