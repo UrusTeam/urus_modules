@@ -12,7 +12,7 @@ const uint16_t PROGMEM port_to_mode_PGM[] = {
 	(uint16_t) &DDRB,
 	(uint16_t) &DDRC,
 	(uint16_t) &DDRD,
-#elif defined(SHAL_CORE_APM2)
+#elif defined(SHAL_CORE_APM2) || defined(SHAL_CORE_MEGA02)
     (uint16_t) &DDRA,
 	(uint16_t) &DDRB,
 	(uint16_t) &DDRC,
@@ -37,7 +37,7 @@ const uint16_t PROGMEM port_to_output_PGM[] = {
 	(uint16_t) &PORTB,
 	(uint16_t) &PORTC,
 	(uint16_t) &PORTD,
-#elif defined(SHAL_CORE_APM2)
+#elif defined(SHAL_CORE_APM2) || defined(SHAL_CORE_MEGA02)
 	(uint16_t) &PORTA,
 	(uint16_t) &PORTB,
 	(uint16_t) &PORTC,
@@ -62,7 +62,7 @@ const uint16_t PROGMEM port_to_input_PGM[] = {
 	(uint16_t) &PINB,
 	(uint16_t) &PINC,
 	(uint16_t) &PIND,
-#elif defined(SHAL_CORE_APM2)
+#elif defined(SHAL_CORE_APM2) || defined(SHAL_CORE_MEGA02)
 	(uint16_t) &PINA,
 	(uint16_t) &PINB,
 	(uint16_t) &PINC,
@@ -104,7 +104,7 @@ const uint8_t PROGMEM digital_pin_to_port_PGM[] = {
 	PC,
 	PC,
 	PC,
-#elif defined(SHAL_CORE_APM2)
+#elif defined(SHAL_CORE_APM2) || defined(SHAL_CORE_MEGA02)
 	PE	, // PE 0 ** 0 ** USART0_RX
 	PE	, // PE 1 ** 1 ** USART0_TX
 	PE	, // PE 4 ** 2 ** PWM2
@@ -231,7 +231,7 @@ const uint8_t PROGMEM digital_pin_to_bit_mask_PGM[] = {
 	_BV(3),
 	_BV(4),
 	_BV(5),
-#elif defined(SHAL_CORE_APM2)
+#elif defined(SHAL_CORE_APM2) || defined(SHAL_CORE_MEGA02)
 	_BV( 0 )	, // PE 0 ** 0 ** USART0_RX
 	_BV( 1 )	, // PE 1 ** 1 ** USART0_TX
 	_BV( 4 )	, // PE 4 ** 2 ** PWM2
@@ -400,7 +400,7 @@ const uint8_t PROGMEM digital_pin_to_timer_PGM[] = {
 	NOT_ON_TIMER,
 	NOT_ON_TIMER,
 	NOT_ON_TIMER,
-#elif defined(SHAL_CORE_APM2)
+#elif defined(SHAL_CORE_APM2) || defined(SHAL_CORE_MEGA02)
 	TIMER3B	, // PE 4 ** 2 ** PWM2
 	TIMER3C	, // PE 5 ** 3 ** PWM3
 	TIMER0B	, // PG 5 ** 4 ** PWM4

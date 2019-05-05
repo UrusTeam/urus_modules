@@ -16,7 +16,7 @@
 #include <avr/io.h>
 #include <avr/interrupt.h>
 
-#if defined(SHAL_CORE_APM2)
+#if defined(SHAL_CORE_APM2) || defined(SHAL_CORE_MEGA02)
 #define  AVR_TIMER_OVF_VECT     TIMER5_OVF_vect
 #define  AVR_TIMER_TCNT         TCNT5
 #define  AVR_TIMER_TIFR         TIFR5
@@ -101,7 +101,7 @@ void CLCoreUrusRCInput_Avr::_timer5_capt_cb(void) {
 
 void CLCoreUrusRCInput_Avr::init() {
     ISRRegistry& isrregistry = CORE_AVR::isrregistry;
-#if defined(SHAL_CORE_APM2)
+#if defined(SHAL_CORE_APM2) || defined(SHAL_CORE_MEGA02)
     isrregistry.register_signal(ISR_REGISTRY_TIMER5_CAPT, _timer5_capt_cb);
 #elif defined(SHAL_CORE_APM328)
     isrregistry.register_signal(ISR_REGISTRY_TIMER1_CAPT, _timer5_capt_cb);
@@ -109,7 +109,7 @@ void CLCoreUrusRCInput_Avr::init() {
 
     /* initialize overrides */
     clear_overrides();
-#if defined(SHAL_CORE_APM2)
+#if defined(SHAL_CORE_APM2) || defined(SHAL_CORE_MEGA02)
     /* Arduino pin 48 is ICP5 / PL1,  timer 5 input capture */
     hal.gpio->pinMode(48, HAL_GPIO_INPUT);
 #else

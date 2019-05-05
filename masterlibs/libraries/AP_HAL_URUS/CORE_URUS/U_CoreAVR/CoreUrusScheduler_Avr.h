@@ -13,7 +13,7 @@
 
 #include "utility/ISRRegistry.h"
 
-#if defined(SHAL_CORE_APM2)
+#if defined(SHAL_CORE_APM2) || defined(SHAL_CORE_MEGA02)
 #define URUS_SCHEDULER_MAX_TIMER_PROCS 5
 #elif defined(SHAL_CORE_APM16U)
 #define URUS_SCHEDULER_MAX_TIMER_PROCS 1
@@ -73,12 +73,13 @@ private:
     bool _initialized;
 
     uint32_t now_micros;
-#if defined(SHAL_CORE_APM2)
+#if defined(SHAL_CORE_APM2) || defined(SHAL_CORE_MEGA02)
     uint16_t dt_micros;
     uint16_t centinel_micros;
     uint16_t ms_cb;
 #endif
     uint32_t start;
+    volatile bool _in_delay_proc;
 
     static volatile uint8_t _timer_reset_value;
 

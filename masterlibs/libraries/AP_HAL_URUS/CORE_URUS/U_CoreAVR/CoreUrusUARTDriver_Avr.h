@@ -110,7 +110,7 @@ private:
 	static const uint16_t _default_tx_buffer_size = 16;
 
 	/// maxium tx/rx buffer size
-#if defined(SHAL_CORE_APM2)
+#if defined(SHAL_CORE_APM2) || defined(SHAL_CORE_MEGA02)
 	static const uint16_t _max_buffer_size = 256;
 #elif defined(SHAL_CORE_APM328)
     static const uint16_t _max_buffer_size = 128;

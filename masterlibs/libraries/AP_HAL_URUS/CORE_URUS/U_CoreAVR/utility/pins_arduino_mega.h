@@ -76,7 +76,7 @@ extern "C" {
 #else
 #define digitalPinHasPWM(p)         ((p) == 3 || (p) == 5 || (p) == 6 || (p) == 9 || (p) == 10 || (p) == 11)
 #endif
-#elif defined(SHAL_CORE_APM2)
+#elif defined(SHAL_CORE_APM2) || defined(SHAL_CORE_MEGA02)
 #define NUM_DIGITAL_PINS            72
 #define NUM_ANALOG_INPUTS           16
 #define analogInputToDigitalPin(p)  ((p < 16) ? (p) + 54 : -1)
@@ -98,7 +98,7 @@ extern const uint8_t PROGMEM analog_pin_to_channel_PGM[];
 #error "UNKNOWN CORE BOARD FOR PINS!"
 #endif
 
-#if defined(SHAL_CORE_APM2)
+#if defined(SHAL_CORE_APM2) || defined(SHAL_CORE_MEGA02)
 const static uint8_t SS   = 53;
 const static uint8_t MOSI = 51;
 const static uint8_t MISO = 50;

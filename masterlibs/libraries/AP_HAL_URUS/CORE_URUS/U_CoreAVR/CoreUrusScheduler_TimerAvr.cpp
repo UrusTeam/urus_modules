@@ -28,7 +28,7 @@
 #define  AVR_TIMER_WGM2         WGM42
 #define  AVR_TIMER_WGM3         WGM43
 #define  AVR_TIMER_CS1          CS41
-#elif defined(SHAL_CORE_APM2)
+#elif defined(SHAL_CORE_APM2) || defined(SHAL_CORE_MEGA02)
 #define  AVR_TIMER_OVF_VECT     TIMER5_OVF_vect
 #define  AVR_TIMER_TCNT         TCNT5
 #define  AVR_TIMER_TIFR         TIFR5
@@ -111,7 +111,7 @@ void AVRTimer::init()
 
     // OCR5B and OCR5C will be used by RCOutput_APM2. Init to 0xFFFF to prevent premature PWM output
     AVR_TIMER_OCRB  = 0xFFFF;
-#if defined(SHAL_CORE_APM2)
+#if defined(SHAL_CORE_APM2) || defined(SHAL_CORE_MEGA02)
     AVR_TIMER_OCRC  = 0xFFFF;
 #endif
 
