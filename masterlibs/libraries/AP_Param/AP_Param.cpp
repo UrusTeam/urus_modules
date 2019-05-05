@@ -786,7 +786,9 @@ bool AP_Param::save(bool force_save)
 
     if (ofs+type_size((enum ap_var_type)phdr.type)+2*sizeof(phdr) >= _storage.size()) {
         // we are out of room for saving variables
+#if !HAL_MINIMIZE_FEATURES_AVR
         hal.console->println("EEPROM full");
+#endif
         return false;
     }
 
@@ -1244,7 +1246,9 @@ void AP_Param::convert_old_parameter(const struct ConversionInfo *info)
     AP_Param *ap2;
     ap2 = find_P((const prog_char_t *)&info->new_name[0], &ptype);
     if (ap2 == NULL) {
+#if !HAL_MINIMIZE_FEATURES_AVR
         hal.console->printf_PS(PSTR("Unknown conversion '%s'\n"), info->new_name);
+#endif
         return;
     }
 
@@ -1274,7 +1278,9 @@ void AP_Param::convert_old_parameter(const struct ConversionInfo *info)
         }
     } else {
         // can't do vector<->scalar conversion, or different vector types
+#if !HAL_MINIMIZE_FEATURES_AVR
         hal.console->printf_PS(PSTR("Bad conversion type '%s'\n"), info->new_name);
+#endif
     }
 }
 #pragma GCC diagnostic pop
