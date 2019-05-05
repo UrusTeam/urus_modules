@@ -32,7 +32,7 @@
 #include "../CoreUrusUARTDriver.h"
 #include "CoreUrusUARTDriver_Avr.h"
 
-#if defined(SHAL_CORE_APM2)
+#if defined(SHAL_CORE_APM2) || defined(SHAL_CORE_MEGA02)
 #define FS_MAX_PORTS 4
 #elif defined(SHAL_CORE_APM328)
 #define FS_MAX_PORTS 1

@@ -167,7 +167,7 @@ void CLCoreUrusAnalogSource_Avr::setup_read()
     if (_pin == ANALOG_INPUT_BOARD_VCC) {
 #if defined(SHAL_CORE_APM328)
         ADMUX = _BV(REFS0)|_BV(MUX3)|_BV(MUX2)|_BV(MUX1);
-#elif defined(SHAL_CORE_APM2)
+#elif defined(SHAL_CORE_APM2) || defined(SHAL_CORE_MEGA02)
         ADCSRB = (ADCSRB & ~(1 << MUX5));
         ADMUX = _BV(REFS0)|_BV(MUX4)|_BV(MUX3)|_BV(MUX2)|_BV(MUX1);
 #endif
@@ -176,7 +176,7 @@ void CLCoreUrusAnalogSource_Avr::setup_read()
     } else {
 #if defined(SHAL_CORE_APM328)
         ADMUX = _BV(REFS0) | (_pin & 0x07);
-#elif defined(SHAL_CORE_APM2)
+#elif defined(SHAL_CORE_APM2) || defined(SHAL_CORE_MEGA02)
         ADCSRB = (ADCSRB & ~(1 << MUX5)) | (((_pin >> 3) & 0x01) << MUX5);
         ADMUX = _BV(REFS0) | (_pin & 0x07);
 #endif
@@ -270,7 +270,7 @@ void CLCoreUrusAnalogIn_Avr::_register_channel(CLCoreUrusAnalogSource_Avr* ch)
         /* After registering the first channel, we can enable the ADC */
 #if defined(SHAL_CORE_APM328)
         PRR &= ~_BV(PRADC);
-#elif defined(SHAL_CORE_APM2)
+#elif defined(SHAL_CORE_APM2) || defined(SHAL_CORE_MEGA02)
         PRR0 &= ~_BV(PRADC);
 #endif
         ADCSRA |= _BV(ADEN);

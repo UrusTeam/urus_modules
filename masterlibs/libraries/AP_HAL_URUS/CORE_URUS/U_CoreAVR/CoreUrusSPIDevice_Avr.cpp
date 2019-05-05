@@ -23,7 +23,7 @@ extern const AP_HAL::HAL& hal;
 #define SPI0_MOSI_PIN   11
 #define SPI0_SCK_PIN    13
 #define SPI0_CS_PIN_10  10
-#elif defined(SHAL_CORE_APM2)
+#elif defined(SHAL_CORE_APM2) || defined(SHAL_CORE_MEGA02)
 #define SPI0_MISO_PIN   50
 #define SPI0_MOSI_PIN   51
 #define SPI0_SCK_PIN    52
@@ -44,7 +44,7 @@ extern const AP_HAL::HAL& hal;
 
 bool CLCoreUrusSPI0Device_Avr::_force_low_speed;
 CLCoreUrusSemaphore_Avr CLCoreUrusSPI0Device_Avr::_semaphore;
-#if defined(SHAL_CORE_APM2)
+#if defined(SHAL_CORE_APM2) || defined(SHAL_CORE_MEGA02)
 CLCoreUrusSemaphore_Avr CLCoreUrusSPI3Device_Avr::_semaphore;
 #endif
 
@@ -62,7 +62,7 @@ SPIDesc CLCoreUrusSPIDeviceManager_Avr::device_table[] = {
     SPIDesc("**dummy**", 0, 0, 0, 0, 0, 0),
 #if defined(SHAL_CORE_APM328)
     SPIDesc("URUS_Cape", 0, 0, SPI0_CS_PIN_10, MASTER_SPI, SPI0_SPCR_500kHz, SPI0_SPCR_8MHz),
-#elif defined(SHAL_CORE_APM2)
+#elif defined(SHAL_CORE_APM2) || defined(SHAL_CORE_MEGA02)
     SPIDesc("URUS_Cape", 0, 0, SPI0_CS_PIN_53, MASTER_SPI, SPI0_SPCR_500kHz, SPI0_SPCR_8MHz),
     SPIDesc("SPI0_M", 0, 0, SPI0_CS_PIN_53, MASTER_SPI, SPI0_SPCR_500kHz, SPI0_SPCR_8MHz),
     SPIDesc("SPI0_S", 3, 0, SPI0_CS_PIN_53, SLAVE_SPI, SPI0_SPCR_500kHz, SPI0_SPCR_8MHz),
@@ -120,7 +120,7 @@ void CLCoreUrusSPI0Device_Avr::init()
 
         _cs_pin->mode(HAL_GPIO_OUTPUT);
         _cs_pin->write(1);
-#if defined(SHAL_CORE_APM2)
+#if defined(SHAL_CORE_APM2) || defined(SHAL_CORE_MEGA02)
         hal.gpio->pinMode(SPI0_CS_PIN_40, HAL_GPIO_OUTPUT);
         hal.gpio->write(SPI0_CS_PIN_40, 1);
 
@@ -177,7 +177,7 @@ uint8_t CLCoreUrusSPI0Device_Avr::_transfer(uint8_t data)
 {
     if (spi0_transferflag) {
 #if !HAL_MINIMIZE_FEATURES_AVR
-        AP_HAL::panic("PANIC: SPI0 transfer collision");
+        AP_HAL::panic(PSTR("PANIC: SPI0 transfer collision"));
 #endif
         return 0;
     }
@@ -185,7 +185,7 @@ uint8_t CLCoreUrusSPI0Device_Avr::_transfer(uint8_t data)
     SPDR = data;
     if (SPSR & _BV(WCOL)) {
 #if !HAL_MINIMIZE_FEATURES_AVR
-        AP_HAL::panic("PANIC: SPI0 write collision");
+        AP_HAL::panic(PSTR("PANIC: SPI0 write collision"));
 #endif
         return 0;
     }
@@ -246,7 +246,7 @@ bool CLCoreUrusSPI0Device_Avr::set_chip_select(bool set)
     return false;
 }
 
-#if defined(SHAL_CORE_APM2)
+#if defined(SHAL_CORE_APM2) || defined(SHAL_CORE_MEGA02)
 // CONSTRUCTOR FOR SPI-3
 CLCoreUrusSPI3Device_Avr::CLCoreUrusSPI3Device_Avr(SPIDesc &device_desc):
     NSCORE_URUS::CLCoreUrusSPIDevice(),
@@ -460,7 +460,7 @@ CLCoreUrusSPIDeviceManager_Avr::get_device(const char *name)
             dev = AP_HAL::OwnPtr<AP_HAL::SPIDevice>(new CLCoreUrusSPI0Device_Avr(desc));
             break;
         }
-#if defined(SHAL_CORE_APM2)
+#if defined(SHAL_CORE_APM2) || defined(SHAL_CORE_MEGA02)
         case 3:
         {
             dev = AP_HAL::OwnPtr<AP_HAL::SPIDevice>(new CLCoreUrusSPI3Device_Avr(desc));

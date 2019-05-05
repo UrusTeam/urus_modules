@@ -87,7 +87,7 @@ private:
     void _cs_assert();
     void _cs_release();
 };
-#if defined(SHAL_CORE_APM2)
+#if defined(SHAL_CORE_APM2) || defined(SHAL_CORE_MEGA02)
 class CLCoreUrusSPI3Device_Avr : public NSCORE_URUS::CLCoreUrusSPIDevice {
 public:
     CLCoreUrusSPI3Device_Avr(SPIDesc &device_desc);
@@ -146,7 +146,7 @@ private:
 class CLCoreUrusSPIDeviceManager_Avr : public NSCORE_URUS::CLCoreUrusSPIDeviceManager {
 public:
     friend class CLCoreUrusSPI0Device_Avr;
-#if defined(SHAL_CORE_APM2)
+#if defined(SHAL_CORE_APM2) || defined(SHAL_CORE_MEGA02)
     friend class CLCoreUrusSPI3Device_Avr;
 #endif
 

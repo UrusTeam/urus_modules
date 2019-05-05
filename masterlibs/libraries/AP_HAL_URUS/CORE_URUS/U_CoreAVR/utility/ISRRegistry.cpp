@@ -37,7 +37,7 @@ extern "C" ISR(TIMER1_CAPT_vect) {
     if ( ISRRegistry::_registry[ISR_REGISTRY_TIMER1_CAPT] != NULL)
          ISRRegistry::_registry[ISR_REGISTRY_TIMER1_CAPT]();
 }
-#elif defined(SHAL_CORE_APM2)
+#elif defined(SHAL_CORE_APM2) || defined(SHAL_CORE_MEGA02)
 extern "C" ISR(TIMER2_OVF_vect) {
     if ( ISRRegistry::_registry[ISR_REGISTRY_TIMER2_OVF] != NULL)
          ISRRegistry::_registry[ISR_REGISTRY_TIMER2_OVF]();

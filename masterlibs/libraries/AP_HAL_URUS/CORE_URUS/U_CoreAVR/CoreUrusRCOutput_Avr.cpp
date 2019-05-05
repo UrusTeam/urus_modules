@@ -15,7 +15,7 @@ CLCoreUrusRCOutput_Avr::CLCoreUrusRCOutput_Avr() :
 
 void CLCoreUrusRCOutput_Avr::init()
 {
-#if defined(SHAL_CORE_APM2)
+#if defined(SHAL_CORE_APM2) || defined(SHAL_CORE_MEGA02)
     hal.gpio->pinMode(12,HAL_GPIO_OUTPUT); // CH_1 (PB6/OC1B)
     hal.gpio->pinMode(11,HAL_GPIO_OUTPUT); // CH_2 (PB5/OC1A)
 
@@ -81,7 +81,7 @@ void CLCoreUrusRCOutput_Avr::init()
 
 void CLCoreUrusRCOutput_Avr::set_freq(uint32_t chmask, uint16_t freq_hz)
 {
-#if defined(SHAL_CORE_APM2)
+#if defined(SHAL_CORE_APM2) || defined(SHAL_CORE_MEGA02)
     uint16_t icr = _timer_period(freq_hz);
     if ((chmask & ( _BV(CH_1) | _BV(CH_2))) != 0) {
         ICR1 = icr;
@@ -101,7 +101,7 @@ uint16_t CLCoreUrusRCOutput_Avr::get_freq(uint8_t ch)
 {
     uint16_t icr;
     switch (ch) {
-#if defined(SHAL_CORE_APM2)
+#if defined(SHAL_CORE_APM2) || defined(SHAL_CORE_MEGA02)
         case CH_1:
         case CH_2:
             icr = ICR1;
@@ -143,7 +143,7 @@ uint16_t CLCoreUrusRCOutput_Avr::get_freq(uint8_t ch)
 void CLCoreUrusRCOutput_Avr::enable_ch(uint8_t ch)
 {
     switch(ch) {
-#if defined(SHAL_CORE_APM2)
+#if defined(SHAL_CORE_APM2) || defined(SHAL_CORE_MEGA02)
     case 0: TCCR1A |= (1<<COM1B1); break; // CH_1 : OC1B
     case 1: TCCR1A |= (1<<COM1A1); break; // CH_2 : OC1A
     case 2: TCCR4A |= (1<<COM4C1); break; // CH_3 : OC4C
@@ -165,7 +165,7 @@ void CLCoreUrusRCOutput_Avr::enable_ch(uint8_t ch)
 void CLCoreUrusRCOutput_Avr::disable_ch(uint8_t ch)
 {
     switch(ch) {
-#if defined(SHAL_CORE_APM2)
+#if defined(SHAL_CORE_APM2) || defined(SHAL_CORE_MEGA02)
     case 0: TCCR1A &= ~(1<<COM1B1); break; // CH_1 : OC1B
     case 1: TCCR1A &= ~(1<<COM1A1); break; // CH_2 : OC1A
     case 2: TCCR4A &= ~(1<<COM4C1); break; // CH_3 : OC4C
@@ -198,7 +198,7 @@ void CLCoreUrusRCOutput_Avr::write(uint8_t ch, uint16_t period_us)
     uint16_t pwm = constrain_period(period_us) << 1;
     switch(ch)
     {
-#if defined(SHAL_CORE_APM2)
+#if defined(SHAL_CORE_APM2) || defined(SHAL_CORE_MEGA02)
     case 0:  OCR1B=pwm; break;  // out1
     case 1:  OCR1A=pwm; break;  // out2
     case 2:  OCR4C=pwm; break;  // out3
@@ -228,7 +228,7 @@ uint16_t CLCoreUrusRCOutput_Avr::read(uint8_t ch)
 {
     uint16_t pwm=0;
     switch(ch) {
-#if defined(SHAL_CORE_APM2)
+#if defined(SHAL_CORE_APM2) || defined(SHAL_CORE_MEGA02)
     case 0:  pwm=OCR1B; break;      // out1
     case 1:  pwm=OCR1A; break;      // out2
     case 2:  pwm=OCR4C; break;      // out3
