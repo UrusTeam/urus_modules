@@ -33,7 +33,7 @@ AP_HAL::Proc CLCoreUrusGPIO_Avr::_interrupt_6[AVR_INT_NUM_PINS_MAX] = {nullptr};
 static volatile uint8_t PCintLast = 0;
 static volatile bool PCintInProc = false;
 
-#if defined(SHAL_CORE_APM2)
+#if defined(SHAL_CORE_APM2) || defined(SHAL_CORE_MEGA02)
 SIGNAL(INT6_vect) {
     if (CLCoreUrusGPIO_Avr::_interrupt_6[0]) {
         CLCoreUrusGPIO_Avr::_interrupt_6[0]();
@@ -183,7 +183,7 @@ void CLCoreUrusGPIO_Avr::pinMode(uint8_t pin, uint8_t output)
 
 int8_t CLCoreUrusGPIO_Avr::analogPinToDigitalPin(uint8_t pin)
 {
-#if defined(SHAL_CORE_APM2) || defined(SHAL_CORE_APM328)
+#if defined(SHAL_CORE_APM2) || defined(SHAL_CORE_APM328) || defined(SHAL_CORE_MEGA02)
     return analogInputToDigitalPin(pin);
 #else
     return 0;
@@ -225,6 +225,33 @@ void CLCoreUrusGPIO_Avr::write(uint8_t pin, uint8_t value)
     SREG = oldSREG;
 }
 
+void CLCoreUrusGPIO_Avr::write_port(uint8_t portnr, uint8_t value)
+{
+    volatile uint8_t *out;
+
+    out = portOutputRegister(portnr);
+
+    if (*out == NOT_A_PORT) return;
+
+    uint8_t oldSREG = SREG;
+    cli();
+
+    *out = value;
+
+    SREG = oldSREG;
+}
+
+uint8_t CLCoreUrusGPIO_Avr::read_port(uint8_t portnr)
+{
+    volatile uint8_t *input;
+
+    input = portInputRegister(portnr);
+
+    if (*input == NOT_A_PORT) return 0;
+
+    return *input;
+}
+
 void CLCoreUrusGPIO_Avr::toggle(uint8_t pin)
 {
     uint8_t bit = digitalPinToBitMask(pin);
@@ -259,7 +286,7 @@ bool CLCoreUrusGPIO_Avr::attach_interrupt(uint8_t interrupt_num, AP_HAL::Proc p,
           (mode == HAL_GPIO_INTERRUPT_HIGH)||
           (mode == HAL_GPIO_INTERRUPT_FALLING)||
           (mode == HAL_GPIO_INTERRUPT_RISING))) return false;
-#if defined(SHAL_CORE_APM2)
+#if defined(SHAL_CORE_APM2) || defined(SHAL_CORE_MEGA02)
     bool ret = false;
     uint8_t oldSREG = SREG;
     cli();

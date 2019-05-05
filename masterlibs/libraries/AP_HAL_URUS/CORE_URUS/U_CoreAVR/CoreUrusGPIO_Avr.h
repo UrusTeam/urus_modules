@@ -6,7 +6,7 @@
 #include "../CORE_URUS_NAMESPACE.h"
 #include "../CoreUrusGPIO.h"
 
-#if defined(SHAL_CORE_APM2)
+#if defined(SHAL_CORE_APM2) || defined(SHAL_CORE_MEGA02)
 #define AVR_INT_NUM_PINS_MAX 9
 #elif defined(SHAL_CORE_APM328)
 #define AVR_INT_NUM_PINS_MAX 4
@@ -26,6 +26,9 @@ public:
     uint8_t read(uint8_t pin);
     void    write(uint8_t pin, uint8_t value);
     void    toggle(uint8_t pin);
+
+    void    write_port(uint8_t portnr, uint8_t value);
+    uint8_t read_port(uint8_t portnr);
 
     /* Alternative interface: */
     AP_HAL::DigitalSource* channel(uint16_t n);
