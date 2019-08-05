@@ -8,7 +8,11 @@
 #define RC_CHANNEL_TYPE_ANGLE       0
 #define RC_CHANNEL_TYPE_RANGE       1
 
+#if CONFIG_SHAL_CORE_RCINPUT == ENABLED
 #define NUM_RC_CHANNELS 16
+#else
+#define NUM_RC_CHANNELS 2
+#endif // CONFIG_SHAL_CORE_RCINPUT
 
 /// @class	RC_Channel
 /// @brief	Object managing one RC channel
@@ -37,7 +41,7 @@ public:
     bool        get_reverse(void) const;
     void        set_default_dead_zone(int16_t dzone);
     uint16_t    get_dead_zone(void) const { return dead_zone; }
-    
+
     // get the center stick position expressed as a control_in value
     int16_t     get_control_mid() const;
 
@@ -84,7 +88,7 @@ public:
 
     // get control input with zero deadzone
     int16_t     get_control_in_zero_dz(void);
-    
+
     int16_t    get_radio_min() const {return radio_min.get();}
     void       set_radio_min(int16_t val) { radio_min = val;}
 
@@ -96,12 +100,12 @@ public:
     void       save_radio_trim() { radio_trim.save();}
 
     void       set_and_save_trim() { radio_trim.set_and_save_ifchanged(radio_in);}
-    
+
     bool min_max_configured() const
     {
         return radio_min.configured() && radio_max.configured();
     }
-    
+
 private:
 
     // pwm is stored here
@@ -109,7 +113,7 @@ private:
 
     // value generated from PWM normalised to configured scale
     int16_t    control_in;
-    
+
     AP_Int16    radio_min;
     AP_Int16    radio_trim;
     AP_Int16    radio_max;
@@ -144,7 +148,7 @@ public:
     }
 
     static void set_pwm_all(void);
-    
+
 private:
     // this static arrangement is to avoid static pointers in AP_Param tables
     static RC_Channel *channels;
