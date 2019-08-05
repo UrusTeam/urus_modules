@@ -1,0 +1,3 @@
+[submodule "modlibs/UR_Protocol"]
+	path = modlibs/UR_Protocol
+	url = https://github.com/hiro2233/UR_Protocol.git
