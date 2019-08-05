@@ -127,7 +127,7 @@
 #define DATAFLASH_NO_CLI 1
 #define HAL_GPIO_LED_ON           HIGH
 #define HAL_GPIO_LED_OFF          LOW
-#define HIL_SUPPORT 1
+#define HIL_SUPPORT 0
 #define HAL_GPIO_USB_MUX_PIN -1
 #elif (CONFIG_SHAL_CORE == SHAL_CORE_APM) && defined(SHAL_CORE_APM16U)
 #define HAL_CPU_CLASS HAL_CPU_CLASS_16
