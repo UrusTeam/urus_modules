@@ -227,9 +227,9 @@ AP_HAL::Semaphore *CLCoreUrusSPI0Device_Avr::get_semaphore()
 
 AP_HAL::Device::PeriodicHandle CLCoreUrusSPI0Device_Avr::register_periodic_callback(uint32_t period_usec, AP_HAL::Device::PeriodicCb cb)
 {
-    AP_HAL::Device::PeriodicHandle p = &cb;
+    //AP_HAL::Device::PeriodicHandle p = &cb;
     hal.scheduler->register_timer_process(cb);
-    return static_cast<AP_HAL::Device::PeriodicHandle>(p);
+    return nullptr;//static_cast<AP_HAL::Device::PeriodicHandle>(p);
 }
 
 bool CLCoreUrusSPI0Device_Avr::adjust_periodic_callback(AP_HAL::Device::PeriodicHandle h, uint32_t period_usec)
@@ -384,9 +384,9 @@ AP_HAL::Semaphore *CLCoreUrusSPI3Device_Avr::get_semaphore()
 
 AP_HAL::Device::PeriodicHandle CLCoreUrusSPI3Device_Avr::register_periodic_callback(uint32_t period_usec, AP_HAL::Device::PeriodicCb cb)
 {
-    AP_HAL::Device::PeriodicHandle p = &cb;
+    //AP_HAL::Device::PeriodicHandle p = &cb;
     hal.scheduler->register_timer_process(cb);
-    return static_cast<AP_HAL::Device::PeriodicHandle>(p);
+    return nullptr;//static_cast<AP_HAL::Device::PeriodicHandle>(p);
 }
 
 bool CLCoreUrusSPI3Device_Avr::adjust_periodic_callback(AP_HAL::Device::PeriodicHandle h, uint32_t period_usec)
