@@ -43,8 +43,7 @@
 #define ISA_GAS_CONSTANT 287.26f
 #define ISA_LAPSE_RATE 0.0065f
 
-#define INTERNAL_TEMPERATURE_CLAMP 35.0f
-
+#define INTERNAL_TEMPERATURE_CLAMP 45.0f
 
 extern const AP_HAL::HAL& hal;
 
@@ -498,31 +497,30 @@ void AP_Baro::init(void)
 	ADD_BACKEND(AP_Baro_LPS25H::probe(*this,
                                       std::move(hal.i2c_mgr->get_device(HAL_BARO_LPS25H_I2C_BUS, HAL_BARO_LPS25H_I2C_ADDR))));
 #elif HAL_BARO_DEFAULT == HAL_BARO_URUS
-    drivers[0] = new AP_Baro_URUS(*this);
-    _num_drivers = 1;
-#endif
+    drivers[_num_drivers++] = new AP_Baro_URUS(*this);
+#elif APM_BUILD_TYPE(APM_BUILD_ArduSub)
     // can optionally have baro on I2C too
     if (_ext_bus >= 0) {
-#if APM_BUILD_TYPE(APM_BUILD_ArduSub)
         ADD_BACKEND(AP_Baro_MS56XX::probe(*this,
                                           std::move(hal.i2c_mgr->get_device(_ext_bus, HAL_BARO_MS5837_I2C_ADDR)), AP_Baro_MS56XX::BARO_MS5837));
 
         ADD_BACKEND(AP_Baro_KellerLD::probe(*this,
                                           std::move(hal.i2c_mgr->get_device(_ext_bus, HAL_BARO_KELLERLD_I2C_ADDR))));
-#elif HAL_BARO_DEFAULT != HAL_BARO_URUS && HAL_BARO_DEFAULT != HAL_BARO_HIL && HAL_BARO_DEFAULT != HAL_BARO_BMP085 \
-    && HAL_BARO_DEFAULT != HAL_BARO_MS5611_SPI
+    }
+#else
+    if (_ext_bus >= 0) {
         ADD_BACKEND(AP_Baro_MS56XX::probe(*this,
                                           std::move(hal.i2c_mgr->get_device(_ext_bus, HAL_BARO_MS5611_I2C_ADDR))));
-#endif
     }
+#endif
 
     if (_num_drivers == 0 || _num_sensors == 0 || drivers[0] == nullptr) {
 #if !HAL_MINIMIZE_FEATURES_AVR
         AP_BoardConfig::sensor_config_error("Baro: unable to initialise driver");
 #endif
     }
+    drivers[_num_drivers++] = new AP_Baro_URUS(*this);
 }
-
 
 /*
   call update on all drivers
@@ -545,19 +543,24 @@ void AP_Baro::update(void)
 
     for (uint8_t i=0; i<_num_sensors; i++) {
         if (sensors[i].healthy) {
-            // update altitude calculation
+            // update altitude calculation;
+            float altnow = get_altitude_difference(101325.0f, (sensors[i].pressure + sensors[i].p_correction), get_temperature());
+            float qnhtmpLocal = calculate_qnh(altnow, ((sensors[i].pressure + sensors[i].p_correction) / 100), get_temperature(), 1);
+            float qfeLocal = calculate_qfe(altnow, qnhtmpLocal, get_temperature(), 1) * 100;
+
             float ground_pressure = sensors[i].ground_pressure;
             if (is_zero(ground_pressure) || isnan(ground_pressure) || isinf(ground_pressure)) {
                 sensors[i].ground_pressure = sensors[i].pressure;
             }
-            float altitude = sensors[i].altitude;
-            float pressure = sensors[i].pressure + sensors[i].p_correction;
+
+            float altitude = altnow;
             if (sensors[i].type == BARO_TYPE_AIR) {
-                altitude = get_altitude_difference(sensors[i].ground_pressure, pressure);
+                altitude = altnow;
             } else if (sensors[i].type == BARO_TYPE_WATER) {
+                float corrected_pressure = sensors[i].pressure + sensors[i].p_correction;
                 //101325Pa is sea level air pressure, 9800 Pascal/ m depth in water.
                 //No temperature or depth compensation for density of water.
-                altitude = (sensors[i].ground_pressure - pressure) / 9800.0f / _specific_gravity;
+                altitude = (sensors[i].ground_pressure - corrected_pressure) / 9800.0f / _specific_gravity;
             }
             // sanity check altitude
             sensors[i].alt_ok = !(isnan(altitude) || isinf(altitude));
@@ -642,3 +645,17 @@ void AP_Baro::set_pressure_correction(uint8_t instance, float p_correction)
     }
 }
 
+float AP_Baro::calculate_qnh(float alt_qnh, float pressure_qnh, float temp, uint8_t alt_qnh_unit)
+{
+    return drivers[_num_drivers - 1]->calculate_qnh(alt_qnh, pressure_qnh, temp, alt_qnh_unit);
+}
+
+float AP_Baro::calculate_qfe(float alt_qfe, float pressure_qfe, float temp, uint8_t alt_qfe_unit)
+{
+    return drivers[_num_drivers - 1]->calculate_qfe(alt_qfe, pressure_qfe, temp,  alt_qfe_unit);
+}
+
+float AP_Baro::get_altitude_difference(float base_pressure, float pressure, float temp) const
+{
+    return drivers[_num_drivers - 1]->get_altitude_difference(base_pressure, pressure, temp);
+}

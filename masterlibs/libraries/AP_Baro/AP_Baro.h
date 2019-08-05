@@ -10,11 +10,11 @@
 
 // maximum number of drivers. Note that a single driver can provide
 // multiple sensor instances
-#define BARO_MAX_DRIVERS 1
+#define BARO_MAX_DRIVERS 2
 
 // timeouts for health reporting
-#define BARO_TIMEOUT_MS                 500     // timeout in ms since last successful read
-#define BARO_DATA_CHANGE_TIMEOUT_MS     2000    // timeout in ms since last successful read that involved temperature of pressure changing
+#define BARO_TIMEOUT_MS                 1500     // timeout in ms since last successful read
+#define BARO_DATA_CHANGE_TIMEOUT_MS     4000    // timeout in ms since last successful read that involved temperature of pressure changing
 
 class AP_Baro_Backend;
 
@@ -164,6 +164,10 @@ public:
 
     // set a pressure correction from AP_TempCalibration
     void set_pressure_correction(uint8_t instance, float p_correction);
+
+    float calculate_qnh(float alt_qnh, float pressure_qnh, float temp, uint8_t alt_qnh_unit);
+    float calculate_qfe(float alt_qfe, float pressure_qfe, float temp, uint8_t alt_qfe_unit);
+    float get_altitude_difference(float base_pressure, float pressure, float temp) const;
 
 private:
     // how many drivers do we have?
