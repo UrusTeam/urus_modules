@@ -98,8 +98,9 @@ void CORE_AVR::init_core() const
 #if defined(SHAL_CORE_APM2) || defined(SHAL_CORE_MEGA02)
     PORTE |= _BV(0);
     PORTH |= _BV(0);
-#endif
     PORTD |= _BV(2);
+#endif
+
 }
 
 NSCORE_URUS::CLCoreUrusScheduler* NSCORE_URUS::get_scheduler()
