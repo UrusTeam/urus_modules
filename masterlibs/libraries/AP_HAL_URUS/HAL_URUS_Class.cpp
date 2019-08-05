@@ -108,8 +108,6 @@ void HAL_URUS::run(int argc, char * const argv[], Callbacks* callbacks) const
     analogin->init();
 #endif
 
-    uartA->printf_PS(PSTR("\n\n\n\n\n\n\nInit URUS System!\n\n"));
-
 #endif
     callbacks->setup();
 
