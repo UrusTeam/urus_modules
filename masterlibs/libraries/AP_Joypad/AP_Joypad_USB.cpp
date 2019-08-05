@@ -44,6 +44,7 @@
 #include <avr/interrupt.h>
 
 #define TXLED 5
+#define RXLED 4
 
 extern const usb_string_descriptor_struct string0 PROGMEM;
 extern const usb_string_descriptor_struct string1 PROGMEM;
@@ -77,8 +78,8 @@ AP_Joypad_USB::~AP_Joypad_USB()
 
 void AP_Joypad_USB::process(AP_Joypad::ProcessMode process_mode)
 {
-    hal.gpio->pinMode(TXLED, HAL_GPIO_OUTPUT);
-    hal.gpio->write(TXLED, 1);
+    //hal.gpio->pinMode(TXLED, HAL_GPIO_OUTPUT);
+    //hal.gpio->write(TXLED, 1);
     _now = AP_HAL::micros();
 
     switch (process_mode) {
@@ -152,8 +153,11 @@ unsigned char AP_Joypad_USB::serialRead(uint16_t timeout)
         hal.scheduler->delay(1);
         timeout--;
         if (timeout == 0) {
+            hal.gpio->toggle(RXLED);
+            hal.scheduler->delay(100);
             return 0;
         }
+        hal.gpio->write(RXLED, 1);
     }
     // Get and return received data from buffer
     return UDR1;
@@ -164,6 +168,14 @@ void AP_Joypad_USB::_process_event()
 {
     if (_inproc_event) {
         return;
+    }
+
+    if (!hal.gpio->read(14)) {
+        _inproc_event = true;
+        hal.gpio->write(TXLED, 0);
+        hal.scheduler->delay(200);
+        hal.gpio->write(TXLED, 1);
+        hal.scheduler->reboot(false);
     }
 
     if ((AP_HAL::micros() - _now) > 4000LU)
@@ -240,8 +252,9 @@ void AP_Joypad_USB::_process_event()
 		hal.gpio->write(TXLED, 0);
         // Finally, we send the data out via the USB port
 		send_controller_data_to_usb(controllerData1, 1);
-		hal.scheduler->delay(2);
+		hal.scheduler->delay(1);
 		send_controller_data_to_usb(controllerData2, 2);
+		hal.scheduler->delay(1);
 		_inproc_event = false;
     }
 }
@@ -266,13 +279,19 @@ bool AP_Joypad_USB::_configure()
 	usb_configure();
     hal.gpio->pinMode(TXLED, HAL_GPIO_OUTPUT);
     hal.gpio->write(TXLED, 1);
+    hal.gpio->pinMode(RXLED, HAL_GPIO_OUTPUT);
+    hal.gpio->write(RXLED, 1);
+    hal.gpio->pinMode(7, HAL_GPIO_OUTPUT);
+    hal.gpio->write(7, 1);
+    hal.gpio->pinMode(14, HAL_GPIO_INPUT);
+    hal.gpio->write(14, 1);
 
 	while (!usb_configured()) {
-        hal.gpio->toggle(TXLED);
-		hal.scheduler->delay(50);
+        hal.gpio->toggle(RXLED);
+        hal.scheduler->delay(20);
 	} // wait
 
-	hal.scheduler->delay(500);
+	hal.scheduler->delay(3000);
 
     return true;
 }
