@@ -22,6 +22,10 @@ public:
 
     void backend_update(uint8_t instance);
 
+    virtual float calculate_qnh(float alt_qnh, float pressure_qnh, float temp, uint8_t alt_qnh_unit) { return 0; };
+    virtual float calculate_qfe(float alt_qfe, float pressure_qfe, float temp, uint8_t alt_qfe_unit) { return 0; };
+    virtual float get_altitude_difference(float base_pressure, float pressure, float temp) const { return 0; };
+
 protected:
     // reference to frontend object
     AP_Baro &_frontend;
@@ -29,7 +33,7 @@ protected:
     void _copy_to_frontend(uint8_t instance, float pressure, float temperature);
 
     // semaphore for access to shared frontend data
-    AP_HAL::Semaphore *_sem;    
+    AP_HAL::Semaphore *_sem;
 
     virtual void update_healthy_flag(uint8_t instance);
 
