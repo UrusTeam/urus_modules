@@ -9,7 +9,7 @@
 #include "CoreUrusScheduler_Avr.h"
 #include "utility/ISRRegistry.h"
 
-#if defined(SHAL_CORE_APM2)
+#if defined(SHAL_CORE_APM2) || defined(SHAL_CORE_MEGA02)
 #define AVR_RC_INPUT_NUM_CHANNELS 11
 #define AVR_RC_INPUT_MIN_CHANNELS 5     // for ppm sum we allow less than 5 channels to make up a valid packet
 #elif defined(SHAL_CORE_APM328)
