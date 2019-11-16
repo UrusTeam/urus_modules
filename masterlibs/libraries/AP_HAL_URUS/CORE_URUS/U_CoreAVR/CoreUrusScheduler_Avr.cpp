@@ -224,7 +224,7 @@ void CLCoreUrusScheduler_Avr::reboot(bool hold_in_bootloader)
     hal.uartA->printf_PS(PSTR("GOING DOWN FOR A REBOOT\r\n"));
     hal.scheduler->delay(100);
 #endif
-#if defined(SHAL_CORE_APM2) || defined(SHAL_CORE_MEGA02)
+#if defined(SHAL_CORE_APM2) || defined(SHAL_CORE_MEGA02) || defined(SHAL_CORE_APM16U)
     /* The APM2 bootloader will reset the watchdog shortly after
      * starting, so we can use the watchdog to force a reboot
      */
