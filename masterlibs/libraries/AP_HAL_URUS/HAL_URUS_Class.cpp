@@ -52,8 +52,8 @@ HAL_URUS::HAL_URUS() :
     uartE = NSCORE_URUS::get_uartE_Driver();
     uartF = NSCORE_URUS::get_uartF_Driver();
 #endif
-
 #endif
+
 #if CONFIG_SHAL_CORE == SHAL_CORE_APM && (defined(SHAL_CORE_APM2) \
     || CONFIG_SHAL_CORE == SHAL_CORE_CYGWIN \
     || defined(SHAL_CORE_MEGA02) \
@@ -65,7 +65,9 @@ HAL_URUS::HAL_URUS() :
 #if CONFIG_SHAL_CORE_SPI == ENABLED
     spi = NSCORE_URUS::get_SPIDeviceManager();
 #endif // CONFIG_SHAL_CORE_SPI
+#if CONFIG_SHAL_CORE_ANALOGIN == ENABLED
     analogin = NSCORE_URUS::get_AnalogIn();
+#endif // CONFIG_SHAL_CORE_ANALOGIN
 #if CONFIG_SHAL_CORE_UTIL == ENABLED
     util = NSCORE_URUS::get_Util();
 #endif
