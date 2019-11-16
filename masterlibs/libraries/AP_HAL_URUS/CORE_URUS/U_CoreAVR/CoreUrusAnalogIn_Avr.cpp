@@ -158,7 +158,7 @@ void CLCoreUrusAnalogSource_Avr::setup_read()
 {
     if (_stop_pin != ANALOG_INPUT_NONE) {
         uint8_t digital_pin = hal.gpio->analogPinToDigitalPin(_stop_pin);
-        hal.gpio->pinMode(digital_pin, HAL_GPIO_OUTPUT);
+        hal.gpio->pinMode(digital_pin, HAL_GPIO_INPUT);
         hal.gpio->write(digital_pin, 1);
     }
     if (_settle_time_ms != 0) {
@@ -187,7 +187,7 @@ void CLCoreUrusAnalogSource_Avr::stop_read()
 {
     if (_stop_pin != ANALOG_INPUT_NONE) {
         uint8_t digital_pin = hal.gpio->analogPinToDigitalPin(_stop_pin);
-        hal.gpio->pinMode(digital_pin, HAL_GPIO_OUTPUT);
+        hal.gpio->pinMode(digital_pin, HAL_GPIO_INPUT);
         hal.gpio->write(digital_pin, 0);
     }
 }
