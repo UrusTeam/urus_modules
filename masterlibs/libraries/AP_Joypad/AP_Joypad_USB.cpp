@@ -283,7 +283,9 @@ int16_t AP_Joypad_USB::get_16bit_value(int serial_index)
 
 bool AP_Joypad_USB::_configure()
 {
-    usart_init(7);
+    //12 for 115200 bps
+    // 7 for 250000 bps
+    usart_init(12);
 	// Configure our USB connection
 	usb_configure();
     hal.gpio->pinMode(TXLED, HAL_GPIO_OUTPUT);
