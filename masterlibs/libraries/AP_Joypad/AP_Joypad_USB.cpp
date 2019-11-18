@@ -35,13 +35,14 @@
  */
 
 #include <AP_HAL/AP_HAL.h>
-#if (CONFIG_HAL_BOARD == HAL_BOARD_URUS) && (CONFIG_SHAL_CORE == SHAL_CORE_APM) && defined(SHAL_CORE_APM16U)
 
-#include "AP_Joypad_USB.h"
+#if (CONFIG_HAL_BOARD == HAL_BOARD_URUS) && (CONFIG_SHAL_CORE == SHAL_CORE_APM) && defined(SHAL_CORE_APM16U)
 
 #include <avr/io.h>
 #include <avr/wdt.h>
 #include <avr/interrupt.h>
+
+#include "AP_Joypad_USB.h"
 
 #define TXLED 5
 #define RXLED 4
@@ -65,12 +66,16 @@ static const descriptor_list_struct descriptor_list[] PROGMEM = {
 volatile uint8_t AP_Joypad_USB::usb_configuration = 0;
 uint8_t AP_Joypad_USB::gamepad_idle_config = 0;
 uint8_t AP_Joypad_USB::gamepad_protocol = 1;
+volatile bool AP_Joypad_USB::_inproc_event = false;
+volatile bool AP_Joypad_USB::_started = false;
+gamepad_state AP_Joypad_USB::usb_controller_state;
 
 extern const AP_HAL::HAL& hal;
 
 AP_Joypad_USB::AP_Joypad_USB(AP_Joypad &joypad) :
     AP_Joypad_Backend(joypad)
 {
+    memset(usb_controller_state.button_array, 0, sizeof(usb_controller_state.button_array));
 }
 
 AP_Joypad_USB::~AP_Joypad_USB()
@@ -78,8 +83,6 @@ AP_Joypad_USB::~AP_Joypad_USB()
 
 void AP_Joypad_USB::process(AP_Joypad::ProcessMode process_mode)
 {
-    //hal.gpio->pinMode(TXLED, HAL_GPIO_OUTPUT);
-    //hal.gpio->write(TXLED, 1);
     _now = AP_HAL::micros();
 
     switch (process_mode) {
@@ -93,6 +96,7 @@ void AP_Joypad_USB::process(AP_Joypad::ProcessMode process_mode)
     default:
         break;
     }
+
     hal.scheduler->delay(100);
 }
 
@@ -150,11 +154,11 @@ unsigned char AP_Joypad_USB::serialRead(uint16_t timeout)
 {
     // Wait for data to be received
     while (!(UCSR1A & (1<<RXC1))) {
-        hal.scheduler->delay(1);
+        hal.scheduler->delay_microseconds(200);
         timeout--;
         if (timeout == 0) {
             hal.gpio->toggle(RXLED);
-            hal.scheduler->delay(100);
+            hal.scheduler->delay(4);
             return 0;
         }
         hal.gpio->write(RXLED, 1);
@@ -166,6 +170,11 @@ unsigned char AP_Joypad_USB::serialRead(uint16_t timeout)
 
 void AP_Joypad_USB::_process_event()
 {
+    if (!_started) {
+        flush_serialRead();
+        return;
+    }
+
     if (_inproc_event) {
         return;
     }
@@ -203,10 +212,10 @@ void AP_Joypad_USB::_process_event()
 		serialWrite(serialIndex);
 		serialIndex++;
 		uint8_t directionButtons1 = serialRead(25);
-		controllerData1.dpad_left_on = 1 & (directionButtons1 >> 0);
-		controllerData1.dpad_up_on = 1 & (directionButtons1 >> 1);
-		controllerData1.dpad_right_on = 1 & (directionButtons1 >> 2);
-		controllerData1.dpad_down_on = 1 & (directionButtons1 >> 3);
+		//controllerData1.dpad_left_on = 1 & (directionButtons1 >> 0);
+		//controllerData1.dpad_up_on = 1 & (directionButtons1 >> 1);
+		//controllerData1.dpad_right_on = 1 & (directionButtons1 >> 2);
+		//controllerData1.dpad_down_on = 1 & (directionButtons1 >> 3);
 
 		// Assuming that 16 bit data gets sent high byte first
 		controllerData1.left_stick_x = get_16bit_value(serialIndex);
@@ -231,10 +240,10 @@ void AP_Joypad_USB::_process_event()
 		serialWrite(serialIndex);
 		serialIndex++;
 		uint8_t directionButtons2 = serialRead(25);
-		controllerData2.dpad_left_on = 1 & (directionButtons2 >> 0);
-		controllerData2.dpad_up_on = 1 & (directionButtons2 >> 1);
-		controllerData2.dpad_right_on = 1 & (directionButtons2 >> 2);
-		controllerData2.dpad_down_on = 1 & (directionButtons2 >> 3);
+		//controllerData2.dpad_left_on = 1 & (directionButtons2 >> 0);
+		//controllerData2.dpad_up_on = 1 & (directionButtons2 >> 1);
+		//controllerData2.dpad_right_on = 1 & (directionButtons2 >> 2);
+		//controllerData2.dpad_down_on = 1 & (directionButtons2 >> 3);
 
 		controllerData2.left_stick_x = get_16bit_value(serialIndex);
 		serialIndex += 2;
@@ -274,7 +283,7 @@ int16_t AP_Joypad_USB::get_16bit_value(int serial_index)
 
 bool AP_Joypad_USB::_configure()
 {
-    usart_init(16);
+    usart_init(7);
 	// Configure our USB connection
 	usb_configure();
     hal.gpio->pinMode(TXLED, HAL_GPIO_OUTPUT);
@@ -291,7 +300,8 @@ bool AP_Joypad_USB::_configure()
         hal.scheduler->delay(20);
 	} // wait
 
-	hal.scheduler->delay(3000);
+	_started = true;
+	hal.scheduler->delay(2000);
 
     return true;
 }
@@ -333,12 +343,14 @@ uint8_t AP_Joypad_USB::usb_configured(void)
 int8_t AP_Joypad_USB::send_controller_data_to_usb(data_controller_t btnList, uint8_t playerID)
 {
 	usb_controller_state.id = playerID;
-	memcpy(usb_controller_state.button_array, btnList.button_array, BUTTON_ARRAY_LENGTH);
+	memcpy(usb_controller_state.button_array, &btnList.button_array[0], BUTTON_ARRAY_LENGTH);
 
 	// digital direction, use the dir_* constants(enum)
 	// 8 = center, 0 = up, 1 = up/right, 2 = right, 3 = right/down
 	// 4 = down, 5 = down/left, 6 = left, 7 = left/up
+
 	usb_controller_state.direction = 8;
+/*
 	if (btnList.dpad_up_on == 1) {
 		if (btnList.dpad_left_on == 1) {
 			usb_controller_state.direction = 7;
@@ -384,7 +396,7 @@ int8_t AP_Joypad_USB::send_controller_data_to_usb(data_controller_t btnList, uin
 		usb_controller_state.left_axis = 0xFF;
 	else
 		usb_controller_state.left_axis = 0;
-
+*/
 	// left and right analog sticks, 0x000 left/up, 0x3E8 middle, 0x7D0 right/down
 	// Sanity check the inputs so we don't try and go out of bounds
 
@@ -417,8 +429,8 @@ int8_t AP_Joypad_USB::send_controller_data_to_usb(data_controller_t btnList, uin
 	if (btnList.stick3_y > stickMax)
 		btnList.stick3_y = stickMax;
 
-	usb_controller_state.l_x_axis = btnList.left_stick_x;
-	usb_controller_state.l_y_axis = btnList.left_stick_y;
+    usb_controller_state.l_x_axis = btnList.left_stick_x;
+    usb_controller_state.l_y_axis = btnList.left_stick_y;
 	usb_controller_state.r_x_axis = btnList.right_stick_x;
 	usb_controller_state.r_y_axis = btnList.right_stick_y;
 	usb_controller_state.x_3_axis = btnList.stick3_x;
@@ -430,33 +442,27 @@ int8_t AP_Joypad_USB::send_controller_data_to_usb(data_controller_t btnList, uin
 
 int8_t AP_Joypad_USB::usb_gamepad_send(void)
 {
-	uint8_t intr_state, timeout, i;
+	uint8_t intr_state, timeout;
 
 	if (!usb_configuration) return -1;
-	intr_state = SREG;
-	cli();
 	UENUM = GAMEPAD_ENDPOINT;
 	timeout = UDFNUML + 50;
 	while (1) {
 		// are we ready to transmit?
-		if (UEINTX & (1<<RWAL)) break;
-		SREG = intr_state;
+		if (UEINTX & (1 << RWAL)) break;
 		// has the USB gone offline?
 		if (!usb_configuration) return -1;
 		// have we waited too long?
 		if (UDFNUML == timeout) return -1;
 		// get ready to try checking again
-		intr_state = SREG;
-		cli();
 		UENUM = GAMEPAD_ENDPOINT;
 	}
 
-	for (i=0; i<sizeof(gamepad_state); i++) {
+	for (uint8_t i=0; i < sizeof(gamepad_state); i++) {
 		UEDATX = ((uint8_t*)&usb_controller_state)[i];
 	}
 
 	UEINTX = 0x3A;
-	SREG = intr_state;
 	return 0;
 }
 
@@ -684,11 +690,19 @@ void AP_Joypad_USB::fire_isr_usb_comvect()
  **************************************************************************/
 ISR(USB_GEN_vect)
 {
+    if (AP_Joypad_USB::_inproc_event) {
+        return;
+    }
+
     AP_Joypad_USB::fire_isr_usb_genvect();
 }
 
 ISR(USB_COM_vect)
 {
+    if (AP_Joypad_USB::_inproc_event) {
+        return;
+    }
+
     AP_Joypad_USB::fire_isr_usb_comvect();
 }
 

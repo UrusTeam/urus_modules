@@ -142,6 +142,7 @@
 #define GAMEPAD_1_REPORT_ID 2
 #define BUTTON_ARRAY_LENGTH 4
 
+#pragma pack(push, 1)
 typedef struct __data_controller
 {
     uint8_t button_array[BUTTON_ARRAY_LENGTH];
@@ -159,6 +160,7 @@ typedef struct __data_controller
     int16_t stick3_y;
 
 } data_controller_t;
+#pragma pack(pop)
 
 // If you're desperate for a little extra code memory, these strings
 // can be completely removed if iManufacturer, iProduct, iSerialNumber
@@ -221,9 +223,10 @@ static const uint8_t gamepad_hid_report_desc[] PROGMEM = {
 	0x19, 0x01,        //   USAGE_MINIMUM (Button 1)
 	0x29, 8 * BUTTON_ARRAY_LENGTH,        //   USAGE_MAXIMUM (Button 32)
 	0x81, 0x02,        //   INPUT (Data,Var,Abs)
+
 	0x05, 0x01,        //   USAGE_PAGE (Generic Desktop)
-	0x25, 0x07,        //   LOGICAL_MAXIMUM (7)
-	0x46, 0x3b, 0x01,  //   PHYSICAL_MAXIMUM (315)
+    0x25, 0x07,        //   LOGICAL_MAXIMUM (7)
+    0x46, 0x3b, 0x01,  //   PHYSICAL_MAXIMUM (315)
 	0x75, 0x04,        //   REPORT_SIZE (4)
 	0x95, 0x01,        //   REPORT_COUNT (1)
 	0x65, 0x14,        //   UNIT (Eng Rot:Angular Pos)
@@ -232,6 +235,7 @@ static const uint8_t gamepad_hid_report_desc[] PROGMEM = {
 	0x65, 0x00,        //   UNIT (None)
 	0x95, 0x01,        //   REPORT_COUNT (1)
 	0x81, 0x01,        //   INPUT (Cnst,Ary,Abs)
+
 	0x16, 0x00, 0x00,  //   LOGICAL_MINIMUM 0
 	0x26, 0xD0, 0x07,  //   LOGICAL_MAXIMUM (2000)
 	0x36, 0x00, 0x00,  //   PHYSICAL_MINIMUM (0)
@@ -245,6 +249,7 @@ static const uint8_t gamepad_hid_report_desc[] PROGMEM = {
 	0x75, 0x10,        //   REPORT_SIZE (16)
 	0x95, 0x06,        //   REPORT_COUNT (6)
 	0x81, 0x02,        //   INPUT (Data,Var,Abs)
+
 	0x06, 0x00, 0xff,  //   USAGE_PAGE (Vendor Specific)
 	0x09, 0x20,        //   Unknown
 	0x09, 0x21,        //   Unknown
@@ -261,9 +266,9 @@ static const uint8_t gamepad_hid_report_desc[] PROGMEM = {
 	0x75, 0x08,        //   REPORT_SIZE (8) NEW
 	0x95, 0x0c,        //   REPORT_COUNT (12)
 	0x81, 0x02,        //   INPUT (Data,Var,Abs)
-	0x0a, 0x21, 0x26,  //   Unknown
-	0x95, 0x08,        //   REPORT_COUNT (8)
-	0xb1, 0x02,        //   FEATURE (Data,Var,Abs)
+    0x0a, 0x21, 0x26,  //   Unknown
+    0x95, 0x08,        //   REPORT_COUNT (8)
+    0xb1, 0x02,        //   FEATURE (Data,Var,Abs)
 	0xc0,              // END_COLLECTION
 
 	//MegaJoy descriptor 2
@@ -281,9 +286,10 @@ static const uint8_t gamepad_hid_report_desc[] PROGMEM = {
 	0x19, 0x01,        //   USAGE_MINIMUM (Button 1)
 	0x29, 8 * BUTTON_ARRAY_LENGTH,        //   USAGE_MAXIMUM (Button 144)
 	0x81, 0x02,        //   INPUT (Data,Var,Abs)
+
 	0x05, 0x01,        //   USAGE_PAGE (Generic Desktop)
-	0x25, 0x07,        //   LOGICAL_MAXIMUM (7)
-	0x46, 0x3b, 0x01,  //   PHYSICAL_MAXIMUM (315)
+    0x25, 0x07,        //   LOGICAL_MAXIMUM (7)
+    0x46, 0x3b, 0x01,  //   PHYSICAL_MAXIMUM (315)
 	0x75, 0x04,        //   REPORT_SIZE (4)
 	0x95, 0x01,        //   REPORT_COUNT (1)
 	0x65, 0x14,        //   UNIT (Eng Rot:Angular Pos)
@@ -292,6 +298,7 @@ static const uint8_t gamepad_hid_report_desc[] PROGMEM = {
 	0x65, 0x00,        //   UNIT (None)
 	0x95, 0x01,        //   REPORT_COUNT (1)
 	0x81, 0x01,        //   INPUT (Cnst,Ary,Abs)
+
 	0x16, 0x00, 0x00,  //   LOGICAL_MINIMUM 0
 	0x26, 0xD0, 0x07,  //   LOGICAL_MAXIMUM (2000)
 	0x36, 0x00, 0x00,  //   PHYSICAL_MINIMUM (0)
@@ -305,6 +312,7 @@ static const uint8_t gamepad_hid_report_desc[] PROGMEM = {
 	0x75, 0x10,        //   REPORT_SIZE (16)
 	0x95, 0x06,        //   REPORT_COUNT (6)
 	0x81, 0x02,        //   INPUT (Data,Var,Abs)
+
 	0x06, 0x00, 0xff,  //   USAGE_PAGE (Vendor Specific)
 	0x09, 0x20,        //   Unknown
 	0x09, 0x21,        //   Unknown
@@ -321,9 +329,9 @@ static const uint8_t gamepad_hid_report_desc[] PROGMEM = {
 	0x75, 0x08,        //   REPORT_SIZE (8) NEW
 	0x95, 0x0c,        //   REPORT_COUNT (12)
 	0x81, 0x02,        //   INPUT (Data,Var,Abs)
-	0x0a, 0x21, 0x26,  //   Unknown
-	0x95, 0x08,        //   REPORT_COUNT (8)
-	0xb1, 0x02,        //   FEATURE (Data,Var,Abs)
+    0x0a, 0x21, 0x26,  //   Unknown
+    0x95, 0x08,        //   REPORT_COUNT (8)
+    0xb1, 0x02,        //   FEATURE (Data,Var,Abs)
 	0xc0,              // END_COLLECTION
 };
 

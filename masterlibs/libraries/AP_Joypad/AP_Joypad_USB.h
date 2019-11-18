@@ -40,9 +40,9 @@
 
 #if (CONFIG_HAL_BOARD == HAL_BOARD_URUS) && (CONFIG_SHAL_CORE == SHAL_CORE_APM) && defined(SHAL_CORE_APM16U)
 
+#include "external/avr/usb_gamepad_def_shared.h"
 #include "AP_Joypad.h"
 #include "AP_Joypad_Backend.h"
-#include "external/avr/usb_gamepad_def_shared.h"
 
 #pragma pack(push, 1)
 #define USB_GAMEPAD_PRIVATE_INCLUDE
@@ -131,6 +131,7 @@ public:
 
     static void fire_isr_usb_genvect();
     static void fire_isr_usb_comvect();
+    static volatile bool _inproc_event;
 
 private:
     AP_Joypad_USB(AP_Joypad &joypad);
@@ -167,12 +168,11 @@ private:
     void serialWrite( unsigned char data );
     void flush_serialRead();
 
-    gamepad_state usb_controller_state;
+    static gamepad_state usb_controller_state;
     data_controller_t controllerData1;
     data_controller_t controllerData2;
 
     uint32_t _now;
-    bool _inproc_event;
 
     // zero when we are not configured, non-zero when enumerated
     static volatile uint8_t usb_configuration;
@@ -183,6 +183,8 @@ private:
     // are required to be able to report which setting is in use.
     static uint8_t gamepad_protocol;
     bool _auto_process = false;
+
+    static volatile bool _started;
 
 };
 
