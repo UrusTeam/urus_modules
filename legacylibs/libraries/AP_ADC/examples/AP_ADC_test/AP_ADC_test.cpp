@@ -1,7 +1,7 @@
 
 /*
  *  Example of APM_ADC library.
- *  Code by Jordi Muñoz and Jose Julio. DIYDrones.com
+ *  Code by Jordi MuÃ±oz and Jose Julio. DIYDrones.com
  */
 
 #include <math.h>
