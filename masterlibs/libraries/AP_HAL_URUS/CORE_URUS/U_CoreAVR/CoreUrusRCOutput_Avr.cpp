@@ -15,6 +15,9 @@ CLCoreUrusRCOutput_Avr::CLCoreUrusRCOutput_Avr() :
 
 void CLCoreUrusRCOutput_Avr::init()
 {
+    uint8_t oldSREGinit = SREG;
+    cli();
+
 #if defined(SHAL_CORE_APM2) || defined(SHAL_CORE_MEGA02)
     hal.gpio->pinMode(12,HAL_GPIO_OUTPUT); // CH_1 (PB6/OC1B)
     hal.gpio->pinMode(11,HAL_GPIO_OUTPUT); // CH_2 (PB5/OC1A)
@@ -76,7 +79,8 @@ void CLCoreUrusRCOutput_Avr::init()
     // --------------- TIMER1: CH_3 ---------------------
     hal.gpio->pinMode(10,HAL_GPIO_OUTPUT); // CH_3 (PB2/OC1B)
 #endif
-
+    SREG = oldSREGinit;
+    sei();
 }
 
 void CLCoreUrusRCOutput_Avr::set_freq(uint32_t chmask, uint16_t freq_hz)
@@ -130,7 +134,7 @@ uint16_t CLCoreUrusRCOutput_Avr::get_freq(uint8_t ch)
         /* CH_3 share TIMER1 with input capture.
          * The period is specified in OCR1A rater than the ICR. */
         case CH_3:
-            icr = ICR1;
+            icr = OCR1A;
             break;
 #endif
         default:
@@ -210,8 +214,8 @@ void CLCoreUrusRCOutput_Avr::write(uint8_t ch, uint16_t period_us)
     case 9:  OCR5B=pwm; break;  // out10
     case 10: OCR5C=pwm; break;  // out11
 #elif defined(SHAL_CORE_APM328)
-    case 0:  OCR0B=(pwm >> 7); break;   // out1
-    case 1:  OCR0A=(pwm >> 7); break;   // out2
+    case 0:  OCR0B=(uint8_t)(pwm >> 7); break;   // out1
+    case 1:  OCR0A=(uint8_t)(pwm >> 7); break;   // out2
     case 2:  OCR1B=pwm; break;          // out3
 #endif
     }
