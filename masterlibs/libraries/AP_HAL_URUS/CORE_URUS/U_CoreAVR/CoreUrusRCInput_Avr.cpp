@@ -132,7 +132,7 @@ void CLCoreUrusRCInput_Avr::init() {
     AVR_TIMER_TCCRB |= _BV(AVR_TIMER_WGM3) | _BV(AVR_TIMER_WGM2) | _BV(AVR_TIMER_CS1) | _BV(AVR_TIMER_ICES);
 
     /* Enable input capture interrupt */
-    AVR_TIMER_TIMSK |= _BV(AVR_TIMER_ICES);
+    AVR_TIMER_TIMSK |= _BV(AVR_TIMER_ICIE);
 
     SREG = oldSREG;
 }
