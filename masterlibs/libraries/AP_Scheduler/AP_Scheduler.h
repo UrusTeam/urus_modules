@@ -19,7 +19,7 @@
  *
  */
 #pragma once
-#if !defined(SHAL_CORE_APM16U)
+#if !defined(SHAL_CORE_APM16U) && !defined(SHAL_CORE_APM32U4)
 #include <AP_Param/AP_Param.h>
 #include <AP_HAL/Util.h>
 #endif
@@ -29,6 +29,7 @@
 /*
   useful macro for creating scheduler task table
  */
+
 #define SCHED_TASK_CLASS(classname, classptr, func, _rate_hz, _max_time_micros) { \
     .function = FUNCTOR_BIND(classptr, &classname::func, void),\
     .rate_hz = _rate_hz,\
@@ -76,7 +77,7 @@ public:
     // return the number of microseconds available for the current task
     uint16_t time_available_usec(void);
 
-#if !defined(SHAL_CORE_APM16U)
+#if !defined(SHAL_CORE_APM16U) && !defined(SHAL_CORE_APM32U4) && !defined(SHAL_CORE_APM328)
     // return debug parameter
     uint8_t debug(void) { return _debug; }
 #endif
@@ -101,7 +102,7 @@ public:
     static int8_t current_task;
 
 private:
-#if !defined(SHAL_CORE_APM16U)
+#if !defined(SHAL_CORE_APM16U) && !defined(SHAL_CORE_APM32U4) && !defined(SHAL_CORE_APM328)
     // used to enable scheduler debugging
     AP_Int8 _debug;
 

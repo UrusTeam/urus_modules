@@ -21,7 +21,7 @@
 #include "AP_Scheduler.h"
 
 #include <AP_HAL/AP_HAL.h>
-#if !defined(SHAL_CORE_APM16U)
+#if !defined(SHAL_CORE_APM16U) && !defined(SHAL_CORE_APM32U4) && !defined(SHAL_CORE_APM328)
 #include <AP_Param/AP_Param.h>
 #include <stdio.h>
 #endif
@@ -37,7 +37,7 @@
 extern const AP_HAL::HAL& hal;
 
 int8_t AP_Scheduler::current_task = -1;
-#if !defined(SHAL_CORE_APM16U)
+#if !defined(SHAL_CORE_APM16U) && !defined(SHAL_CORE_APM32U4) && !defined(SHAL_CORE_APM328)
 const AP_Param::GroupInfo AP_Scheduler::var_info[] PROGMEM = {
     // @Param: DEBUG
     // @DisplayName: Scheduler debug level
@@ -61,7 +61,7 @@ const AP_Param::GroupInfo AP_Scheduler::var_info[] PROGMEM = {
 // constructor
 AP_Scheduler::AP_Scheduler(void)
 {
-#if !defined(SHAL_CORE_APM16U)
+#if !defined(SHAL_CORE_APM16U) && !defined(SHAL_CORE_APM32U4) && !defined(SHAL_CORE_APM328)
     _loop_rate_hz.set(SCHEDULER_DEFAULT_LOOP_RATE);
     AP_Param::setup_object_defaults(this, var_info);
 
