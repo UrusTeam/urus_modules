@@ -26,7 +26,7 @@
 
 // used to pack structures
 // used to pack structures
-#if defined(__AVR_ATmega1280__) || defined(__AVR_ATmega2560__) || defined(__AVR_ATmega328P__) || defined(__AVR_ATmega328__) || defined(__AVR_ATmega16U2__)
+#if defined(__AVR_ATmega1280__) || defined(__AVR_ATmega2560__) || defined(__AVR_ATmega328P__) || defined(__AVR_ATmega328__) || defined(__AVR_ATmega16U2__) || defined(__AVR_ATmega32U4__)
 #define PACKED
 #else
 #define PROGMEM

@@ -393,7 +393,7 @@ bool CLCoreUrusGPIO_Avr::attach_interrupt(uint8_t interrupt_num, AP_HAL::Proc p,
     } else {
         return false;
     }
-#elif defined(SHAL_CORE_APM16U)
+#elif defined(SHAL_CORE_APM16U) || defined(SHAL_CORE_APM32U4)
     return false;
 #endif
 }

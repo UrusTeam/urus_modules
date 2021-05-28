@@ -36,8 +36,8 @@
 #define FS_MAX_PORTS 4
 #elif defined(SHAL_CORE_APM328)
 #define FS_MAX_PORTS 1
-#elif defined(SHAL_CORE_APM16U)
-#define FS_MAX_PORTS 1
+#elif defined(SHAL_CORE_APM16U) || defined(SHAL_CORE_APM32U4)
+#define FS_MAX_PORTS 3
 #endif
 
 CLCoreUrusUARTDriver_Avr::Buffer __CLCoreUrusUARTDriver_Avr__rxBuffer[FS_MAX_PORTS];
