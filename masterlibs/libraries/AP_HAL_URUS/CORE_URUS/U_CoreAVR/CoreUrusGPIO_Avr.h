@@ -12,6 +12,8 @@
 #define AVR_INT_NUM_PINS_MAX 4
 #elif defined(SHAL_CORE_APM16U)
 #define AVR_INT_NUM_PINS_MAX 1
+#elif defined(SHAL_CORE_APM32U4)
+#define AVR_INT_NUM_PINS_MAX 1
 #else
 #error "UNKNOWN AVR_INT_NUM_PINS_MAX CORE BOARD FOR PINS!"
 #endif

@@ -41,7 +41,7 @@ public:
         AP_HAL::CANManager** _can_mgr)
 #endif
         :
-#if !defined(SHAL_CORE_APM16U)
+#if !defined(SHAL_CORE_APM16U) && !defined(SHAL_CORE_APM32U4)
         uartA(_uartA),
         uartB(_uartB),
         uartC(_uartC),
@@ -54,8 +54,13 @@ public:
         storage(_storage),
         console(_console),
 #endif
+#if  defined(SHAL_CORE_APM32U4)
+        uartA(_uartA),
+        uartB(_uartB),
+        console(_console),
+#endif
         gpio(_gpio),
-#if !defined(SHAL_CORE_APM16U)
+#if !defined(SHAL_CORE_APM16U) && !defined(SHAL_CORE_APM32U4)
         rcin(_rcin),
         rcout(_rcout),
         scheduler(_scheduler),
@@ -96,7 +101,7 @@ public:
 
     virtual void run(int argc, char * const argv[], Callbacks* callbacks) const = 0;
 
-#if !defined(SHAL_CORE_APM16U)
+#if !defined(SHAL_CORE_APM16U) && !defined(SHAL_CORE_APM32U4)
     AP_HAL::UARTDriver* uartA;
     AP_HAL::UARTDriver* uartB;
     AP_HAL::UARTDriver* uartC;
@@ -109,13 +114,18 @@ public:
     AP_HAL::Storage*    storage;
     AP_HAL::UARTDriver* console;
 #endif
+#if  defined(SHAL_CORE_APM32U4)
+    AP_HAL::UARTDriver* uartA;
+    AP_HAL::UARTDriver* uartB;
+    AP_HAL::UARTDriver* console;
+#endif
     AP_HAL::GPIO*       gpio;
-#if !defined(SHAL_CORE_APM16U)
+#if !defined(SHAL_CORE_APM16U) && !defined(SHAL_CORE_APM32U4)
     AP_HAL::RCInput*    rcin;
     AP_HAL::RCOutput*   rcout;
 #endif
     AP_HAL::Scheduler*  scheduler;
-#if !defined(SHAL_CORE_APM16U)
+#if !defined(SHAL_CORE_APM16U) && !defined(SHAL_CORE_APM32U4)
     AP_HAL::Util        *util;
     AP_HAL::OpticalFlow *opticalflow;
 #if HAL_WITH_UAVCAN

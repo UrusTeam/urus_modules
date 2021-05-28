@@ -18,6 +18,7 @@
 #include "CoreUrusStorage_Avr.h"
 #include "CoreUrusSPIDevice_Avr.h"
 #include "CoreUrusSemaphores_Avr.h"
+#include "CoreUrusUsbUARTDriver_Avr.h"
 
 #include "utility/ISRRegistry.h"
 #include <avr/wdt.h>
@@ -28,13 +29,21 @@ static CLCoreUrusTimers_Avr coreTimers;
 static CLCoreUrusScheduler_Avr coreScheduler;
 static CLCoreUrusGPIO_Avr coreGPIO;
 #else
+#if defined(SHAL_CORE_APM32U4)
+CLCoreUrusUARTDriver_AvrISRs(1);
+#else
 CLCoreUrusUARTDriver_AvrISRs(0);
+#endif
 #if defined(SHAL_CORE_APM2) || defined(SHAL_CORE_MEGA02)
 CLCoreUrusUARTDriver_AvrISRs(1);
 CLCoreUrusUARTDriver_AvrISRs(2);
 #endif
-
+#if defined(SHAL_CORE_APM32U4)
+CLCoreUrusUARTDriver_AvrInstance(coreUARTB_Driver, 1);
+static CLCoreUrusUsbUARTDriver_Avr coreUARTA_Driver;
+#else
 CLCoreUrusUARTDriver_AvrInstance(coreUARTA_Driver, 0);
+#endif
 #if defined(SHAL_CORE_APM2) || defined(SHAL_CORE_MEGA02)
 CLCoreUrusUARTDriver_AvrInstance(coreUARTB_Driver, 1);
 CLCoreUrusUARTDriver_AvrInstance(coreUARTC_Driver, 2);
@@ -94,7 +103,9 @@ void CORE_AVR::init_core() const
 #if defined(SHAL_CORE_APM2) || defined(SHAL_CORE_APM328) || defined(SHAL_CORE_MEGA02)
     coreUARTA_Driver.begin(115200, 32, 32);
 #endif
-
+#if defined(SHAL_CORE_APM32U4)
+    coreUARTA_Driver.begin(115200);
+#endif // defined
 #if defined(SHAL_CORE_APM2) || defined(SHAL_CORE_MEGA02)
     PORTE |= _BV(0);
     PORTH |= _BV(0);
@@ -110,7 +121,7 @@ NSCORE_URUS::CLCoreUrusScheduler* NSCORE_URUS::get_scheduler()
 
 NSCORE_URUS::CLCoreUrusUARTDriver* NSCORE_URUS::get_uartA_Driver()
 {
-#if defined(SHAL_CORE_APM2) || defined(SHAL_CORE_APM328) || defined(SHAL_CORE_MEGA02)
+#if defined(SHAL_CORE_APM2) || defined(SHAL_CORE_APM328) || defined(SHAL_CORE_MEGA02) || defined(SHAL_CORE_APM32U4)
     return &coreUARTA_Driver;
 #else
     return nullptr;
@@ -119,7 +130,7 @@ NSCORE_URUS::CLCoreUrusUARTDriver* NSCORE_URUS::get_uartA_Driver()
 
 NSCORE_URUS::CLCoreUrusUARTDriver* NSCORE_URUS::get_uartB_Driver()
 {
-#if defined(SHAL_CORE_APM2) || defined(SHAL_CORE_MEGA02)
+#if defined(SHAL_CORE_APM2) || defined(SHAL_CORE_MEGA02) || defined(SHAL_CORE_APM32U4)
     return &coreUARTB_Driver;
 #else
     return nullptr;

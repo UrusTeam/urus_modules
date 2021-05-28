@@ -80,7 +80,7 @@ private:
 #endif
     uint32_t start;
     volatile bool _in_delay_proc;
-
+    static volatile uint32_t _start_micros;
     static volatile uint8_t _timer_reset_value;
 
 };

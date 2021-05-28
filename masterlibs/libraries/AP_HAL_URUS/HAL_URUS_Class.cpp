@@ -35,7 +35,8 @@ HAL_URUS::HAL_URUS() :
 #if CONFIG_SHAL_CORE == SHAL_CORE_APM && (defined(SHAL_CORE_APM2) \
     || CONFIG_SHAL_CORE == SHAL_CORE_CYGWIN \
     || defined(SHAL_CORE_MEGA02) \
-    || defined(SHAL_CORE_APM328))
+    || defined(SHAL_CORE_APM328)) \
+    || defined(SHAL_CORE_APM32U4)
 
     uartA = NSCORE_URUS::get_uartA_Driver();
     console = NSCORE_URUS::get_uartA_Driver();
@@ -43,10 +44,13 @@ HAL_URUS::HAL_URUS() :
 
 #if CONFIG_SHAL_CORE == SHAL_CORE_APM && defined(SHAL_CORE_APM2) \
     || defined(SHAL_CORE_MEGA02) \
-    || CONFIG_SHAL_CORE == SHAL_CORE_CYGWIN
+    || CONFIG_SHAL_CORE == SHAL_CORE_CYGWIN \
+    || defined(SHAL_CORE_APM32U4)
 
     uartB = NSCORE_URUS::get_uartB_Driver();
+#if !defined(SHAL_CORE_APM32U4)
     uartC = NSCORE_URUS::get_uartC_Driver();
+#endif
 #if CONFIG_SHAL_CORE == SHAL_CORE_CYGWIN
     uartD = NSCORE_URUS::get_uartD_Driver();
     uartE = NSCORE_URUS::get_uartE_Driver();

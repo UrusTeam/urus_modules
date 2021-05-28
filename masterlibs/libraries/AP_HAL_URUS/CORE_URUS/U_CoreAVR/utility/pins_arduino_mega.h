@@ -94,6 +94,12 @@ extern const uint8_t PROGMEM analog_pin_to_channel_PGM[];
 #define RXLED0			PORTB |= (1<<0)
 #define RXLED1			PORTB &= ~(1<<0)
 */
+#elif defined(SHAL_CORE_APM32U4)
+#define NUM_DIGITAL_PINS  31
+#define NUM_ANALOG_INPUTS 12
+extern const uint8_t PROGMEM analog_pin_to_channel_PGM[];
+#define analogInputToDigitalPin(P)  ( pgm_read_byte( analog_pin_to_channel_PGM + (P) ) )
+#define digitalPinHasPWM(p)         ((p) == 3 || (p) == 5 || (p) == 6 || (p) == 9 || (p) == 10 || (p) == 11 || (p) == 13)
 #else
 #error "UNKNOWN CORE BOARD FOR PINS!"
 #endif
@@ -153,6 +159,29 @@ static const uint8_t MISO = 14;
 static const uint8_t SCK  = 15;
 // Mapping of analog pins as digital I/O
 // A6-A11 share with digital pins
+static const uint8_t A0 = 18;
+static const uint8_t A1 = 19;
+static const uint8_t A2 = 20;
+static const uint8_t A3 = 21;
+static const uint8_t A4 = 22;
+static const uint8_t A5 = 23;
+static const uint8_t A6 = 24;	// D4
+static const uint8_t A7 = 25;	// D6
+static const uint8_t A8 = 26;	// D8
+static const uint8_t A9 = 27;	// D9
+static const uint8_t A10 = 28;	// D10
+static const uint8_t A11 = 29;	// D12
+#elif defined(SHAL_CORE_APM32U4)
+static const uint8_t SDA = 2;
+static const uint8_t SCL = 3;
+#define LED_BUILTIN 13
+
+// Map SPI port to 'new' pins D14..D17
+static const uint8_t SS   = 17;
+static const uint8_t MOSI = 16;
+static const uint8_t MISO = 14;
+static const uint8_t SCK  = 15;
+
 static const uint8_t A0 = 18;
 static const uint8_t A1 = 19;
 static const uint8_t A2 = 20;
