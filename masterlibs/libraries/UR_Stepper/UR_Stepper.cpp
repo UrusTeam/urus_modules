@@ -12,6 +12,10 @@ extern const AP_HAL::HAL& hal;
 UR_Stepper::UR_Stepper()
 {}
 
+UR_Stepper::UR_Stepper(UR_STEPPER_NAMESPACE::stepper_profile_t profile) :
+    _profile(profile)
+{}
+
 void UR_Stepper::configure(ProcessMode process_mode)
 {
     _configure_backends(process_mode);
@@ -77,6 +81,16 @@ void UR_Stepper::move_steps(int64_t steps)
     for (uint8_t i = 0; i < _backend_count; i++) {
         _backends[i]->move_steps(steps);
     }
+}
+
+void UR_Stepper::set_profile(UR_STEPPER_NAMESPACE::stepper_profile_t profile)
+{
+    _profile = profile;
+}
+
+UR_STEPPER_NAMESPACE::State UR_Stepper::get_current_state(uint8_t backend)
+{
+    return _backends[backend]->_get_current_state();
 }
 
 #endif

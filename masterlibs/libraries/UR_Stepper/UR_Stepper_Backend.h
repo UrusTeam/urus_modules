@@ -30,10 +30,12 @@ public:
     virtual void update();
     virtual void move_degree(int64_t deg);
     virtual void move_steps(int64_t steps);
+    virtual UR_STEPPER_NAMESPACE::State _get_current_state(void);
 
 protected:
     // access to frontend
     UR_Stepper &_ur_stepper;
+    UR_STEPPER_NAMESPACE::stepper_profile_t &_profile;
 };
 
 #endif
