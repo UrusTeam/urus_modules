@@ -42,6 +42,7 @@ void CLurus_stepper_test::setup(void)
 void CLurus_stepper_test::loop(void)
 {
     if (_cnt_loop > 5) {
+        hal.scheduler->delay(100);
         return;
     }
 
