@@ -122,9 +122,65 @@ void HAL_URUS::run(int argc, char * const argv[], Callbacks* callbacks) const
     }
 }
 
+void HAL_URUS::rcout_init()
+{
+    rcout = NSCORE_URUS::get_RCOutput();
+    rcout->init();
+}
+
+void HAL_URUS::rcin_init()
+{
+    rcin = NSCORE_URUS::get_RCInput();
+    rcin->init();
+}
+
+void HAL_URUS::analogin_init()
+{
+    analogin = NSCORE_URUS::get_AnalogIn();
+    analogin->init();
+}
+
+void HAL_URUS::i2c_init()
+{
+    i2c_mgr = NSCORE_URUS::get_I2CDeviceManager();
+}
+
+static const HAL_URUS shal;
+
+void NSCORE_URUS::rcout_init()
+{
+#if CONFIG_SHAL_CORE_RCOUTPUT != ENABLED
+    HAL_URUS &shaltmp = (HAL_URUS&)shal;
+    shaltmp.rcout_init();
+#endif // CONFIG_SHAL_CORE_RCOUTPUT
+}
+
+void NSCORE_URUS::rcin_init()
+{
+#if CONFIG_SHAL_CORE_RCINPUT != ENABLED
+    HAL_URUS &shaltmp = (HAL_URUS&)shal;
+    shaltmp.rcin_init();
+#endif // CONFIG_SHAL_CORE_RCOUTPUT
+}
+
+void NSCORE_URUS::analogin_init()
+{
+#if CONFIG_SHAL_CORE_ANALOGIN != ENABLED
+    HAL_URUS &shaltmp = (HAL_URUS&)shal;
+    shaltmp.analogin_init();
+#endif // CONFIG_SHAL_CORE_RCOUTPUT
+}
+
+void NSCORE_URUS::i2c_init()
+{
+#if CONFIG_SHAL_CORE_I2C != ENABLED
+    HAL_URUS &shaltmp = (HAL_URUS&)shal;
+    shaltmp.i2c_init();
+#endif // CONFIG_SHAL_CORE_RCOUTPUT
+}
+
 const AP_HAL::HAL& AP_HAL::get_HAL() {
-    static const HAL_URUS hal;
-    return hal;
+    return shal;
 }
 
 #endif // CONFIG_HAL_BOARD == HAL_BOARD_URUS

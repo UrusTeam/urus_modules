@@ -40,4 +40,8 @@ namespace NSCORE_URUS {
     CLCoreUrusRCInput* get_RCInput();
     CLCoreUrusRCOutput* get_RCOutput();
 
+    void rcout_init();
+    void rcin_init();
+    void analogin_init();
+    void i2c_init();
 }

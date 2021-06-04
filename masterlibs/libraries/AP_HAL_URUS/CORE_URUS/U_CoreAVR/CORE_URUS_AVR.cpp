@@ -51,25 +51,7 @@ CLCoreUrusUARTDriver_AvrInstance(coreUARTC_Driver, 2);
 ISRRegistry CORE_AVR::isrregistry;
 static CLCoreUrusTimers_Avr coreTimers;
 static CLCoreUrusScheduler_Avr coreScheduler;
-static CLCoreUrusGPIO_Avr coreGPIO;
 #if defined(SHAL_CORE_APM2) || defined(SHAL_CORE_APM328) || defined(SHAL_CORE_MEGA02)
-#if CONFIG_SHAL_CORE_RCOUTPUT == ENABLED
-static CLCoreUrusRCOutput_Avr coreRCOutput;
-#endif // CONFIG_SHAL_CORE_RCOUTPUT
-#if CONFIG_SHAL_CORE_RCINPUT == ENABLED
-static CLCoreUrusRCInput_Avr coreRCInput;
-#endif // CONFIG_SHAL_CORE_RCINPUT
-#if CONFIG_SHAL_CORE_ANALOGIN == ENABLED
-static CLCoreUrusAnalogIn_Avr coreAnalogIn;
-#endif // CONFIG_SHAL_CORE_ANALOGIN
-#endif
-#if defined(SHAL_CORE_APM2) || defined(SHAL_CORE_APM328) || defined(SHAL_CORE_MEGA02)
-#if CONFIG_SHAL_CORE_I2C == ENABLED
-static CLCoreUrusI2CDeviceManager_Avr coreI2C_mgr;
-#endif // CONFIG_SHAL_CORE_I2C
-#if CONFIG_SHAL_CORE_UTIL == ENABLED
-static CLCoreUrusUtil_Avr coreUtil;
-#endif // CONFIG_SHAL_CORE_UTIL
 #if CONFIG_SHAL_CORE_SPI == ENABLED
 static CLCoreUrusSPIDeviceManager_Avr coreSPI_mgr;
 #endif // CONFIG_SHAL_CORE_SPI
@@ -164,9 +146,8 @@ NSCORE_URUS::CLCoreUrusUARTDriver* NSCORE_URUS::get_uartF_Driver()
 NSCORE_URUS::CLCoreUrusI2CDeviceManager* NSCORE_URUS::get_I2CDeviceManager()
 {
 #if defined(SHAL_CORE_APM2) || defined(SHAL_CORE_APM328) || defined(SHAL_CORE_MEGA02)
-#if CONFIG_SHAL_CORE_I2C == ENABLED
+    static CLCoreUrusI2CDeviceManager_Avr coreI2C_mgr;
     return &coreI2C_mgr;
-#endif // CONFIG_SHAL_CORE_I2C
 #endif
     return nullptr;
 }
@@ -189,9 +170,8 @@ NSCORE_URUS::CLCoreUrusAnalogSource* NSCORE_URUS::get_AnalogSource()
 NSCORE_URUS::CLCoreUrusAnalogIn* NSCORE_URUS::get_AnalogIn()
 {
 #if defined(SHAL_CORE_APM2) || defined(SHAL_CORE_APM328) || defined(SHAL_CORE_MEGA02)
-#if CONFIG_SHAL_CORE_ANALOGIN == ENABLED
+    static CLCoreUrusAnalogIn_Avr coreAnalogIn;
     return &coreAnalogIn;
-#endif // CONFIG_SHAL_CORE_ANALOGIN
 #endif
     return nullptr;
 }
@@ -199,9 +179,8 @@ NSCORE_URUS::CLCoreUrusAnalogIn* NSCORE_URUS::get_AnalogIn()
 NSCORE_URUS::CLCoreUrusUtil* NSCORE_URUS::get_Util()
 {
 #if defined(SHAL_CORE_APM2) || defined(SHAL_CORE_APM328) || defined(SHAL_CORE_MEGA02)
-#if CONFIG_SHAL_CORE_UTIL == ENABLED
+    static CLCoreUrusUtil_Avr coreUtil;
     return &coreUtil;
-#endif // CONFIG_SHAL_CORE_UTIL
 #endif
     return nullptr;
 }
@@ -217,15 +196,15 @@ NSCORE_URUS::CLCoreUrusEEStorage* NSCORE_URUS::get_Storage()
 
 NSCORE_URUS::CLCoreUrusGPIO* NSCORE_URUS::get_GPIO()
 {
+    static CLCoreUrusGPIO_Avr coreGPIO;
     return &coreGPIO;
 }
 
 NSCORE_URUS::CLCoreUrusRCInput* NSCORE_URUS::get_RCInput()
 {
 #if defined(SHAL_CORE_APM2) || defined(SHAL_CORE_APM328) || defined(SHAL_CORE_MEGA02)
-#if CONFIG_SHAL_CORE_RCINPUT == ENABLED
+    static CLCoreUrusRCInput_Avr coreRCInput;
     return &coreRCInput;
-#endif // CONFIG_SHAL_CORE_RCINPUT
 #endif
     return nullptr;
 }
@@ -233,9 +212,8 @@ NSCORE_URUS::CLCoreUrusRCInput* NSCORE_URUS::get_RCInput()
 NSCORE_URUS::CLCoreUrusRCOutput* NSCORE_URUS::get_RCOutput()
 {
 #if defined(SHAL_CORE_APM2) || defined(SHAL_CORE_APM328) || defined(SHAL_CORE_MEGA02)
-#if CONFIG_SHAL_CORE_RCOUTPUT == ENABLED
+    static CLCoreUrusRCOutput_Avr coreRCOutput;
     return &coreRCOutput;
-#endif // CONFIG_SHAL_CORE_RCOUTPUT
 #endif
     return nullptr;
 }
