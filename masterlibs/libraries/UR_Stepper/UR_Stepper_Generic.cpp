@@ -5,18 +5,6 @@
 #include "UR_Stepper_Generic.h"
 #include <math.h>
 
-#define MAX_SPEED_MOTOR     3500
-#define MIN_SPEED_MOTOR     300
-#define MOTOR_STEPS         200.0f
-#define MOTOR_RPM           200.0f
-#define MICROSTEPS          1.0f
-#define MOTOR_ACCEL         400.0f
-#define MOTOR_DECEL         400.0f
-
-#define STEP_PIN        8
-#define DIR_PIN         9
-#define INPUT_DIR_PIN   38
-
 #define STEP_PULSE(steps, microsteps, rpm) (60.0*1000000L/steps/microsteps/rpm)
 
 extern const AP_HAL::HAL& hal;
@@ -31,8 +19,6 @@ UR_Stepper_Generic::~UR_Stepper_Generic()
 
 void UR_Stepper_Generic::setup_process(UR_Stepper::ProcessMode process_mode)
 {
-    _now = AP_HAL::millis();
-
     switch (process_mode) {
     case UR_Stepper::LoopProcess:
         _auto_process = false;
@@ -71,23 +57,11 @@ UR_Stepper_Backend *UR_Stepper_Generic::configure(UR_Stepper &ur_stepper)
 
 bool UR_Stepper_Generic::_configure()
 {
-    _profile.mode = SPEED_MODE::LINEAR_SPEED;
-    _profile.accel = MOTOR_ACCEL;
-    _profile.decel = MOTOR_DECEL;
+    hal.gpio->pinMode(_profile.step_pin, HAL_GPIO_OUTPUT);
+    hal.gpio->pinMode(_profile.dir_pin, HAL_GPIO_OUTPUT);
 
-    hal.gpio->pinMode(STEP_PIN, HAL_GPIO_OUTPUT);
-    hal.gpio->pinMode(DIR_PIN, HAL_GPIO_OUTPUT);
-    hal.gpio->pinMode(INPUT_DIR_PIN, HAL_GPIO_INPUT);
-
-    hal.gpio->write(INPUT_DIR_PIN, LOW);
-
-    if (hal.gpio->read(INPUT_DIR_PIN)) {
-        _set_step_dir(STEP_DIR::DIR_CCW);
-    } else {
-        _set_step_dir(STEP_DIR::DIR_CW);
-    }
-
-    hal.gpio->write(STEP_PIN, LOW);
+    hal.gpio->write(_profile.step_pin, LOW);
+    _set_step_dir(STEP_DIR::DIR_CW);
 
     return true;
 }
@@ -106,17 +80,12 @@ void UR_Stepper_Generic::move_degree(int64_t deg)
 
 int64_t UR_Stepper_Generic::_calc_steps_for_rotation(int64_t deg)
 {
-    return (int64_t)(deg * MOTOR_STEPS * MICROSTEPS / 360);
+    return (int64_t)(deg * _profile.steps * _profile.microsteps / 360);
 }
 
 void UR_Stepper_Generic::_steps_loop(void)
 {
     _next_action();
-
-    if ((AP_HAL::millis() - _now) > 1000LU)
-    {
-        _now = AP_HAL::millis();
-    }
 
     if (_steps_remaining <= 0) {
         _start_move(_steps);
@@ -127,7 +96,7 @@ void UR_Stepper_Generic::_steps_loop(void)
 
 void UR_Stepper_Generic::_set_step_dir(STEP_DIR dir)
 {
-    hal.gpio->write(DIR_PIN, dir);
+    hal.gpio->write(_profile.dir_pin, dir);
 }
 
 void UR_Stepper_Generic::_start_move(int64_t steps)
@@ -137,12 +106,12 @@ void UR_Stepper_Generic::_start_move(int64_t steps)
     _steps_remaining = labs(steps);
     _step_count = 0;
     _rest = 0;
-    switch (_profile.mode){
+    switch (_profile.mode) {
     case LINEAR_SPEED:
         // speed is in [steps/s]
-        speed = MOTOR_RPM * MOTOR_STEPS / 60.0;
+        speed = _profile.rpm * _profile.steps / 60.0;
         // how many microsteps from 0 to target speed
-        _steps_to_cruise = MICROSTEPS * (speed * speed / (2.0 * _profile.accel));
+        _steps_to_cruise = _profile.microsteps * (speed * speed / (2.0 * _profile.accel));
         // how many microsteps are needed from cruise speed to a full stop
         _steps_to_brake = _steps_to_cruise * _profile.accel / _profile.decel;
         if (_steps_remaining < _steps_to_cruise + _steps_to_brake){
@@ -151,16 +120,17 @@ void UR_Stepper_Generic::_start_move(int64_t steps)
             _steps_to_brake = _steps_remaining - _steps_to_cruise;
         }
         // Initial pulse (c0) including error correction factor 0.676 [us]
-        _step_pulse = 1e+6 * 0.676 * sqrt(2.0 / _profile.accel / MICROSTEPS);
+        _step_pulse = 1e+6 * 0.676 * sqrt(2.0 / _profile.accel / _profile.microsteps);
         // Save cruise timing since we will no longer have the calculated target speed later
-        _cruise_step_pulse = 1e+6 / speed / MICROSTEPS;
+        _cruise_step_pulse = 1e+6 / speed / _profile.microsteps;
         break;
 
     case CONSTANT_SPEED:
     default:
         _steps_to_cruise = 0;
         _steps_to_brake = 0;
-        _step_pulse = _cruise_step_pulse = STEP_PULSE(MOTOR_STEPS, MICROSTEPS, MOTOR_RPM);
+        _cruise_step_pulse = STEP_PULSE(_profile.steps, _profile.microsteps, _profile.rpm);
+        _step_pulse = _cruise_step_pulse;
     }
 }
 
@@ -169,14 +139,14 @@ int64_t UR_Stepper_Generic::_next_action(void)
     if (_steps_remaining > 0) {
         _delay_micros((uint32_t)_next_action_interval, (uint32_t)_last_action_end);
 
-        hal.gpio->write(STEP_PIN, HIGH);
+        hal.gpio->write(_profile.step_pin, HIGH);
 
         float ms = AP_HAL::micros();
         float pulse = _step_pulse; // save value because _calc_step_pulse() will overwrite it
         _calc_step_pulse();
         // We should pull HIGH for at least 1-2us (step_high_min)
         _delay_micros(1);
-        hal.gpio->write(STEP_PIN, LOW);
+        hal.gpio->write(_profile.step_pin, LOW);
         // account for _calc_step_pulse() execution time; sets ceiling for max rpm on slower MCUs
         _last_action_end = AP_HAL::micros();
         ms = _last_action_end - ms;
@@ -222,7 +192,7 @@ void UR_Stepper_Generic::_calc_step_pulse(void)
     }
 }
 
-UR_Stepper_Generic::State UR_Stepper_Generic::_get_current_state(void)
+UR_STEPPER_NAMESPACE::State UR_Stepper_Generic::_get_current_state(void)
 {
     enum State state;
     if (_steps_remaining <= 0){
