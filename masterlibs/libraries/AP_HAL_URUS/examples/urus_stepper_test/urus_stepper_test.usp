@@ -1,0 +1,1138 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes" ?>
+<UrusStudio_project_file>
+	<FileVersion major="1" minor="6" />
+	<Project>
+		<Option title="urus_stepper_test" />
+		<Option pch_mode="2" />
+		<Option compiler="gcc" />
+		<Build>
+			<Target title="NATIVE_Debug">
+				<Option output="build/urusnative/bin/Debug/urus_stepper_test" prefix_auto="1" extension_auto="1" />
+				<Option object_output="build/urusnative/obj/Debug/" />
+				<Option type="1" />
+				<Option compiler="gcc" />
+				<Option projectLinkerOptionsRelation="2" />
+				<Compiler>
+					<Add option="-std=gnu++11" />
+					<Add option="-DCONFIG_HAL_BOARD=HAL_BOARD_URUS" />
+					<Add option="-DCONFIG_HAL_BOARD_SUBTYPE=HAL_BOARD_SUBTYPE_NONE" />
+					<Add option="-ffunction-sections" />
+					<Add option="-fdata-sections" />
+					<Add option="-fno-exceptions" />
+					<Add option="-Wno-unknown-pragmas" />
+					<Add option="-fpermissive" />
+					<Add option="-Wformat" />
+					<Add option="-Wshadow" />
+					<Add option="-Wl,--gc-sections" />
+					<Add option="-fsigned-char" />
+					<Add option="-Wcast-align" />
+					<Add option="-Wwrite-strings" />
+					<Add option="-Wno-unused-parameter" />
+					<Add option="-fno-threadsafe-statics" />
+					<Add option="-Wno-overflow" />
+					<Add option="-DCONFIG_SHAL_CORE=SHAL_CORE_CYGWIN" />
+					<Add option="-DHAVE_CMATH_ISFINITE=1" />
+					<Add option="-DHAVE_CMATH_ISINF=1" />
+					<Add option="-DHAVE_CMATH_ISNAN=1" />
+					<Add option="-DNEED_CMATH_ISFINITE_STD_NAMESPACE=1" />
+					<Add option="-DNEED_CMATH_ISINF_STD_NAMESPACE=1" />
+					<Add option="-DNEED_CMATH_ISNAN_STD_NAMESPACE=1" />
+					<Add option="-D_GNU_SOURCE=1" />
+					<Add option="-g" />
+					<Add directory="../../libraries" />
+					<Add directory="../../libraries/AP_Common/missing" />
+					<Add directory="$(#URUSSTOOL.base)/src/URUS/libraries" />
+					<Add directory="$(#URUSSTOOL.base)/src/URUS/libraries/AP_Common/missing" />
+				</Compiler>
+				<Linker>
+					<Add option="-Wl,--gc-sections" />
+					<Add option="-pthread" />
+					<Add library="MasterApmLibs" />
+					<Add directory="../../build/uruscygwin/lib/Debug" />
+					<Add directory="$(#URUSSTOOL.base)/src/URUS/build/uruscygwin/lib/Debug" />
+				</Linker>
+			</Target>
+			<Target title="NATIVE_Release">
+				<Option output="build/urusnative/bin/Release/urus_stepper_test" prefix_auto="1" extension_auto="1" />
+				<Option object_output="build/urusnative/obj/Release/" />
+				<Option type="1" />
+				<Option compiler="gcc" />
+				<Option projectLinkerOptionsRelation="2" />
+				<Compiler>
+					<Add option="-std=gnu++11" />
+					<Add option="-DCONFIG_HAL_BOARD=HAL_BOARD_URUS" />
+					<Add option="-DCONFIG_HAL_BOARD_SUBTYPE=HAL_BOARD_SUBTYPE_NONE" />
+					<Add option="-ffunction-sections" />
+					<Add option="-fdata-sections" />
+					<Add option="-fno-exceptions" />
+					<Add option="-Wno-unknown-pragmas" />
+					<Add option="-fpermissive" />
+					<Add option="-Wformat" />
+					<Add option="-Wshadow" />
+					<Add option="-Wl,--gc-sections" />
+					<Add option="-fsigned-char" />
+					<Add option="-Wcast-align" />
+					<Add option="-Wwrite-strings" />
+					<Add option="-Wno-unused-parameter" />
+					<Add option="-fno-threadsafe-statics" />
+					<Add option="-Wno-overflow" />
+					<Add option="-DCONFIG_SHAL_CORE=SHAL_CORE_CYGWIN" />
+					<Add option="-DHAVE_CMATH_ISFINITE=1" />
+					<Add option="-DHAVE_CMATH_ISINF=1" />
+					<Add option="-DHAVE_CMATH_ISNAN=1" />
+					<Add option="-DNEED_CMATH_ISFINITE_STD_NAMESPACE=1" />
+					<Add option="-DNEED_CMATH_ISINF_STD_NAMESPACE=1" />
+					<Add option="-DNEED_CMATH_ISNAN_STD_NAMESPACE=1" />
+					<Add option="-D_GNU_SOURCE=1" />
+					<Add option="-O2" />
+					<Add directory="../../libraries" />
+					<Add directory="../../libraries/AP_Common/missing" />
+					<Add directory="$(#URUSSTOOL.base)/src/URUS/libraries" />
+					<Add directory="$(#URUSSTOOL.base)/src/URUS/libraries/AP_Common/missing" />
+				</Compiler>
+				<Linker>
+					<Add option="-Wl,--gc-sections" />
+					<Add option="-s" />
+					<Add option="-pthread" />
+					<Add library="MasterApmLibs" />
+					<Add directory="../../build/uruscygwin/lib/Release" />
+					<Add directory="$(#URUSSTOOL.base)/src/URUS/build/uruscygwin/lib/Release" />
+				</Linker>
+			</Target>
+			<Target title="URUSSYSTEM_Debug">
+				<Option output="build/urussystem/bin/Debug/urus_stepper_test" prefix_auto="1" extension_auto="1" />
+				<Option object_output="build/urussystem/obj/Debug/" />
+				<Option type="1" />
+				<Option compiler="gcc" />
+				<Option projectLinkerOptionsRelation="2" />
+				<Compiler>
+					<Add option="-std=gnu++11" />
+					<Add option="-DCONFIG_HAL_BOARD=HAL_BOARD_URUS" />
+					<Add option="-DCONFIG_HAL_BOARD_SUBTYPE=HAL_BOARD_SUBTYPE_NONE" />
+					<Add option="-ffunction-sections" />
+					<Add option="-fdata-sections" />
+					<Add option="-fno-exceptions" />
+					<Add option="-Wno-unknown-pragmas" />
+					<Add option="-fpermissive" />
+					<Add option="-Wformat" />
+					<Add option="-Wshadow" />
+					<Add option="-Wl,--gc-sections" />
+					<Add option="-fsigned-char" />
+					<Add option="-Wcast-align" />
+					<Add option="-Wwrite-strings" />
+					<Add option="-Wno-unused-parameter" />
+					<Add option="-fno-threadsafe-statics" />
+					<Add option="-Wno-overflow" />
+					<Add option="-DCONFIG_SHAL_CORE=SHAL_CORE_CYGWIN" />
+					<Add option="-DHAVE_CMATH_ISFINITE=1" />
+					<Add option="-DHAVE_CMATH_ISINF=1" />
+					<Add option="-DHAVE_CMATH_ISNAN=1" />
+					<Add option="-DNEED_CMATH_ISFINITE_STD_NAMESPACE=1" />
+					<Add option="-DNEED_CMATH_ISINF_STD_NAMESPACE=1" />
+					<Add option="-DNEED_CMATH_ISNAN_STD_NAMESPACE=1" />
+					<Add option="-D_GNU_SOURCE=1" />
+					<Add option="-g" />
+					<Add directory="../../libraries" />
+					<Add directory="../../libraries/AP_Common/missing" />
+					<Add directory="$(#URUSSTOOL.base)/src/URUS/libraries" />
+					<Add directory="$(#URUSSTOOL.base)/src/URUS/libraries/AP_Common/missing" />
+				</Compiler>
+				<Linker>
+					<Add option="-Wl,--gc-sections" />
+					<Add option="-pthread" />
+					<Add library="MasterApmLibs" />
+					<Add directory="../../build/uruscygwin/lib/Debug" />
+					<Add directory="$(#URUSSTOOL.base)/src/URUS/build/uruscygwin/lib/Debug" />
+				</Linker>
+			</Target>
+			<Target title="URUSSYSTEM_Release">
+				<Option output="build/urussystem/bin/Release/urus_stepper_test" prefix_auto="1" extension_auto="1" />
+				<Option object_output="build/urussystem/obj/Release/" />
+				<Option type="1" />
+				<Option compiler="gcc" />
+				<Option projectLinkerOptionsRelation="2" />
+				<Compiler>
+					<Add option="-std=gnu++11" />
+					<Add option="-DCONFIG_HAL_BOARD=HAL_BOARD_URUS" />
+					<Add option="-DCONFIG_HAL_BOARD_SUBTYPE=HAL_BOARD_SUBTYPE_NONE" />
+					<Add option="-ffunction-sections" />
+					<Add option="-fdata-sections" />
+					<Add option="-fno-exceptions" />
+					<Add option="-Wno-unknown-pragmas" />
+					<Add option="-fpermissive" />
+					<Add option="-Wformat" />
+					<Add option="-Wshadow" />
+					<Add option="-Wl,--gc-sections" />
+					<Add option="-fsigned-char" />
+					<Add option="-Wcast-align" />
+					<Add option="-Wwrite-strings" />
+					<Add option="-Wno-unused-parameter" />
+					<Add option="-fno-threadsafe-statics" />
+					<Add option="-Wno-overflow" />
+					<Add option="-DCONFIG_SHAL_CORE=SHAL_CORE_CYGWIN" />
+					<Add option="-DHAVE_CMATH_ISFINITE=1" />
+					<Add option="-DHAVE_CMATH_ISINF=1" />
+					<Add option="-DHAVE_CMATH_ISNAN=1" />
+					<Add option="-DNEED_CMATH_ISFINITE_STD_NAMESPACE=1" />
+					<Add option="-DNEED_CMATH_ISINF_STD_NAMESPACE=1" />
+					<Add option="-DNEED_CMATH_ISNAN_STD_NAMESPACE=1" />
+					<Add option="-D_GNU_SOURCE=1" />
+					<Add option="-O2" />
+					<Add directory="../../libraries" />
+					<Add directory="../../libraries/AP_Common/missing" />
+					<Add directory="$(#URUSSTOOL.base)/src/URUS/libraries" />
+					<Add directory="$(#URUSSTOOL.base)/src/URUS/libraries/AP_Common/missing" />
+				</Compiler>
+				<Linker>
+					<Add option="-Wl,--gc-sections" />
+					<Add option="-s" />
+					<Add option="-pthread" />
+					<Add library="MasterApmLibs" />
+					<Add directory="../../build/uruscygwin/lib/Release" />
+					<Add directory="$(#URUSSTOOL.base)/src/URUS/build/uruscygwin/lib/Release" />
+				</Linker>
+			</Target>
+			<Target title="URUSCYGWIN_Debug">
+				<Option output="build/uruscygwin/bin/Debug/urus_stepper_test" prefix_auto="1" extension_auto="1" />
+				<Option object_output="build/uruscygwin/obj/Debug/" />
+				<Option type="1" />
+				<Option compiler="gcc" />
+				<Option projectLinkerOptionsRelation="2" />
+				<Compiler>
+					<Add option="-std=gnu++11" />
+					<Add option="-DCONFIG_HAL_BOARD=HAL_BOARD_URUS" />
+					<Add option="-DCONFIG_HAL_BOARD_SUBTYPE=HAL_BOARD_SUBTYPE_NONE" />
+					<Add option="-ffunction-sections" />
+					<Add option="-fdata-sections" />
+					<Add option="-fno-exceptions" />
+					<Add option="-Wno-unknown-pragmas" />
+					<Add option="-fpermissive" />
+					<Add option="-Wformat" />
+					<Add option="-Wshadow" />
+					<Add option="-Wl,--gc-sections" />
+					<Add option="-fsigned-char" />
+					<Add option="-Wcast-align" />
+					<Add option="-Wwrite-strings" />
+					<Add option="-Wno-unused-parameter" />
+					<Add option="-fno-threadsafe-statics" />
+					<Add option="-Wno-overflow" />
+					<Add option="-DCONFIG_SHAL_CORE=SHAL_CORE_CYGWIN" />
+					<Add option="-DHAVE_CMATH_ISFINITE=1" />
+					<Add option="-DHAVE_CMATH_ISINF=1" />
+					<Add option="-DHAVE_CMATH_ISNAN=1" />
+					<Add option="-DNEED_CMATH_ISFINITE_STD_NAMESPACE=1" />
+					<Add option="-DNEED_CMATH_ISINF_STD_NAMESPACE=1" />
+					<Add option="-DNEED_CMATH_ISNAN_STD_NAMESPACE=1" />
+					<Add option="-D_GNU_SOURCE=1" />
+					<Add option="-g" />
+					<Add directory="../../libraries" />
+					<Add directory="../../libraries/AP_Common/missing" />
+					<Add directory="$(#URUSSTOOL.base)/src/URUS/libraries" />
+					<Add directory="$(#URUSSTOOL.base)/src/URUS/libraries/AP_Common/missing" />
+				</Compiler>
+				<Linker>
+					<Add option="-Wl,--gc-sections" />
+					<Add option="-pthread" />
+					<Add library="MasterApmLibs" />
+					<Add directory="../../build/uruscygwin/lib/Debug" />
+					<Add directory="$(#URUSSTOOL.base)/src/URUS/build/uruscygwin/lib/Debug" />
+				</Linker>
+			</Target>
+			<Target title="URUSCYGWIN_Release">
+				<Option output="build/uruscygwin/bin/Release/urus_stepper_test" prefix_auto="1" extension_auto="1" />
+				<Option object_output="build/uruscygwin/obj/Release/" />
+				<Option type="1" />
+				<Option compiler="gcc" />
+				<Option projectLinkerOptionsRelation="2" />
+				<Compiler>
+					<Add option="-std=gnu++11" />
+					<Add option="-DCONFIG_HAL_BOARD=HAL_BOARD_URUS" />
+					<Add option="-DCONFIG_HAL_BOARD_SUBTYPE=HAL_BOARD_SUBTYPE_NONE" />
+					<Add option="-ffunction-sections" />
+					<Add option="-fdata-sections" />
+					<Add option="-fno-exceptions" />
+					<Add option="-Wno-unknown-pragmas" />
+					<Add option="-fpermissive" />
+					<Add option="-Wformat" />
+					<Add option="-Wshadow" />
+					<Add option="-Wl,--gc-sections" />
+					<Add option="-fsigned-char" />
+					<Add option="-Wcast-align" />
+					<Add option="-Wwrite-strings" />
+					<Add option="-Wno-unused-parameter" />
+					<Add option="-fno-threadsafe-statics" />
+					<Add option="-Wno-overflow" />
+					<Add option="-DCONFIG_SHAL_CORE=SHAL_CORE_CYGWIN" />
+					<Add option="-DHAVE_CMATH_ISFINITE=1" />
+					<Add option="-DHAVE_CMATH_ISINF=1" />
+					<Add option="-DHAVE_CMATH_ISNAN=1" />
+					<Add option="-DNEED_CMATH_ISFINITE_STD_NAMESPACE=1" />
+					<Add option="-DNEED_CMATH_ISINF_STD_NAMESPACE=1" />
+					<Add option="-DNEED_CMATH_ISNAN_STD_NAMESPACE=1" />
+					<Add option="-D_GNU_SOURCE=1" />
+					<Add option="-O2" />
+					<Add directory="../../libraries" />
+					<Add directory="../../libraries/AP_Common/missing" />
+					<Add directory="$(#URUSSTOOL.base)/src/URUS/libraries" />
+					<Add directory="$(#URUSSTOOL.base)/src/URUS/libraries/AP_Common/missing" />
+				</Compiler>
+				<Linker>
+					<Add option="-Wl,--gc-sections" />
+					<Add option="-s" />
+					<Add option="-pthread" />
+					<Add library="MasterApmLibs" />
+					<Add directory="../../build/uruscygwin/lib/Release" />
+					<Add directory="$(#URUSSTOOL.base)/src/URUS/build/uruscygwin/lib/Release" />
+				</Linker>
+			</Target>
+			<Target title="URUSANDROID_Debug">
+				<Option output="build/urusandroid/bin/Debug/urus_stepper_test" prefix_auto="1" extension_auto="1" />
+				<Option object_output="build/urusandroid/obj/Debug/" />
+				<Option type="1" />
+				<Option compiler="gcc" />
+				<Option projectLinkerOptionsRelation="2" />
+				<Compiler>
+					<Add option="-std=gnu++11" />
+					<Add option="-DCONFIG_HAL_BOARD=HAL_BOARD_URUS" />
+					<Add option="-DCONFIG_HAL_BOARD_SUBTYPE=HAL_BOARD_SUBTYPE_NONE" />
+					<Add option="-ffunction-sections" />
+					<Add option="-fdata-sections" />
+					<Add option="-fno-exceptions" />
+					<Add option="-Wno-unknown-pragmas" />
+					<Add option="-fpermissive" />
+					<Add option="-Wformat" />
+					<Add option="-Wshadow" />
+					<Add option="-Wl,--gc-sections" />
+					<Add option="-fsigned-char" />
+					<Add option="-Wcast-align" />
+					<Add option="-Wwrite-strings" />
+					<Add option="-Wno-unused-parameter" />
+					<Add option="-fno-threadsafe-statics" />
+					<Add option="-Wno-overflow" />
+					<Add option="-DCONFIG_SHAL_CORE=SHAL_CORE_ANDROID" />
+					<Add option="-g" />
+					<Add directory="../../libraries" />
+					<Add directory="../../libraries/AP_Common/missing" />
+					<Add directory="$(#URUSSTOOL.base)/src/URUS/libraries" />
+					<Add directory="$(#URUSSTOOL.base)/src/URUS/libraries/AP_Common/missing" />
+				</Compiler>
+				<Linker>
+					<Add option="-pthread" />
+					<Add library="MasterApmLibs" />
+					<Add directory="../../build/uruscygwin/lib/Debug" />
+					<Add directory="$(#URUSSTOOL.base)/src/URUS/build/uruscygwin/lib/Debug" />
+				</Linker>
+			</Target>
+			<Target title="URUSANDROID_Release">
+				<Option output="build/urusandroid/bin/Release/urus_stepper_test" prefix_auto="1" extension_auto="1" />
+				<Option object_output="build/urusandroid/obj/Release/" />
+				<Option type="1" />
+				<Option compiler="gcc" />
+				<Option projectLinkerOptionsRelation="2" />
+				<Compiler>
+					<Add option="-std=gnu++11" />
+					<Add option="-DCONFIG_HAL_BOARD=HAL_BOARD_URUS" />
+					<Add option="-DCONFIG_HAL_BOARD_SUBTYPE=HAL_BOARD_SUBTYPE_NONE" />
+					<Add option="-ffunction-sections" />
+					<Add option="-fdata-sections" />
+					<Add option="-fno-exceptions" />
+					<Add option="-Wno-unknown-pragmas" />
+					<Add option="-fpermissive" />
+					<Add option="-Wformat" />
+					<Add option="-Wshadow" />
+					<Add option="-Wl,--gc-sections" />
+					<Add option="-fsigned-char" />
+					<Add option="-Wcast-align" />
+					<Add option="-Wwrite-strings" />
+					<Add option="-Wno-unused-parameter" />
+					<Add option="-fno-threadsafe-statics" />
+					<Add option="-Wno-overflow" />
+					<Add option="-DCONFIG_SHAL_CORE=SHAL_CORE_ANDROID" />
+					<Add option="-O2" />
+					<Add directory="../../libraries" />
+					<Add directory="../../libraries/AP_Common/missing" />
+					<Add directory="$(#URUSSTOOL.base)/src/URUS/libraries" />
+					<Add directory="$(#URUSSTOOL.base)/src/URUS/libraries/AP_Common/missing" />
+				</Compiler>
+				<Linker>
+					<Add option="-s" />
+					<Add option="-pthread" />
+					<Add library="MasterApmLibs" />
+					<Add directory="../../build/uruscygwin/lib/Release" />
+					<Add directory="$(#URUSSTOOL.base)/src/URUS/build/uruscygwin/lib/Release" />
+				</Linker>
+			</Target>
+			<Target title="APM2_Debug">
+				<Option output="build/urusapm2/bin/Debug/urus_stepper_test" prefix_auto="1" extension_auto="1" />
+				<Option object_output="build/urusapm2/obj/Debug/" />
+				<Option type="1" />
+				<Option compiler="avr-gcc" />
+				<Option projectLinkerOptionsRelation="2" />
+				<Compiler>
+					<Add option="-std=gnu++11" />
+					<Add option="-DCONFIG_HAL_BOARD=HAL_BOARD_URUS" />
+					<Add option="-DCONFIG_HAL_BOARD_SUBTYPE=HAL_BOARD_SUBTYPE_NONE" />
+					<Add option="-ffunction-sections" />
+					<Add option="-fdata-sections" />
+					<Add option="-fno-exceptions" />
+					<Add option="-Wno-unknown-pragmas" />
+					<Add option="-fpermissive" />
+					<Add option="-Wformat" />
+					<Add option="-Wshadow" />
+					<Add option="-Wl,--gc-sections" />
+					<Add option="-fsigned-char" />
+					<Add option="-Wcast-align" />
+					<Add option="-Wwrite-strings" />
+					<Add option="-Wno-unused-parameter" />
+					<Add option="-fno-threadsafe-statics" />
+					<Add option="-Wno-overflow" />
+					<Add option="-DCONFIG_SHAL_CORE=SHAL_CORE_APM" />
+					<Add option="-fno-use-cxa-atexit" />
+					<Add option="-DSHAL_CORE_APM2=1" />
+					<Add option="-DF_CPU=16000000L" />
+					<Add option="-mmcu=atmega2560" />
+					<Add option="-D_GNU_SOURCE=1" />
+					<Add option="-D__STDC_FORMAT_MACROS=1" />
+					<Add option="-DHAVE_TYPE_TRAITS_H=0" />
+					<Add option="-DHAVE_CMATH_H=0" />
+					<Add option="-DHAVE_STD_NULLPTR_T=0" />
+					<Add option="-DHAVE_CMATH_ISNAN=1" />
+					<Add option="-DHAL_OS_POSIX_IO=0" />
+					<Add option="-DHAVE_STD_MOVE=0" />
+					<Add option="-DHAVE_STD_REMOVE_REFERENCE=0" />
+					<Add option="-DHAL_MINIMIZE_FEATURES=1" />
+					<Add option="-DHAL_MINIMIZE_FEATURES_AVR=1" />
+					<Add option="-g" />
+					<Add directory="../../modules/urus_modules/masterlibs/libraries" />
+					<Add directory="../../modules/urus_modules/masterlibs/libraries/AP_Common/missing" />
+					<Add directory="$(#URUSSTOOL.base)/src/URUS/modules/urus_modules/masterlibs/libraries" />
+					<Add directory="$(#URUSSTOOL.base)/src/URUS/modules/urus_modules/masterlibs/libraries/AP_Common/missing" />
+				</Compiler>
+				<Linker>
+					<Add option="-mmcu=atmega2560" />
+					<Add option="-Wl,--gc-sections" />
+					<Add library="MasterLibUrus" />
+					<Add directory="../../build/apm2/lib/Debug" />
+					<Add directory="$(#URUSSTOOL.base)/src/URUS/build/apm2/lib/Debug" />
+				</Linker>
+				<ExtraCommands>
+					<Add after="avr-size --format=avr --mcu=atmega2560 $(TARGET_OUTPUT_FILE)&#x0A;avr-objcopy -R .eeprom -R .fuse -R .lock -R .signature -O ihex $(TARGET_OUTPUT_FILE) $(TARGET_OUTPUT_DIR)$(TARGET_OUTPUT_BASENAME).hex&#x0A;avr-objcopy --no-change-warnings -j .eeprom --change-section-lma .eeprom=0 -O ihex $(TARGET_OUTPUT_FILE) $(TARGET_OUTPUT_DIR)$(TARGET_OUTPUT_BASENAME).eep" />
+				</ExtraCommands>
+			</Target>
+			<Target title="APM2_Release">
+				<Option output="build/urusapm2/bin/Release/urus_stepper_test" prefix_auto="1" extension_auto="1" />
+				<Option object_output="build/urusapm2/obj/Release/" />
+				<Option type="1" />
+				<Option compiler="avr-gcc" />
+				<Option projectLinkerOptionsRelation="2" />
+				<Compiler>
+					<Add option="-std=gnu++11" />
+					<Add option="-DCONFIG_HAL_BOARD=HAL_BOARD_URUS" />
+					<Add option="-DCONFIG_HAL_BOARD_SUBTYPE=HAL_BOARD_SUBTYPE_NONE" />
+					<Add option="-ffunction-sections" />
+					<Add option="-fdata-sections" />
+					<Add option="-fno-exceptions" />
+					<Add option="-Wno-unknown-pragmas" />
+					<Add option="-fpermissive" />
+					<Add option="-Wformat" />
+					<Add option="-Wshadow" />
+					<Add option="-Wl,--gc-sections" />
+					<Add option="-fsigned-char" />
+					<Add option="-Wcast-align" />
+					<Add option="-Wwrite-strings" />
+					<Add option="-Wno-unused-parameter" />
+					<Add option="-fno-threadsafe-statics" />
+					<Add option="-Wno-overflow" />
+					<Add option="-DCONFIG_SHAL_CORE=SHAL_CORE_APM" />
+					<Add option="-fno-use-cxa-atexit" />
+					<Add option="-DSHAL_CORE_APM2=1" />
+					<Add option="-DF_CPU=16000000L" />
+					<Add option="-mmcu=atmega2560" />
+					<Add option="-D_GNU_SOURCE=1" />
+					<Add option="-D__STDC_FORMAT_MACROS=1" />
+					<Add option="-DHAVE_TYPE_TRAITS_H=0" />
+					<Add option="-DHAVE_CMATH_H=0" />
+					<Add option="-DHAVE_STD_NULLPTR_T=0" />
+					<Add option="-DHAVE_CMATH_ISNAN=1" />
+					<Add option="-DHAL_OS_POSIX_IO=0" />
+					<Add option="-DHAVE_STD_MOVE=0" />
+					<Add option="-DHAVE_STD_REMOVE_REFERENCE=0" />
+					<Add option="-DHAL_MINIMIZE_FEATURES=1" />
+					<Add option="-DHAL_MINIMIZE_FEATURES_AVR=1" />
+					<Add option="-O2" />
+					<Add directory="../../modules/urus_modules/masterlibs/libraries" />
+					<Add directory="../../modules/urus_modules/masterlibs/libraries/AP_Common/missing" />
+					<Add directory="$(#URUSSTOOL.base)/src/URUS/modules/urus_modules/masterlibs/libraries" />
+					<Add directory="$(#URUSSTOOL.base)/src/URUS/modules/urus_modules/masterlibs/libraries/AP_Common/missing" />
+				</Compiler>
+				<Linker>
+					<Add option="-mmcu=atmega2560" />
+					<Add option="-Wl,--gc-sections" />
+					<Add option="-s" />
+					<Add library="MasterLibUrus" />
+					<Add directory="../../build/apm2/lib/Release" />
+					<Add directory="$(#URUSSTOOL.base)/src/URUS/build/apm2/lib/Release" />
+				</Linker>
+				<ExtraCommands>
+					<Add after="avr-size --format=avr --mcu=atmega2560 $(TARGET_OUTPUT_FILE)&#x0A;avr-objcopy -R .eeprom -R .fuse -R .lock -R .signature -O ihex $(TARGET_OUTPUT_FILE) $(TARGET_OUTPUT_DIR)$(TARGET_OUTPUT_BASENAME).hex&#x0A;avr-objcopy --no-change-warnings -j .eeprom --change-section-lma .eeprom=0 -O ihex $(TARGET_OUTPUT_FILE) $(TARGET_OUTPUT_DIR)$(TARGET_OUTPUT_BASENAME).eep" />
+				</ExtraCommands>
+			</Target>
+			<Target title="APM2_HIL_Debug">
+				<Option output="build/urusapm2hil/bin/Debug/urus_stepper_test" prefix_auto="1" extension_auto="1" />
+				<Option object_output="build/urusapm2hil/obj/Debug/" />
+				<Option type="1" />
+				<Option compiler="avr-gcc" />
+				<Option projectLinkerOptionsRelation="2" />
+				<Compiler>
+					<Add option="-std=gnu++11" />
+					<Add option="-DCONFIG_HAL_BOARD=HAL_BOARD_URUS" />
+					<Add option="-DCONFIG_HAL_BOARD_SUBTYPE=HAL_BOARD_SUBTYPE_NONE" />
+					<Add option="-ffunction-sections" />
+					<Add option="-fdata-sections" />
+					<Add option="-fno-exceptions" />
+					<Add option="-Wno-unknown-pragmas" />
+					<Add option="-fpermissive" />
+					<Add option="-Wformat" />
+					<Add option="-Wshadow" />
+					<Add option="-Wl,--gc-sections" />
+					<Add option="-fsigned-char" />
+					<Add option="-Wcast-align" />
+					<Add option="-Wwrite-strings" />
+					<Add option="-Wno-unused-parameter" />
+					<Add option="-fno-threadsafe-statics" />
+					<Add option="-Wno-overflow" />
+					<Add option="-DCONFIG_SHAL_CORE=SHAL_CORE_APM" />
+					<Add option="-fno-use-cxa-atexit" />
+					<Add option="-DSHAL_CORE_APM2_HIL=1" />
+					<Add option="-DF_CPU=16000000L" />
+					<Add option="-mmcu=atmega2560" />
+					<Add option="-D_GNU_SOURCE=1" />
+					<Add option="-D__STDC_FORMAT_MACROS=1" />
+					<Add option="-DHAVE_TYPE_TRAITS_H=0" />
+					<Add option="-DHAVE_CMATH_H=0" />
+					<Add option="-DHAVE_STD_NULLPTR_T=0" />
+					<Add option="-DHAVE_CMATH_ISNAN=1" />
+					<Add option="-DHAL_OS_POSIX_IO=0" />
+					<Add option="-DHAVE_STD_MOVE=0" />
+					<Add option="-DHAVE_STD_REMOVE_REFERENCE=0" />
+					<Add option="-DHAL_MINIMIZE_FEATURES=1" />
+					<Add option="-DHAL_MINIMIZE_FEATURES_AVR=1" />
+					<Add option="-g" />
+					<Add directory="../../modules/urus_modules/masterlibs/libraries" />
+					<Add directory="../../modules/urus_modules/masterlibs/libraries/AP_Common/missing" />
+					<Add directory="$(#URUSSTOOL.base)/src/URUS/modules/urus_modules/masterlibs/libraries" />
+					<Add directory="$(#URUSSTOOL.base)/src/URUS/modules/urus_modules/masterlibs/libraries/AP_Common/missing" />
+				</Compiler>
+				<Linker>
+					<Add option="-mmcu=atmega2560" />
+					<Add option="-Wl,--gc-sections" />
+					<Add library="MasterLibUrus" />
+					<Add directory="../../build/apm2/lib/Debug" />
+					<Add directory="$(#URUSSTOOL.base)/src/URUS/build/apm2/lib/Debug" />
+				</Linker>
+				<ExtraCommands>
+					<Add after="avr-size --format=avr --mcu=atmega2560 $(TARGET_OUTPUT_FILE)&#x0A;avr-objcopy -R .eeprom -R .fuse -R .lock -R .signature -O ihex $(TARGET_OUTPUT_FILE) $(TARGET_OUTPUT_DIR)$(TARGET_OUTPUT_BASENAME).hex&#x0A;avr-objcopy --no-change-warnings -j .eeprom --change-section-lma .eeprom=0 -O ihex $(TARGET_OUTPUT_FILE) $(TARGET_OUTPUT_DIR)$(TARGET_OUTPUT_BASENAME).eep" />
+				</ExtraCommands>
+			</Target>
+			<Target title="APM2_HIL_Release">
+				<Option output="build/urusapm2hil/bin/Release/urus_stepper_test" prefix_auto="1" extension_auto="1" />
+				<Option object_output="build/urusapm2hil/obj/Release/" />
+				<Option type="1" />
+				<Option compiler="avr-gcc" />
+				<Option projectLinkerOptionsRelation="2" />
+				<Compiler>
+					<Add option="-std=gnu++11" />
+					<Add option="-DCONFIG_HAL_BOARD=HAL_BOARD_URUS" />
+					<Add option="-DCONFIG_HAL_BOARD_SUBTYPE=HAL_BOARD_SUBTYPE_NONE" />
+					<Add option="-ffunction-sections" />
+					<Add option="-fdata-sections" />
+					<Add option="-fno-exceptions" />
+					<Add option="-Wno-unknown-pragmas" />
+					<Add option="-fpermissive" />
+					<Add option="-Wformat" />
+					<Add option="-Wshadow" />
+					<Add option="-Wl,--gc-sections" />
+					<Add option="-fsigned-char" />
+					<Add option="-Wcast-align" />
+					<Add option="-Wwrite-strings" />
+					<Add option="-Wno-unused-parameter" />
+					<Add option="-fno-threadsafe-statics" />
+					<Add option="-Wno-overflow" />
+					<Add option="-DCONFIG_SHAL_CORE=SHAL_CORE_APM" />
+					<Add option="-fno-use-cxa-atexit" />
+					<Add option="-DSHAL_CORE_APM2_HIL=1" />
+					<Add option="-DF_CPU=16000000L" />
+					<Add option="-mmcu=atmega2560" />
+					<Add option="-D_GNU_SOURCE=1" />
+					<Add option="-D__STDC_FORMAT_MACROS=1" />
+					<Add option="-DHAVE_TYPE_TRAITS_H=0" />
+					<Add option="-DHAVE_CMATH_H=0" />
+					<Add option="-DHAVE_STD_NULLPTR_T=0" />
+					<Add option="-DHAVE_CMATH_ISNAN=1" />
+					<Add option="-DHAL_OS_POSIX_IO=0" />
+					<Add option="-DHAVE_STD_MOVE=0" />
+					<Add option="-DHAVE_STD_REMOVE_REFERENCE=0" />
+					<Add option="-DHAL_MINIMIZE_FEATURES=1" />
+					<Add option="-DHAL_MINIMIZE_FEATURES_AVR=1" />
+					<Add option="-O2" />
+					<Add directory="../../modules/urus_modules/masterlibs/libraries" />
+					<Add directory="../../modules/urus_modules/masterlibs/libraries/AP_Common/missing" />
+					<Add directory="$(#URUSSTOOL.base)/src/URUS/modules/urus_modules/masterlibs/libraries" />
+					<Add directory="$(#URUSSTOOL.base)/src/URUS/modules/urus_modules/masterlibs/libraries/AP_Common/missing" />
+				</Compiler>
+				<Linker>
+					<Add option="-mmcu=atmega2560" />
+					<Add option="-Wl,--gc-sections" />
+					<Add option="-s" />
+					<Add library="MasterLibUrus" />
+					<Add directory="../../build/apm2/lib/Release" />
+					<Add directory="$(#URUSSTOOL.base)/src/URUS/build/apm2/lib/Release" />
+				</Linker>
+				<ExtraCommands>
+					<Add after="avr-size --format=avr --mcu=atmega2560 $(TARGET_OUTPUT_FILE)&#x0A;avr-objcopy -R .eeprom -R .fuse -R .lock -R .signature -O ihex $(TARGET_OUTPUT_FILE) $(TARGET_OUTPUT_DIR)$(TARGET_OUTPUT_BASENAME).hex&#x0A;avr-objcopy --no-change-warnings -j .eeprom --change-section-lma .eeprom=0 -O ihex $(TARGET_OUTPUT_FILE) $(TARGET_OUTPUT_DIR)$(TARGET_OUTPUT_BASENAME).eep" />
+				</ExtraCommands>
+			</Target>
+			<Target title="MEGA01_Debug">
+				<Option output="build/urusmega01/bin/Debug/urus_stepper_test" prefix_auto="1" extension_auto="1" />
+				<Option object_output="build/urusmega01/obj/Debug/" />
+				<Option type="1" />
+				<Option compiler="avr-gcc" />
+				<Option projectLinkerOptionsRelation="2" />
+				<Compiler>
+					<Add option="-std=gnu++11" />
+					<Add option="-DCONFIG_HAL_BOARD=HAL_BOARD_URUS" />
+					<Add option="-DCONFIG_HAL_BOARD_SUBTYPE=HAL_BOARD_SUBTYPE_NONE" />
+					<Add option="-ffunction-sections" />
+					<Add option="-fdata-sections" />
+					<Add option="-fno-exceptions" />
+					<Add option="-Wno-unknown-pragmas" />
+					<Add option="-fpermissive" />
+					<Add option="-Wformat" />
+					<Add option="-Wshadow" />
+					<Add option="-Wl,--gc-sections" />
+					<Add option="-fsigned-char" />
+					<Add option="-Wcast-align" />
+					<Add option="-Wwrite-strings" />
+					<Add option="-Wno-unused-parameter" />
+					<Add option="-fno-threadsafe-statics" />
+					<Add option="-Wno-overflow" />
+					<Add option="-DCONFIG_SHAL_CORE=SHAL_CORE_APM" />
+					<Add option="-fno-use-cxa-atexit" />
+					<Add option="-DSHAL_CORE_MEGA01=1" />
+					<Add option="-DF_CPU=16000000L" />
+					<Add option="-mmcu=atmega2560" />
+					<Add option="-D_GNU_SOURCE=1" />
+					<Add option="-D__STDC_FORMAT_MACROS=1" />
+					<Add option="-DHAVE_TYPE_TRAITS_H=0" />
+					<Add option="-DHAVE_CMATH_H=0" />
+					<Add option="-DHAVE_STD_NULLPTR_T=0" />
+					<Add option="-DHAVE_CMATH_ISNAN=1" />
+					<Add option="-DHAL_OS_POSIX_IO=0" />
+					<Add option="-DHAVE_STD_MOVE=0" />
+					<Add option="-DHAVE_STD_REMOVE_REFERENCE=0" />
+					<Add option="-DHAL_MINIMIZE_FEATURES=1" />
+					<Add option="-DHAL_MINIMIZE_FEATURES_AVR=1" />
+					<Add option="-g" />
+					<Add directory="../../modules/urus_modules/masterlibs/libraries" />
+					<Add directory="../../modules/urus_modules/masterlibs/libraries/AP_Common/missing" />
+					<Add directory="$(#URUSSTOOL.base)/src/URUS/modules/urus_modules/masterlibs/libraries" />
+					<Add directory="$(#URUSSTOOL.base)/src/URUS/modules/urus_modules/masterlibs/libraries/AP_Common/missing" />
+				</Compiler>
+				<Linker>
+					<Add option="-mmcu=atmega2560" />
+					<Add option="-Wl,--gc-sections" />
+					<Add library="MasterLibUrus" />
+					<Add directory="../../build/apm2/lib/Debug" />
+					<Add directory="$(#URUSSTOOL.base)/src/URUS/build/apm2/lib/Debug" />
+				</Linker>
+				<ExtraCommands>
+					<Add after="avr-size --format=avr --mcu=atmega2560 $(TARGET_OUTPUT_FILE)&#x0A;avr-objcopy -R .eeprom -R .fuse -R .lock -R .signature -O ihex $(TARGET_OUTPUT_FILE) $(TARGET_OUTPUT_DIR)$(TARGET_OUTPUT_BASENAME).hex&#x0A;avr-objcopy --no-change-warnings -j .eeprom --change-section-lma .eeprom=0 -O ihex $(TARGET_OUTPUT_FILE) $(TARGET_OUTPUT_DIR)$(TARGET_OUTPUT_BASENAME).eep" />
+				</ExtraCommands>
+			</Target>
+			<Target title="MEGA01_Release">
+				<Option output="build/urusmega01/bin/Release/urus_stepper_test" prefix_auto="1" extension_auto="1" />
+				<Option object_output="build/urusmega01/obj/Release/" />
+				<Option type="1" />
+				<Option compiler="avr-gcc" />
+				<Option projectLinkerOptionsRelation="2" />
+				<Compiler>
+					<Add option="-std=gnu++11" />
+					<Add option="-DCONFIG_HAL_BOARD=HAL_BOARD_URUS" />
+					<Add option="-DCONFIG_HAL_BOARD_SUBTYPE=HAL_BOARD_SUBTYPE_NONE" />
+					<Add option="-ffunction-sections" />
+					<Add option="-fdata-sections" />
+					<Add option="-fno-exceptions" />
+					<Add option="-Wno-unknown-pragmas" />
+					<Add option="-fpermissive" />
+					<Add option="-Wformat" />
+					<Add option="-Wshadow" />
+					<Add option="-Wl,--gc-sections" />
+					<Add option="-fsigned-char" />
+					<Add option="-Wcast-align" />
+					<Add option="-Wwrite-strings" />
+					<Add option="-Wno-unused-parameter" />
+					<Add option="-fno-threadsafe-statics" />
+					<Add option="-Wno-overflow" />
+					<Add option="-DCONFIG_SHAL_CORE=SHAL_CORE_APM" />
+					<Add option="-fno-use-cxa-atexit" />
+					<Add option="-DSHAL_CORE_MEGA01=1" />
+					<Add option="-DF_CPU=16000000L" />
+					<Add option="-mmcu=atmega2560" />
+					<Add option="-D_GNU_SOURCE=1" />
+					<Add option="-D__STDC_FORMAT_MACROS=1" />
+					<Add option="-DHAVE_TYPE_TRAITS_H=0" />
+					<Add option="-DHAVE_CMATH_H=0" />
+					<Add option="-DHAVE_STD_NULLPTR_T=0" />
+					<Add option="-DHAVE_CMATH_ISNAN=1" />
+					<Add option="-DHAL_OS_POSIX_IO=0" />
+					<Add option="-DHAVE_STD_MOVE=0" />
+					<Add option="-DHAVE_STD_REMOVE_REFERENCE=0" />
+					<Add option="-DHAL_MINIMIZE_FEATURES=1" />
+					<Add option="-DHAL_MINIMIZE_FEATURES_AVR=1" />
+					<Add option="-O2" />
+					<Add directory="../../modules/urus_modules/masterlibs/libraries" />
+					<Add directory="../../modules/urus_modules/masterlibs/libraries/AP_Common/missing" />
+					<Add directory="$(#URUSSTOOL.base)/src/URUS/modules/urus_modules/masterlibs/libraries" />
+					<Add directory="$(#URUSSTOOL.base)/src/URUS/modules/urus_modules/masterlibs/libraries/AP_Common/missing" />
+				</Compiler>
+				<Linker>
+					<Add option="-mmcu=atmega2560" />
+					<Add option="-Wl,--gc-sections" />
+					<Add option="-s" />
+					<Add library="MasterLibUrus" />
+					<Add directory="../../build/apm2/lib/Release" />
+					<Add directory="$(#URUSSTOOL.base)/src/URUS/build/apm2/lib/Release" />
+				</Linker>
+				<ExtraCommands>
+					<Add after="avr-size --format=avr --mcu=atmega2560 $(TARGET_OUTPUT_FILE)&#x0A;avr-objcopy -R .eeprom -R .fuse -R .lock -R .signature -O ihex $(TARGET_OUTPUT_FILE) $(TARGET_OUTPUT_DIR)$(TARGET_OUTPUT_BASENAME).hex&#x0A;avr-objcopy --no-change-warnings -j .eeprom --change-section-lma .eeprom=0 -O ihex $(TARGET_OUTPUT_FILE) $(TARGET_OUTPUT_DIR)$(TARGET_OUTPUT_BASENAME).eep" />
+				</ExtraCommands>
+			</Target>
+			<Target title="MEGA02_Debug">
+				<Option output="build/urusmega02/bin/Debug/urus_stepper_test" prefix_auto="1" extension_auto="1" />
+				<Option object_output="build/urusmega02/obj/Debug/" />
+				<Option type="1" />
+				<Option compiler="avr-gcc" />
+				<Option projectLinkerOptionsRelation="2" />
+				<Compiler>
+					<Add option="-std=gnu++11" />
+					<Add option="-DCONFIG_HAL_BOARD=HAL_BOARD_URUS" />
+					<Add option="-DCONFIG_HAL_BOARD_SUBTYPE=HAL_BOARD_SUBTYPE_NONE" />
+					<Add option="-ffunction-sections" />
+					<Add option="-fdata-sections" />
+					<Add option="-fno-exceptions" />
+					<Add option="-Wno-unknown-pragmas" />
+					<Add option="-fpermissive" />
+					<Add option="-Wformat" />
+					<Add option="-Wshadow" />
+					<Add option="-Wl,--gc-sections" />
+					<Add option="-fsigned-char" />
+					<Add option="-Wcast-align" />
+					<Add option="-Wwrite-strings" />
+					<Add option="-Wno-unused-parameter" />
+					<Add option="-fno-threadsafe-statics" />
+					<Add option="-Wno-overflow" />
+					<Add option="-DCONFIG_SHAL_CORE=SHAL_CORE_APM" />
+					<Add option="-fno-use-cxa-atexit" />
+					<Add option="-DSHAL_CORE_MEGA02=1" />
+					<Add option="-DF_CPU=16000000L" />
+					<Add option="-mmcu=atmega2560" />
+					<Add option="-D_GNU_SOURCE=1" />
+					<Add option="-D__STDC_FORMAT_MACROS=1" />
+					<Add option="-DHAVE_TYPE_TRAITS_H=0" />
+					<Add option="-DHAVE_CMATH_H=0" />
+					<Add option="-DHAVE_STD_NULLPTR_T=0" />
+					<Add option="-DHAVE_CMATH_ISNAN=1" />
+					<Add option="-DHAL_OS_POSIX_IO=0" />
+					<Add option="-DHAVE_STD_MOVE=0" />
+					<Add option="-DHAVE_STD_REMOVE_REFERENCE=0" />
+					<Add option="-DHAL_MINIMIZE_FEATURES=1" />
+					<Add option="-DHAL_MINIMIZE_FEATURES_AVR=1" />
+					<Add option="-g" />
+					<Add directory="../../modules/urus_modules/masterlibs/libraries" />
+					<Add directory="../../modules/urus_modules/masterlibs/libraries/AP_Common/missing" />
+					<Add directory="$(#URUSSTOOL.base)/src/URUS/modules/urus_modules/masterlibs/libraries" />
+					<Add directory="$(#URUSSTOOL.base)/src/URUS/modules/urus_modules/masterlibs/libraries/AP_Common/missing" />
+				</Compiler>
+				<Linker>
+					<Add option="-mmcu=atmega2560" />
+					<Add option="-Wl,--gc-sections" />
+					<Add library="MasterLibUrus" />
+					<Add directory="../../build/apm2/lib/Debug" />
+					<Add directory="$(#URUSSTOOL.base)/src/URUS/build/apm2/lib/Debug" />
+				</Linker>
+				<ExtraCommands>
+					<Add after="avr-size --format=avr --mcu=atmega2560 $(TARGET_OUTPUT_FILE)&#x0A;avr-objcopy -R .eeprom -R .fuse -R .lock -R .signature -O ihex $(TARGET_OUTPUT_FILE) $(TARGET_OUTPUT_DIR)$(TARGET_OUTPUT_BASENAME).hex&#x0A;avr-objcopy --no-change-warnings -j .eeprom --change-section-lma .eeprom=0 -O ihex $(TARGET_OUTPUT_FILE) $(TARGET_OUTPUT_DIR)$(TARGET_OUTPUT_BASENAME).eep" />
+				</ExtraCommands>
+			</Target>
+			<Target title="MEGA02_Release">
+				<Option output="build/urusmega02/bin/Release/urus_stepper_test" prefix_auto="1" extension_auto="1" />
+				<Option object_output="build/urusmega02/obj/Release/" />
+				<Option type="1" />
+				<Option compiler="avr-gcc" />
+				<Option projectLinkerOptionsRelation="2" />
+				<Compiler>
+					<Add option="-O2" />
+					<Add option="-std=gnu++11" />
+					<Add option="-ffunction-sections" />
+					<Add option="-fdata-sections" />
+					<Add option="-fno-exceptions" />
+					<Add option="-Wno-unknown-pragmas" />
+					<Add option="-fpermissive" />
+					<Add option="-Wformat" />
+					<Add option="-Wshadow" />
+					<Add option="-Wl,--gc-sections" />
+					<Add option="-fsigned-char" />
+					<Add option="-Wcast-align" />
+					<Add option="-Wwrite-strings" />
+					<Add option="-Wno-unused-parameter" />
+					<Add option="-fno-threadsafe-statics" />
+					<Add option="-Wno-overflow" />
+					<Add option="-fno-use-cxa-atexit" />
+					<Add option="-mmcu=atmega2560" />
+					<Add option="-DCONFIG_HAL_BOARD=HAL_BOARD_URUS" />
+					<Add option="-DCONFIG_HAL_BOARD_SUBTYPE=HAL_BOARD_SUBTYPE_NONE" />
+					<Add option="-DCONFIG_SHAL_CORE=SHAL_CORE_APM" />
+					<Add option="-DSHAL_CORE_MEGA02=1" />
+					<Add option="-DF_CPU=16000000L" />
+					<Add option="-D_GNU_SOURCE=1" />
+					<Add option="-D__STDC_FORMAT_MACROS=1" />
+					<Add option="-DHAVE_TYPE_TRAITS_H=0" />
+					<Add option="-DHAVE_CMATH_H=0" />
+					<Add option="-DHAVE_STD_NULLPTR_T=0" />
+					<Add option="-DHAVE_CMATH_ISNAN=1" />
+					<Add option="-DHAL_OS_POSIX_IO=0" />
+					<Add option="-DHAVE_STD_MOVE=0" />
+					<Add option="-DHAVE_STD_REMOVE_REFERENCE=0" />
+					<Add option="-DHAL_MINIMIZE_FEATURES=1" />
+					<Add option="-DHAL_MINIMIZE_FEATURES_AVR=1" />
+					<Add directory="../../modules/urus_modules/masterlibs/libraries" />
+					<Add directory="../../modules/urus_modules/masterlibs/libraries/AP_Common/missing" />
+					<Add directory="$(#URUSSTOOL.base)/src/URUS/modules/urus_modules/masterlibs/libraries" />
+					<Add directory="$(#URUSSTOOL.base)/src/URUS/modules/urus_modules/masterlibs/libraries/AP_Common/missing" />
+					<Add directory="$(#URUSSTOOL.base)/src/URUS/build/sitl/libraries/GCS_MAVLink" />
+				</Compiler>
+				<Linker>
+					<Add option="-s" />
+					<Add option="-mmcu=atmega2560" />
+					<Add option="-Wl,--gc-sections" />
+					<Add library="MasterLibUrus" />
+					<Add directory="../../build/apm2/lib/Release" />
+					<Add directory="$(#URUSSTOOL.base)/src/URUS/build/apm2/lib/Release" />
+				</Linker>
+				<ExtraCommands>
+					<Add after="avr-size --format=avr --mcu=atmega2560 $(TARGET_OUTPUT_FILE)" />
+					<Add after="avr-objcopy -R .eeprom -R .fuse -R .lock -R .signature -O ihex $(TARGET_OUTPUT_FILE) $(TARGET_OUTPUT_DIR)$(TARGET_OUTPUT_BASENAME).hex" />
+					<Add after="avr-objcopy --no-change-warnings -j .eeprom --change-section-lma .eeprom=0 -O ihex $(TARGET_OUTPUT_FILE) $(TARGET_OUTPUT_DIR)$(TARGET_OUTPUT_BASENAME).eep" />
+				</ExtraCommands>
+			</Target>
+			<Target title="APM328_Debug">
+				<Option output="build/urusapm328/bin/Debug/urus_stepper_test" prefix_auto="1" extension_auto="1" />
+				<Option object_output="build/urusapm328/obj/Debug/" />
+				<Option type="1" />
+				<Option compiler="avr-gcc" />
+				<Option projectLinkerOptionsRelation="2" />
+				<Compiler>
+					<Add option="-std=gnu++11" />
+					<Add option="-DCONFIG_HAL_BOARD=HAL_BOARD_URUS" />
+					<Add option="-DCONFIG_HAL_BOARD_SUBTYPE=HAL_BOARD_SUBTYPE_NONE" />
+					<Add option="-ffunction-sections" />
+					<Add option="-fdata-sections" />
+					<Add option="-fno-exceptions" />
+					<Add option="-Wno-unknown-pragmas" />
+					<Add option="-fpermissive" />
+					<Add option="-Wformat" />
+					<Add option="-Wshadow" />
+					<Add option="-Wl,--gc-sections" />
+					<Add option="-fsigned-char" />
+					<Add option="-Wcast-align" />
+					<Add option="-Wwrite-strings" />
+					<Add option="-Wno-unused-parameter" />
+					<Add option="-fno-threadsafe-statics" />
+					<Add option="-Wno-overflow" />
+					<Add option="-DCONFIG_SHAL_CORE=SHAL_CORE_APM" />
+					<Add option="-fno-use-cxa-atexit" />
+					<Add option="-DSHAL_CORE_APM328=1" />
+					<Add option="-DF_CPU=16000000L" />
+					<Add option="-mmcu=atmega328p" />
+					<Add option="-D_GNU_SOURCE=1" />
+					<Add option="-D__STDC_FORMAT_MACROS=1" />
+					<Add option="-DHAVE_TYPE_TRAITS_H=0" />
+					<Add option="-DHAVE_CMATH_H=0" />
+					<Add option="-DHAVE_STD_NULLPTR_T=0" />
+					<Add option="-DHAVE_CMATH_ISNAN=1" />
+					<Add option="-DHAL_OS_POSIX_IO=0" />
+					<Add option="-DHAVE_STD_MOVE=0" />
+					<Add option="-DHAVE_STD_REMOVE_REFERENCE=0" />
+					<Add option="-DHAL_MINIMIZE_FEATURES=1" />
+					<Add option="-DHAL_MINIMIZE_FEATURES_AVR=1" />
+					<Add option="-g" />
+					<Add directory="../../modules/urus_modules/masterlibs/libraries" />
+					<Add directory="../../modules/urus_modules/masterlibs/libraries/AP_Common/missing" />
+					<Add directory="$(#URUSSTOOL.base)/src/URUS/modules/urus_modules/masterlibs/libraries" />
+					<Add directory="$(#URUSSTOOL.base)/src/URUS/modules/urus_modules/masterlibs/libraries/AP_Common/missing" />
+				</Compiler>
+				<Linker>
+					<Add option="-mmcu=atmega328p" />
+					<Add option="-Wl,--gc-sections" />
+					<Add library="MasterLibUrus" />
+					<Add directory="../../build/apm2/lib/Debug" />
+					<Add directory="$(#URUSSTOOL.base)/src/URUS/build/apm2/lib/Debug" />
+				</Linker>
+				<ExtraCommands>
+					<Add after="avr-size --format=avr --mcu=atmega328p $(TARGET_OUTPUT_FILE)&#x0A;avr-objcopy -R .eeprom -R .fuse -R .lock -R .signature -O ihex $(TARGET_OUTPUT_FILE) $(TARGET_OUTPUT_DIR)$(TARGET_OUTPUT_BASENAME).hex&#x0A;avr-objcopy --no-change-warnings -j .eeprom --change-section-lma .eeprom=0 -O ihex $(TARGET_OUTPUT_FILE) $(TARGET_OUTPUT_DIR)$(TARGET_OUTPUT_BASENAME).eep" />
+				</ExtraCommands>
+			</Target>
+			<Target title="APM328_Release">
+				<Option output="build/urusapm328/bin/Release/urus_stepper_test" prefix_auto="1" extension_auto="1" />
+				<Option object_output="build/urusapm328/obj/Release/" />
+				<Option type="1" />
+				<Option compiler="avr-gcc" />
+				<Option projectLinkerOptionsRelation="2" />
+				<Compiler>
+					<Add option="-std=gnu++11" />
+					<Add option="-DCONFIG_HAL_BOARD=HAL_BOARD_URUS" />
+					<Add option="-DCONFIG_HAL_BOARD_SUBTYPE=HAL_BOARD_SUBTYPE_NONE" />
+					<Add option="-ffunction-sections" />
+					<Add option="-fdata-sections" />
+					<Add option="-fno-exceptions" />
+					<Add option="-Wno-unknown-pragmas" />
+					<Add option="-fpermissive" />
+					<Add option="-Wformat" />
+					<Add option="-Wshadow" />
+					<Add option="-Wl,--gc-sections" />
+					<Add option="-fsigned-char" />
+					<Add option="-Wcast-align" />
+					<Add option="-Wwrite-strings" />
+					<Add option="-Wno-unused-parameter" />
+					<Add option="-fno-threadsafe-statics" />
+					<Add option="-Wno-overflow" />
+					<Add option="-DCONFIG_SHAL_CORE=SHAL_CORE_APM" />
+					<Add option="-fno-use-cxa-atexit" />
+					<Add option="-DSHAL_CORE_APM328=1" />
+					<Add option="-DF_CPU=16000000L" />
+					<Add option="-mmcu=atmega328p" />
+					<Add option="-D_GNU_SOURCE=1" />
+					<Add option="-D__STDC_FORMAT_MACROS=1" />
+					<Add option="-DHAVE_TYPE_TRAITS_H=0" />
+					<Add option="-DHAVE_CMATH_H=0" />
+					<Add option="-DHAVE_STD_NULLPTR_T=0" />
+					<Add option="-DHAVE_CMATH_ISNAN=1" />
+					<Add option="-DHAL_OS_POSIX_IO=0" />
+					<Add option="-DHAVE_STD_MOVE=0" />
+					<Add option="-DHAVE_STD_REMOVE_REFERENCE=0" />
+					<Add option="-DHAL_MINIMIZE_FEATURES=1" />
+					<Add option="-DHAL_MINIMIZE_FEATURES_AVR=1" />
+					<Add option="-O2" />
+					<Add directory="../../modules/urus_modules/masterlibs/libraries" />
+					<Add directory="../../modules/urus_modules/masterlibs/libraries/AP_Common/missing" />
+					<Add directory="$(#URUSSTOOL.base)/src/URUS/modules/urus_modules/masterlibs/libraries" />
+					<Add directory="$(#URUSSTOOL.base)/src/URUS/modules/urus_modules/masterlibs/libraries/AP_Common/missing" />
+				</Compiler>
+				<Linker>
+					<Add option="-mmcu=atmega328p" />
+					<Add option="-Wl,--gc-sections" />
+					<Add option="-s" />
+					<Add library="MasterLibUrus" />
+					<Add directory="../../build/apm2/lib/Release" />
+					<Add directory="$(#URUSSTOOL.base)/src/URUS/build/apm2/lib/Release" />
+				</Linker>
+				<ExtraCommands>
+					<Add after="avr-size --format=avr --mcu=atmega328p $(TARGET_OUTPUT_FILE)&#x0A;avr-objcopy -R .eeprom -R .fuse -R .lock -R .signature -O ihex $(TARGET_OUTPUT_FILE) $(TARGET_OUTPUT_DIR)$(TARGET_OUTPUT_BASENAME).hex&#x0A;avr-objcopy --no-change-warnings -j .eeprom --change-section-lma .eeprom=0 -O ihex $(TARGET_OUTPUT_FILE) $(TARGET_OUTPUT_DIR)$(TARGET_OUTPUT_BASENAME).eep" />
+				</ExtraCommands>
+			</Target>
+			<Target title="URUSSYSTEM_X86_Debug">
+				<Option output="build/urussystem_x86/bin/Debug/urus_stepper_test" prefix_auto="1" extension_auto="1" />
+				<Option object_output="build/urussystem_x86/obj/Debug/" />
+				<Option type="1" />
+				<Option compiler="i686-urus-linux-gcc" />
+				<Option projectLinkerOptionsRelation="2" />
+				<Compiler>
+					<Add option="-std=gnu++11" />
+					<Add option="-DCONFIG_HAL_BOARD=HAL_BOARD_URUS" />
+					<Add option="-DCONFIG_HAL_BOARD_SUBTYPE=HAL_BOARD_SUBTYPE_NONE" />
+					<Add option="-ffunction-sections" />
+					<Add option="-fdata-sections" />
+					<Add option="-fno-exceptions" />
+					<Add option="-Wno-unknown-pragmas" />
+					<Add option="-fpermissive" />
+					<Add option="-Wformat" />
+					<Add option="-Wshadow" />
+					<Add option="-Wl,--gc-sections" />
+					<Add option="-fsigned-char" />
+					<Add option="-Wcast-align" />
+					<Add option="-Wwrite-strings" />
+					<Add option="-Wno-unused-parameter" />
+					<Add option="-fno-threadsafe-statics" />
+					<Add option="-Wno-overflow" />
+					<Add option="-DCONFIG_SHAL_CORE=SHAL_CORE_CYGWIN" />
+					<Add option="-DHAVE_CMATH_ISFINITE=1" />
+					<Add option="-DHAVE_CMATH_ISINF=1" />
+					<Add option="-DHAVE_CMATH_ISNAN=1" />
+					<Add option="-DNEED_CMATH_ISFINITE_STD_NAMESPACE=1" />
+					<Add option="-DNEED_CMATH_ISINF_STD_NAMESPACE=1" />
+					<Add option="-DNEED_CMATH_ISNAN_STD_NAMESPACE=1" />
+					<Add option="-D_GNU_SOURCE=1" />
+					<Add option="-g" />
+					<Add directory="../../libraries" />
+					<Add directory="../../libraries/AP_Common/missing" />
+					<Add directory="$(#URUSSTOOL.base)/src/URUS/libraries" />
+					<Add directory="$(#URUSSTOOL.base)/src/URUS/libraries/AP_Common/missing" />
+				</Compiler>
+				<Linker>
+					<Add option="-Wl,--gc-sections" />
+					<Add option="-pthread" />
+					<Add library="MasterApmLibs" />
+					<Add directory="../../build/uruscygwin/lib/Debug" />
+					<Add directory="$(#URUSSTOOL.base)/src/URUS/build/uruscygwin/lib/Debug" />
+				</Linker>
+			</Target>
+			<Target title="URUSSYSTEM_X86_Release">
+				<Option output="build/urussystem_x86/bin/Release/urus_stepper_test" prefix_auto="1" extension_auto="1" />
+				<Option object_output="build/urussystem_x86/obj/Release/" />
+				<Option type="1" />
+				<Option compiler="i686-urus-linux-gcc" />
+				<Option projectLinkerOptionsRelation="2" />
+				<Compiler>
+					<Add option="-std=gnu++11" />
+					<Add option="-DCONFIG_HAL_BOARD=HAL_BOARD_URUS" />
+					<Add option="-DCONFIG_HAL_BOARD_SUBTYPE=HAL_BOARD_SUBTYPE_NONE" />
+					<Add option="-ffunction-sections" />
+					<Add option="-fdata-sections" />
+					<Add option="-fno-exceptions" />
+					<Add option="-Wno-unknown-pragmas" />
+					<Add option="-fpermissive" />
+					<Add option="-Wformat" />
+					<Add option="-Wshadow" />
+					<Add option="-Wl,--gc-sections" />
+					<Add option="-fsigned-char" />
+					<Add option="-Wcast-align" />
+					<Add option="-Wwrite-strings" />
+					<Add option="-Wno-unused-parameter" />
+					<Add option="-fno-threadsafe-statics" />
+					<Add option="-Wno-overflow" />
+					<Add option="-DCONFIG_SHAL_CORE=SHAL_CORE_CYGWIN" />
+					<Add option="-DHAVE_CMATH_ISFINITE=1" />
+					<Add option="-DHAVE_CMATH_ISINF=1" />
+					<Add option="-DHAVE_CMATH_ISNAN=1" />
+					<Add option="-DNEED_CMATH_ISFINITE_STD_NAMESPACE=1" />
+					<Add option="-DNEED_CMATH_ISINF_STD_NAMESPACE=1" />
+					<Add option="-DNEED_CMATH_ISNAN_STD_NAMESPACE=1" />
+					<Add option="-D_GNU_SOURCE=1" />
+					<Add option="-O2" />
+					<Add directory="../../libraries" />
+					<Add directory="../../libraries/AP_Common/missing" />
+					<Add directory="$(#URUSSTOOL.base)/src/URUS/libraries" />
+					<Add directory="$(#URUSSTOOL.base)/src/URUS/libraries/AP_Common/missing" />
+				</Compiler>
+				<Linker>
+					<Add option="-Wl,--gc-sections" />
+					<Add option="-s" />
+					<Add option="-pthread" />
+					<Add library="MasterApmLibs" />
+					<Add directory="../../build/uruscygwin/lib/Release" />
+					<Add directory="$(#URUSSTOOL.base)/src/URUS/build/uruscygwin/lib/Release" />
+				</Linker>
+			</Target>
+			<Target title="URUSSYSTEM_ARM_Debug">
+				<Option output="build/urussystem_arm/bin/Debug/urus_stepper_test" prefix_auto="1" extension_auto="1" />
+				<Option object_output="build/urussystem_arm/obj/Debug/" />
+				<Option type="1" />
+				<Option compiler="arm-urus-linux-gcc" />
+				<Option projectLinkerOptionsRelation="2" />
+				<Compiler>
+					<Add option="-std=gnu++11" />
+					<Add option="-DCONFIG_HAL_BOARD=HAL_BOARD_URUS" />
+					<Add option="-DCONFIG_HAL_BOARD_SUBTYPE=HAL_BOARD_SUBTYPE_NONE" />
+					<Add option="-ffunction-sections" />
+					<Add option="-fdata-sections" />
+					<Add option="-fno-exceptions" />
+					<Add option="-Wno-unknown-pragmas" />
+					<Add option="-fpermissive" />
+					<Add option="-Wformat" />
+					<Add option="-Wshadow" />
+					<Add option="-Wl,--gc-sections" />
+					<Add option="-fsigned-char" />
+					<Add option="-Wcast-align" />
+					<Add option="-Wwrite-strings" />
+					<Add option="-Wno-unused-parameter" />
+					<Add option="-fno-threadsafe-statics" />
+					<Add option="-Wno-overflow" />
+					<Add option="-DCONFIG_SHAL_CORE=SHAL_CORE_CYGWIN" />
+					<Add option="-DHAVE_CMATH_ISFINITE=1" />
+					<Add option="-DHAVE_CMATH_ISINF=1" />
+					<Add option="-DHAVE_CMATH_ISNAN=1" />
+					<Add option="-DNEED_CMATH_ISFINITE_STD_NAMESPACE=1" />
+					<Add option="-DNEED_CMATH_ISINF_STD_NAMESPACE=1" />
+					<Add option="-DNEED_CMATH_ISNAN_STD_NAMESPACE=1" />
+					<Add option="-D_GNU_SOURCE=1" />
+					<Add option="-g" />
+					<Add directory="../../libraries" />
+					<Add directory="../../libraries/AP_Common/missing" />
+					<Add directory="$(#URUSSTOOL.base)/src/URUS/libraries" />
+					<Add directory="$(#URUSSTOOL.base)/src/URUS/libraries/AP_Common/missing" />
+				</Compiler>
+				<Linker>
+					<Add option="-Wl,--gc-sections" />
+					<Add option="-pthread" />
+					<Add library="MasterApmLibs" />
+					<Add directory="../../build/uruscygwin/lib/Debug" />
+					<Add directory="$(#URUSSTOOL.base)/src/URUS/build/uruscygwin/lib/Debug" />
+				</Linker>
+			</Target>
+			<Target title="URUSSYSTEM_ARM_Release">
+				<Option output="build/urussystem_arm/bin/Release/urus_stepper_test" prefix_auto="1" extension_auto="1" />
+				<Option object_output="build/urussystem_arm/obj/Release/" />
+				<Option type="1" />
+				<Option compiler="arm-urus-linux-gcc" />
+				<Option projectLinkerOptionsRelation="2" />
+				<Compiler>
+					<Add option="-std=gnu++11" />
+					<Add option="-DCONFIG_HAL_BOARD=HAL_BOARD_URUS" />
+					<Add option="-DCONFIG_HAL_BOARD_SUBTYPE=HAL_BOARD_SUBTYPE_NONE" />
+					<Add option="-ffunction-sections" />
+					<Add option="-fdata-sections" />
+					<Add option="-fno-exceptions" />
+					<Add option="-Wno-unknown-pragmas" />
+					<Add option="-fpermissive" />
+					<Add option="-Wformat" />
+					<Add option="-Wshadow" />
+					<Add option="-Wl,--gc-sections" />
+					<Add option="-fsigned-char" />
+					<Add option="-Wcast-align" />
+					<Add option="-Wwrite-strings" />
+					<Add option="-Wno-unused-parameter" />
+					<Add option="-fno-threadsafe-statics" />
+					<Add option="-Wno-overflow" />
+					<Add option="-DCONFIG_SHAL_CORE=SHAL_CORE_CYGWIN" />
+					<Add option="-DHAVE_CMATH_ISFINITE=1" />
+					<Add option="-DHAVE_CMATH_ISINF=1" />
+					<Add option="-DHAVE_CMATH_ISNAN=1" />
+					<Add option="-DNEED_CMATH_ISFINITE_STD_NAMESPACE=1" />
+					<Add option="-DNEED_CMATH_ISINF_STD_NAMESPACE=1" />
+					<Add option="-DNEED_CMATH_ISNAN_STD_NAMESPACE=1" />
+					<Add option="-D_GNU_SOURCE=1" />
+					<Add option="-O2" />
+					<Add directory="../../libraries" />
+					<Add directory="../../libraries/AP_Common/missing" />
+					<Add directory="$(#URUSSTOOL.base)/src/URUS/libraries" />
+					<Add directory="$(#URUSSTOOL.base)/src/URUS/libraries/AP_Common/missing" />
+				</Compiler>
+				<Linker>
+					<Add option="-Wl,--gc-sections" />
+					<Add option="-s" />
+					<Add option="-pthread" />
+					<Add library="MasterApmLibs" />
+					<Add directory="../../build/uruscygwin/lib/Release" />
+					<Add directory="$(#URUSSTOOL.base)/src/URUS/build/uruscygwin/lib/Release" />
+				</Linker>
+			</Target>
+		</Build>
+		<Compiler>
+			<Add option='[[if (GetCompilerFactory().GetCompilerVersionString(_T(&quot;gcc&quot;)) &gt;= _T(&quot;4.8.0&quot;)) print(_T(&quot;-Wno-unused-local-typedefs&quot;));]]' />
+			<Add option="-Wall" />
+		</Compiler>
+		<Unit filename="urus_stepper_test.cpp" />
+		<Unit filename="urus_stepper_test.h" />
+		<Extensions />
+	</Project>
+</UrusStudio_project_file>
