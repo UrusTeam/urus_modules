@@ -4,6 +4,9 @@
 
 #include "UR_Stepper_Generic.h"
 #include <math.h>
+#if CONFIG_SHAL_CORE == SHAL_CORE_CYGWIN
+#include <unistd.h>
+#endif // CONFIG_SHAL_CORE
 
 #define STEP_PULSE(steps, microsteps, rpm) (60.0*1000000L/steps/microsteps/rpm)
 
@@ -214,7 +217,11 @@ inline void UR_Stepper_Generic::_delay_micros(uint32_t delay_us, uint32_t start_
         if (!start_us) {
             start_us = AP_HAL::micros();
         }
+#if CONFIG_SHAL_CORE == SHAL_CORE_CYGWIN
+        usleep(delay_us);
+#else
         while (AP_HAL::micros() - start_us < delay_us);
+#endif // CONFIG_SHAL_CORE
     }
 }
 
