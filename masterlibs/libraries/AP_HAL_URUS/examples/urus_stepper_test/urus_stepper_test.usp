@@ -245,23 +245,24 @@
 				<Option compiler="gcc" />
 				<Option projectLinkerOptionsRelation="2" />
 				<Compiler>
+					<Add option="-O2" />
+					<Add option="-Wshadow" />
+					<Add option="-Wcast-align" />
 					<Add option="-std=gnu++11" />
-					<Add option="-DCONFIG_HAL_BOARD=HAL_BOARD_URUS" />
-					<Add option="-DCONFIG_HAL_BOARD_SUBTYPE=HAL_BOARD_SUBTYPE_NONE" />
 					<Add option="-ffunction-sections" />
 					<Add option="-fdata-sections" />
 					<Add option="-fno-exceptions" />
 					<Add option="-Wno-unknown-pragmas" />
 					<Add option="-fpermissive" />
 					<Add option="-Wformat" />
-					<Add option="-Wshadow" />
 					<Add option="-Wl,--gc-sections" />
 					<Add option="-fsigned-char" />
-					<Add option="-Wcast-align" />
 					<Add option="-Wwrite-strings" />
 					<Add option="-Wno-unused-parameter" />
 					<Add option="-fno-threadsafe-statics" />
 					<Add option="-Wno-overflow" />
+					<Add option="-DCONFIG_HAL_BOARD=HAL_BOARD_URUS" />
+					<Add option="-DCONFIG_HAL_BOARD_SUBTYPE=HAL_BOARD_SUBTYPE_NONE" />
 					<Add option="-DCONFIG_SHAL_CORE=SHAL_CORE_CYGWIN" />
 					<Add option="-DHAVE_CMATH_ISFINITE=1" />
 					<Add option="-DHAVE_CMATH_ISINF=1" />
@@ -270,15 +271,15 @@
 					<Add option="-DNEED_CMATH_ISINF_STD_NAMESPACE=1" />
 					<Add option="-DNEED_CMATH_ISNAN_STD_NAMESPACE=1" />
 					<Add option="-D_GNU_SOURCE=1" />
-					<Add option="-O2" />
 					<Add directory="../../libraries" />
 					<Add directory="../../libraries/AP_Common/missing" />
 					<Add directory="$(#URUSSTOOL.base)/src/URUS/libraries" />
 					<Add directory="$(#URUSSTOOL.base)/src/URUS/libraries/AP_Common/missing" />
+					<Add directory="$(#URUSSTOOL.base)/src/URUS/modules/urus_modules/masterlibs/libraries" />
 				</Compiler>
 				<Linker>
-					<Add option="-Wl,--gc-sections" />
 					<Add option="-s" />
+					<Add option="-Wl,--gc-sections" />
 					<Add option="-pthread" />
 					<Add library="MasterApmLibs" />
 					<Add directory="../../build/uruscygwin/lib/Release" />
