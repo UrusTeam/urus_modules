@@ -124,25 +124,33 @@ void HAL_URUS::run(int argc, char * const argv[], Callbacks* callbacks) const
 
 void HAL_URUS::rcout_init()
 {
+#if !defined(SHAL_CORE_APM32U4)
     rcout = NSCORE_URUS::get_RCOutput();
     rcout->init();
+#endif
 }
 
 void HAL_URUS::rcin_init()
 {
+#if !defined(SHAL_CORE_APM32U4)
     rcin = NSCORE_URUS::get_RCInput();
     rcin->init();
+#endif
 }
 
 void HAL_URUS::analogin_init()
 {
+#if !defined(SHAL_CORE_APM32U4)
     analogin = NSCORE_URUS::get_AnalogIn();
     analogin->init();
+#endif
 }
 
 void HAL_URUS::i2c_init()
 {
+#if !defined(SHAL_CORE_APM32U4)
     i2c_mgr = NSCORE_URUS::get_I2CDeviceManager();
+#endif
 }
 
 static const HAL_URUS shal;
