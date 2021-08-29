@@ -22,11 +22,13 @@
 #include <avr/wdt.h>
 #include <util/atomic.h>
 
+#include <AP_HAL_URUS/AP_HAL_URUS.h>
+
 extern const AP_HAL::HAL &hal;
 
 #if defined(USBCON)
 
-volatile LineInfo _usbLineInfo = { 57600, 0x00, 0x00, 0x00, 0x00 };
+extern volatile LineInfo _usbLineInfo;
 static volatile int32_t breakValue = -1;
 
 extern const CDCDescriptor _cdcInterface PROGMEM;
@@ -44,8 +46,8 @@ const CDCDescriptor _cdcInterface =
 
 	//	CDC data interface
 	D_INTERFACE(CDC_DATA_INTERFACE,2,CDC_DATA_INTERFACE_CLASS,0,0),
-	D_ENDPOINT(USB_ENDPOINT_OUT(CDC_ENDPOINT_OUT),USB_ENDPOINT_TYPE_BULK,USB_EP_SIZE,2),
-	D_ENDPOINT(USB_ENDPOINT_IN (CDC_ENDPOINT_IN ),USB_ENDPOINT_TYPE_BULK,USB_EP_SIZE,2)
+	D_ENDPOINT(USB_ENDPOINT_OUT(CDC_ENDPOINT_OUT),USB_ENDPOINT_TYPE_BULK,USB_EP_SIZE,0),
+	D_ENDPOINT(USB_ENDPOINT_IN (CDC_ENDPOINT_IN ),USB_ENDPOINT_TYPE_BULK,USB_EP_SIZE,0)
 };
 
 int CDC_GetInterface(u8* interfaceNum)

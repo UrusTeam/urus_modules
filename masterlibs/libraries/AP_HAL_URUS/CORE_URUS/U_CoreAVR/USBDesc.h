@@ -16,8 +16,6 @@
    SOFTWARE.
  */
 
-//#define PLUGGABLE_USB_ENABLED
-
 #if defined(EPRST6)
 #define USB_ENDPOINTS 7 // AtMegaxxU4
 #else
@@ -43,4 +41,4 @@
 
 #define IMANUFACTURER   1
 #define IPRODUCT        2
-#define ISERIAL         0
+#define ISERIAL         3

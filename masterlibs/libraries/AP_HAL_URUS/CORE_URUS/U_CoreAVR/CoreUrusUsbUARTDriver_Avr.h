@@ -14,10 +14,14 @@
 class CLCoreUrusUsbUARTDriver_Avr : public NSCORE_URUS::CLCoreUrusUARTDriver
 {
 public:
-	CLCoreUrusUsbUARTDriver_Avr() { peek_buffer = -1; };
+
+    CLCoreUrusUsbUARTDriver_Avr()
+        :   NSCORE_URUS::CLCoreUrusUARTDriver()
+    { peek_buffer = -1; };
 
     void begin(uint32_t b);
     void begin(uint32_t b, uint16_t rxS, uint16_t txS) { peek_buffer = -1; };
+    void begin(unsigned long, uint8_t byte) { peek_buffer = -1; };
 	void end(void);
 
 	void _timer_tick(void) override;
@@ -42,6 +46,7 @@ public:
 	void flush(void);
 	size_t write(uint8_t);
 	size_t write(const uint8_t*, size_t);
+	operator bool();
 
 private:
 	int peek_buffer;

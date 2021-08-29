@@ -289,7 +289,6 @@ int USB_Send(u8 ep, const void* d, int len)
 			if (!ReadWriteAllowed())
 				continue;
 			len -= n;
-			len -= n;
 			if (ep & TRANSFER_ZERO)
 			{
 				while (n--)
@@ -786,8 +785,6 @@ ISR(USB_GEN_vect)
 
 //=======================================================================
 //=======================================================================
-
-CLCoreUrusUsbDevice_Avr usb_dev;
 
 CLCoreUrusUsbDevice_Avr::CLCoreUrusUsbDevice_Avr()
 {

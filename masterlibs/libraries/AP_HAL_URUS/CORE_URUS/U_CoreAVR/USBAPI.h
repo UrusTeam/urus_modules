@@ -22,8 +22,7 @@
 
 #if (CONFIG_HAL_BOARD == HAL_BOARD_URUS) && (CONFIG_SHAL_CORE == SHAL_CORE_APM) && defined(SHAL_CORE_APM32U4)
 
-#include "../CORE_URUS_NAMESPACE.h"
-#include "../CoreUrusUARTDriver.h"
+#include <AP_HAL_URUS/AP_HAL_URUS.h>
 
 #include <inttypes.h>
 #include <avr/pgmspace.h>
@@ -41,11 +40,19 @@ typedef unsigned long u32;
 #define USB_EP_SIZE 64
 #endif
 
+#ifdef TXRX_LEDS_ENABLED
 #define TX_RX_LED_INIT	DDRD |= (1<<5), DDRB |= (1<<0)
 #define TXLED0			PORTD |= (1<<5)
 #define TXLED1			PORTD &= ~(1<<5)
 #define RXLED0			PORTB |= (1<<0)
 #define RXLED1			PORTB &= ~(1<<0)
+#else
+#define TX_RX_LED_INIT
+#define TXLED0
+#define TXLED1
+#define RXLED0
+#define RXLED1
+#endif // TXRX_LEDS_ENABLED
 
 #define STRINGIFY(x) #x
 #define TOSTRING(x) STRINGIFY(x)
@@ -80,12 +87,8 @@ class CLCoreUrusUsbDevice_Avr
 {
 public:
 	CLCoreUrusUsbDevice_Avr();
-
 	void attach();
 };
-
-extern CLCoreUrusUsbDevice_Avr usb_dev;
-extern volatile LineInfo _usbLineInfo;
 
 //================================================================================
 //================================================================================
@@ -139,4 +142,4 @@ void USB_Flush(uint8_t ep);
 #endif
 
 #endif /* if defined(USBCON) */
-#endif
+#endif // __USBAPI__

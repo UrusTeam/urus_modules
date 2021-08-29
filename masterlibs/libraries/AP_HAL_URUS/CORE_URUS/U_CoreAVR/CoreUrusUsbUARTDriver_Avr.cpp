@@ -3,6 +3,18 @@
 
 #if (CONFIG_HAL_BOARD == HAL_BOARD_URUS) && (CONFIG_SHAL_CORE == SHAL_CORE_APM) && defined(SHAL_CORE_APM32U4)
 
+#include "USBAPI.h"
+#include <avr/wdt.h>
+#include <util/atomic.h>
+
+extern const AP_HAL::HAL &hal;
+
+CLCoreUrusUsbDevice_Avr usb_dev;
+
+#if defined(USBCON)
+
+volatile LineInfo _usbLineInfo = { 57600, 0x00, 0x00, 0x00, 0x00 };
+
 void CLCoreUrusUsbUARTDriver_Avr::begin(uint32_t b)
 {
     usb_dev.attach();
@@ -76,5 +88,22 @@ size_t CLCoreUrusUsbUARTDriver_Avr::write(const uint8_t *buffer, size_t size)
 
 	return 0;
 }
+
+// This operator is a convenient way for a sketch to check whether the
+// port has actually been configured and opened by the host (as opposed
+// to just being connected to the host).  It can be used, for example, in
+// setup() before printing to ensure that an application on the host is
+// actually ready to receive and display the data.
+// We add a short delay before returning to fix a bug observed by Federico
+// where the port is configured (lineState != 0) but not quite opened.
+CLCoreUrusUsbUARTDriver_Avr::operator bool() {
+	bool result = false;
+	if (_usbLineInfo.lineState > 0)
+		result = true;
+	hal.scheduler->delay(10);
+	return result;
+}
+
+#endif /* if defined(USBCON) */
 
 #endif

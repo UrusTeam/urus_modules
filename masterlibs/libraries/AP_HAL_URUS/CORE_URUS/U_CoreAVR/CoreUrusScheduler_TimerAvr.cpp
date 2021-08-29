@@ -44,7 +44,7 @@
 #define  AVR_TIMER_WGM2         WGM52
 #define  AVR_TIMER_WGM3         WGM53
 #define  AVR_TIMER_CS1          CS51
-#elif defined(SHAL_CORE_APM328) || defined(SHAL_CORE_APM16U)
+#elif defined(SHAL_CORE_APM328) || defined(SHAL_CORE_APM16U) || defined(SHAL_CORE_APM32U4)
 #define  AVR_TIMER_OVF_VECT     TIMER1_OVF_vect
 #define  AVR_TIMER_TCNT         TCNT1
 #define  AVR_TIMER_TIFR         TIFR1
