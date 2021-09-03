@@ -156,8 +156,8 @@
 #define HAL_COMPASS_DEFAULT HAL_COMPASS_URUS
 #define HAL_HAVE_BOARD_VOLTAGE  0
 #define DATAFLASH_NO_CLI 1
-#define HAL_GPIO_LED_ON           HIGH
-#define HAL_GPIO_LED_OFF          LOW
+#define HAL_GPIO_LED_ON           LOW
+#define HAL_GPIO_LED_OFF          HIGH
 #define HIL_SUPPORT 1
 #define HAL_GPIO_USB_MUX_PIN -1
 #else
