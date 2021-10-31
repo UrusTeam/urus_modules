@@ -84,12 +84,16 @@ void CORE_AVR::init_core() const
     coreScheduler.init();
 #if defined(SHAL_CORE_APM2) || defined(SHAL_CORE_APM328) || defined(SHAL_CORE_MEGA02)
     coreUARTA_Driver.begin(115200, 32, 32);
+#if defined(SHAL_CORE_APM328)
+    PORTD |= _BV(0);
+#else
     PORTD |= _BV(2);
+#endif // defined(SHAL_CORE_APM328)
 #endif
 #if defined(SHAL_CORE_APM32U4)
     coreUARTA_Driver.begin(115200);
     PORTD |= _BV(2);
-#endif // defined
+#endif // defined(SHAL_CORE_APM32U4)
 #if defined(SHAL_CORE_APM2) || defined(SHAL_CORE_MEGA02)
     PORTE |= _BV(0);
     PORTH |= _BV(0);
