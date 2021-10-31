@@ -7,6 +7,31 @@
 
 #include <avr/interrupt.h>
 
+#if defined(SHAL_CORE_APM328)
+#define HIGH_GPIO(pin)  PORTD |= 1<<pin
+#define LOW_GPIO(pin)   PORTD &= ~(1<<pin)
+
+#define CPU_DIV_8       8
+#define CPU_DIV_64      64
+#define CPU_DIV_256     256
+#define CPU_DIV_1024    1024
+
+#define CPU_DIVIDER     CPU_DIV_8
+#define TIMER_RESOLUTION_FACTOR 0x13
+#define TIMER_SPEED_US  (((1000 / ((F_CPU / 1000000) / CPU_DIVIDER)) * TIMER_RESOLUTION_FACTOR) / 1000)
+
+#define HZ_TO_US(hz)    1000000UL / hz
+#define DEFAULT_HZ      50
+
+static volatile uint16_t tick_freq = 0;
+static volatile uint16_t pwm_dat_chan_1 = 0;
+static volatile uint16_t pwm_dat_chan_2 = 0;
+static volatile uint16_t pwm_dat_chan_3 = 0;
+static volatile uint16_t pwm_dat_chan_4 = 0;
+static volatile uint16_t pwm_cnt = 0;
+
+#endif
+
 extern const AP_HAL::HAL& hal;
 
 CLCoreUrusRCOutput_Avr::CLCoreUrusRCOutput_Avr() :
@@ -64,24 +89,50 @@ void CLCoreUrusRCOutput_Avr::init()
     hal.gpio->pinMode(45, HAL_GPIO_OUTPUT); // CH_10 (PL4/OC5B)
     hal.gpio->pinMode(44, HAL_GPIO_OUTPUT); // CH_11 (PL5/OC5C)
 #elif defined(SHAL_CORE_APM328)
-    // --------------------- TIMER0: CH_1 and CH_2 -----------------------
-    hal.gpio->pinMode(5,HAL_GPIO_OUTPUT); // CH_1 (PD5/OC0B)
-    hal.gpio->pinMode(6,HAL_GPIO_OUTPUT); // CH_2 (PD6/OC0A)
+    TCCR0A = (1<<WGM01);
+#if CPU_DIVIDER == CPU_DIV_8
+    TCCR0B = (1<<CS01);
+#endif // CPU_DIVIDER
 
-    // WGM: 1 1 1 0. Clear Timer on Compare, TOP is ICR1.
-    // CS11: prescale by 8 => 0.5us tick
-    TCCR0A = (1<<WGM01)|(1<<WGM00);
-    TCCR0B = (1<<CS02) | (1<<CS00);
-    //ICR1 = 40000; // 0.5us tick => 50hz freq
-    OCR0A = 0xFF; // Init OCR registers to nil output signal
-    OCR0B = 0xFF;
+    OCR0A = TIMER_RESOLUTION_FACTOR; // Init OCR registers
 
-    // --------------- TIMER1: CH_3 ---------------------
-    hal.gpio->pinMode(10,HAL_GPIO_OUTPUT); // CH_3 (PB2/OC1B)
+    TIFR0 = _BV(TOV0) | _BV(OCF0B) | _BV(OCF0A);      //Clear pending interrupts
+    TIMSK0 = _BV(OCIE0A);    //Enable overflow interrupt
+
+    // --------------- TIMER1: CH_5 ---------------------
+    hal.gpio->pinMode(10,HAL_GPIO_OUTPUT); // CH_5 (PB2/OC1B)
+
+    tick_freq = (uint16_t)(HZ_TO_US(DEFAULT_HZ) / TIMER_SPEED_US);
 #endif
     SREG = oldSREGinit;
     sei();
 }
+
+#if defined(SHAL_CORE_APM328)
+ISR(TIMER0_COMPA_vect)
+{
+    if (pwm_cnt >= tick_freq) {
+        pwm_cnt = 0;
+    }
+    if (pwm_dat_chan_1 > 0) {
+        pwm_cnt < pwm_dat_chan_1 ? HIGH_GPIO(2) : LOW_GPIO(2);
+    }
+
+    if (pwm_dat_chan_2 > 0) {
+        pwm_cnt < pwm_dat_chan_2 ? HIGH_GPIO(3) : LOW_GPIO(3);
+    }
+
+    if (pwm_dat_chan_3 > 0) {
+        pwm_cnt < pwm_dat_chan_3 ? HIGH_GPIO(4) : LOW_GPIO(4);
+    }
+
+    if (pwm_dat_chan_4 > 0) {
+        pwm_cnt < pwm_dat_chan_4 ? HIGH_GPIO(5) : LOW_GPIO(5);
+    }
+
+    pwm_cnt++;
+}
+#endif // defined
 
 void CLCoreUrusRCOutput_Avr::set_freq(uint32_t chmask, uint16_t freq_hz)
 {
@@ -97,6 +148,10 @@ void CLCoreUrusRCOutput_Avr::set_freq(uint32_t chmask, uint16_t freq_hz)
 
     if ((chmask & ( _BV(CH_6) | _BV(CH_7) | _BV(CH_8))) != 0) {
         ICR3 = icr;
+    }
+#elif defined(SHAL_CORE_APM328)
+    if ((chmask & (_BV(CH_1) | _BV(CH_2) | _BV(CH_3) | _BV(CH_4))) != 0) {
+        tick_freq = (uint16_t)(HZ_TO_US(freq_hz) / TIMER_SPEED_US);
     }
 #endif
 }
@@ -129,11 +184,13 @@ uint16_t CLCoreUrusRCOutput_Avr::get_freq(uint8_t ch)
 #elif defined(SHAL_CORE_APM328)
         case CH_1:
         case CH_2:
-            icr = OCR0A;
-            break;
-        /* CH_3 share TIMER1 with input capture.
-         * The period is specified in OCR1A rater than the ICR. */
         case CH_3:
+        case CH_4:
+            icr = (tick_freq * TIMER_SPEED_US) << 1;
+            break;
+        /* CH_5 share TIMER1 with input capture.
+         * The period is specified in OCR1A rater than the ICR. */
+        case CH_5:
             icr = OCR1A;
             break;
 #endif
@@ -159,9 +216,23 @@ void CLCoreUrusRCOutput_Avr::enable_ch(uint8_t ch)
     case 9: TCCR5A |= (1<<COM5B1); break; // CH_10 : OC5B
     case 10: TCCR5A |= (1<<COM5C1); break; // CH_11 : OC5C
 #elif defined(SHAL_CORE_APM328)
-    case 0: TCCR0A |= (1<<COM0B1); break; // CH_1 : OC0B
-    case 1: TCCR0A |= (1<<COM0A1); break; // CH_2 : OC0A
-    case 2: TCCR1A |= (1<<COM1B1); break; // CH_3 : OC1B
+    case 0:
+        hal.gpio->pinMode(2, HAL_GPIO_OUTPUT);  // CH_1
+        chans_status |= _BV(CH_1);
+        break;
+    case 1:
+        chans_status |= _BV(CH_2);
+        hal.gpio->pinMode(3, HAL_GPIO_OUTPUT);  // CH_2
+        break;
+    case 2:
+        chans_status |= _BV(CH_3);
+        hal.gpio->pinMode(4, HAL_GPIO_OUTPUT);  // CH_3
+        break;
+    case 3:
+        chans_status |= _BV(CH_4);
+        hal.gpio->pinMode(5, HAL_GPIO_OUTPUT);  // CH_4
+        break;
+    case 4: TCCR1A |= (1<<COM1B1); break; // CH_5 : OC1B
 #endif
     }
 }
@@ -181,9 +252,27 @@ void CLCoreUrusRCOutput_Avr::disable_ch(uint8_t ch)
     case 9: TCCR5A &= ~(1<<COM5B1); break; // CH_10 : OC5B
     case 10: TCCR5A &= ~(1<<COM5C1); break; // CH_11 : OC5C
 #elif defined(SHAL_CORE_APM328)
-    case 0: TCCR0A &= ~(1<<COM0B1); break; // CH_1 : OC0B
-    case 1: TCCR0A &= ~(1<<COM0A1); break; // CH_2 : OC0A
-    case 2: TCCR1A &= ~(1<<COM1B1); break; // CH_3 : OC1B
+    case 0:
+        chans_status &= ~_BV(CH_1);
+        pwm_dat_chan_1 = 0;
+        LOW_GPIO(2);  // CH_1
+        break;
+    case 1:
+        chans_status &= ~_BV(CH_2);
+        pwm_dat_chan_2 = 0;
+        LOW_GPIO(3);  // CH_2
+        break;
+    case 2:
+        chans_status &= ~_BV(CH_3);
+        pwm_dat_chan_3 = 0;
+        LOW_GPIO(4);  // CH_3
+        break;
+    case 3:
+        pwm_dat_chan_4 = 0;
+        chans_status &= ~_BV(CH_4);
+        LOW_GPIO(5);  // CH_4
+        break;
+    case 4: TCCR1A &= ~(1<<COM1B1); break; // CH_5 : OC1B
 #endif
     }
 }
@@ -200,6 +289,9 @@ void CLCoreUrusRCOutput_Avr::write(uint8_t ch, uint16_t period_us)
     /* constrain, then scale from 1us resolution (input units)
      * to 0.5us (timer units) */
     uint16_t pwm = constrain_period(period_us) << 1;
+#if defined(SHAL_CORE_APM328)
+    uint16_t pwm_dat = (pwm >> 1) / TIMER_SPEED_US;
+#endif // defined
     switch(ch)
     {
 #if defined(SHAL_CORE_APM2) || defined(SHAL_CORE_MEGA02)
@@ -214,9 +306,29 @@ void CLCoreUrusRCOutput_Avr::write(uint8_t ch, uint16_t period_us)
     case 9:  OCR5B=pwm; break;  // out10
     case 10: OCR5C=pwm; break;  // out11
 #elif defined(SHAL_CORE_APM328)
-    case 0:  OCR0B=(uint8_t)(pwm >> 7); break;   // out1
-    case 1:  OCR0A=(uint8_t)(pwm >> 7); break;   // out2
-    case 2:  OCR1B=pwm; break;          // out3
+    case 0:
+        if (((chans_status >> CH_1) & 0x01) == 1) {
+            pwm_dat_chan_1 = pwm_dat;
+        }
+        break;
+    case 1:
+        if (((chans_status >> CH_2) & 0x01) == 1) {
+            pwm_dat_chan_2 = pwm_dat;
+        }
+        break;
+    case 2:
+        if (((chans_status >> CH_3) & 0x01) == 1) {
+            pwm_dat_chan_3 = pwm_dat;
+        }
+        break;
+    case 3:
+        if (((chans_status >> CH_4) & 0x01) == 1) {
+            pwm_dat_chan_4 = pwm_dat;
+        }
+        break;
+    case 4:
+        OCR1B = pwm;
+        break;
 #endif
     }
 }
@@ -244,14 +356,15 @@ uint16_t CLCoreUrusRCOutput_Avr::read(uint8_t ch)
     case 9:  pwm=OCR5B; break;      // out10
     case 10: pwm=OCR5C; break;      // out11
 #elif defined(SHAL_CORE_APM328)
-    case 0:  pwm=(uint16_t)(OCR0B << 7); break; // out1
-    case 1:  pwm=(uint16_t)(OCR0A << 7); break; // out2
-    case 2:  pwm=OCR1B; break;                  // out3
+    case 0:  pwm=(pwm_dat_chan_1 * TIMER_SPEED_US) << 1; break; // out1
+    case 1:  pwm=(pwm_dat_chan_2 * TIMER_SPEED_US) << 1; break; // out2
+    case 2:  pwm=(pwm_dat_chan_3 * TIMER_SPEED_US) << 1; break; // out3
+    case 3:  pwm=(pwm_dat_chan_4 * TIMER_SPEED_US) << 1; break; // out4
+    case 4:  pwm=OCR1B; break;                                  // out5
 #endif
     }
     /* scale from 0.5us resolution (timer units) to 1us units */
     return pwm>>1;
-
 }
 
 void CLCoreUrusRCOutput_Avr::read(uint16_t* period_us, uint8_t len)

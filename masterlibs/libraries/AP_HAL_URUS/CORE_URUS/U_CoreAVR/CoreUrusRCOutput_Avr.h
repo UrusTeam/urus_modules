@@ -21,6 +21,9 @@ public:
 
 private:
     uint16_t _timer_period(uint16_t speed_hz);
+#if defined(SHAL_CORE_APM328)
+    uint8_t chans_status;
+#endif // defined
 };
 
 #endif // __SHAL_CORE_APM__
