@@ -412,9 +412,9 @@ private:
     } _state[COMPASS_MAX_INSTANCES];
 
     AP_Int16 _offset_max;
-
+#if !HAL_MINIMIZE_FEATURES
     CompassCalibrator _calibrator[COMPASS_MAX_INSTANCES];
-
+#endif
     // if we want HIL only
     bool _hil_mode:1;
 

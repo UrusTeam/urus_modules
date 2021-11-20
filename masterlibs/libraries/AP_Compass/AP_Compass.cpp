@@ -479,7 +479,11 @@ Compass::init()
 uint8_t Compass::register_compass(void)
 {
     if (_compass_count == COMPASS_MAX_INSTANCES) {
+#if !HAL_MINIMIZE_FEATURES_AVR
         AP_HAL::panic(PSTR("Too many compass instances"));
+#else
+        AP_HAL::panic(PSTR("E:comp-1"));
+#endif
     }
     return _compass_count++;
 }
@@ -491,7 +495,11 @@ bool Compass::_add_backend(AP_Compass_Backend *backend, const char *name, bool e
     }
 
     if (_backend_count == COMPASS_MAX_BACKEND) {
+#if !HAL_MINIMIZE_FEATURES_AVR
         AP_HAL::panic(PSTR("Too many compass backends"));
+#else
+        AP_HAL::panic(PSTR("E:comp-2"));
+#endif
     }
 
     _backends[_backend_count++] = backend;
@@ -780,7 +788,11 @@ void Compass::_detect_backends(void)
 
     if (_backend_count == 0 ||
         _compass_count == 0) {
+#if !HAL_MINIMIZE_FEATURES_AVR
         hal.console->printf_PS(PSTR("No Compass backends available\n"));
+#else
+        hal.console->printf_PS(PSTR("N comp bknd\n"));
+#endif
     }
 }
 

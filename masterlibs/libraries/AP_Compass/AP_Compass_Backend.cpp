@@ -8,7 +8,7 @@ extern const AP_HAL::HAL& hal;
 AP_Compass_Backend::AP_Compass_Backend(Compass &compass) :
     _compass(compass)
 {
-    _sem = hal.util->new_semaphore();    
+    _sem = hal.util->new_semaphore();
 }
 
 void AP_Compass_Backend::rotate_field(Vector3f &mag, uint8_t instance)
@@ -34,8 +34,9 @@ void AP_Compass_Backend::publish_raw_field(const Vector3f &mag, uint8_t instance
     // EKF and DCM would end up consuming compass data at the full
     // sensor rate. We want them to consume only the filtered fields
     state.last_update_ms = AP_HAL::millis();
-
+#if !HAL_MINIMIZE_FEATURES
     _compass._calibrator[instance].new_sample(mag);
+#endif
 }
 
 void AP_Compass_Backend::correct_field(Vector3f &mag, uint8_t i)
@@ -96,8 +97,8 @@ void AP_Compass_Backend::set_last_update_usec(uint32_t last_update, uint8_t inst
   should be used in publish_field()
  */
 uint8_t AP_Compass_Backend::register_compass(void) const
-{ 
-    return _compass.register_compass(); 
+{
+    return _compass.register_compass();
 }
 
 

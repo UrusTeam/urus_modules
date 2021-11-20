@@ -162,7 +162,11 @@ bool AP_Compass_HMC5843::init()
 
     if (!bus_sem || !bus_sem->take(5)) {
         hal.scheduler->resume_timer_procs();
+#if !HAL_MINIMIZE_FEATURES_AVR
         hal.console->printf_PS(PSTR("HMC5843: Unable to get bus semaphore\n"));
+#else
+        hal.console->printf_PS(PSTR("HMC:E:1\n"));
+#endif
         return false;
     }
 
@@ -171,17 +175,29 @@ bool AP_Compass_HMC5843::init()
     //_bus->set_retries(10);
 
     if (!_bus->configure()) {
+#if !HAL_MINIMIZE_FEATURES_AVR
         hal.console->printf_PS(PSTR("HMC5843: Could not configure the bus\n"));
+#else
+        hal.console->printf_PS(PSTR("HMC:E:2\n"));
+#endif
         goto errout;
     }
 
     if (!_check_whoami()) {
+#if !HAL_MINIMIZE_FEATURES_AVR
         hal.console->printf_PS(PSTR("HMC5843: not a HMC device\n"));
+#else
+        hal.console->printf_PS(PSTR("HMC:E:3\n"));
+#endif
         goto errout;
     }
 
     if (!_calibrate()) {
+#if !HAL_MINIMIZE_FEATURES_AVR
         hal.console->printf_PS(PSTR("HMC5843: Could not calibrate sensor\n"));
+#else
+        hal.console->printf_PS(PSTR("HMC:E:4\n"));
+#endif
         goto errout;
     }
 
@@ -190,7 +206,11 @@ bool AP_Compass_HMC5843::init()
     }
 
     if (!_bus->start_measurements()) {
+#if !HAL_MINIMIZE_FEATURES_AVR
         hal.console->printf_PS(PSTR("HMC5843: Could not start measurements on bus\n"));
+#else
+        hal.console->printf_PS(PSTR("HMC:E:5\n"));
+#endif
         goto errout;
     }
 
