@@ -67,8 +67,13 @@
 //#define TicksToMicros(x) (x * (40000 / 2))
 //#define TicksToMillis(x) (x * (40000 / 2000))
 
-static volatile uint32_t timer_micros_counter = 0;
+static volatile uint16_t timer_micros_counter = 0;
+//static volatile uint32_t timer_micros_counter = 4294966296;
+//static volatile uint16_t timer_micros_ovf = 0;
 static volatile uint32_t timer_millis_counter = 0;
+
+//static volatile uint32_t _time_millis_tmp = 0;
+//static volatile uint32_t _timer_millis_counter = 0;
 
 AVRTimer::AVRTimer()
 {}
@@ -118,14 +123,21 @@ void AVRTimer::init()
     SREG = oldSREGinit;
 }
 
-ISR( AVR_TIMER_OVF_VECT)
+ISR( AVR_TIMER_OVF_VECT, ISR_NOBLOCK)
 {
     //time_micros += 1;
     //time_millis += 1;
     // Hardcoded for AVR@16MHZ and 8x pre-scale 16-bit timer overflow at 40000
 
-    timer_micros_counter += 40000 / 2; // 20000us each overflow
-    timer_millis_counter += 40000 / 2000; // 20ms each overlflow
+    //timer_micros_counter += 40000 / 2; // 20000us each overflow
+    //timer_millis_counter += 40000 / 2000; // 20ms each overlflow
+/*
+    if (timer_micros_counter == 0xFFFF) {
+        timer_micros_ovf += 1;
+    }
+*/
+    timer_micros_counter += 1;
+    timer_millis_counter += 1;
 
 }
 
@@ -159,17 +171,23 @@ uint32_t AVRTimer::micros()
     //uint32_t time_micros = timer_micros_counter + (AVR_TIMER_TCNT / 2);
     //uint32_t time_micros = timer_micros_counter + (AVR_TIMER_TCNT >> 1);
 
-    uint32_t time_micros = timer_micros_counter;
+    uint16_t time_micros = timer_micros_counter;
     uint16_t tcnt = AVR_TIMER_TCNT;
+    //uint16_t time_ovf = timer_micros_ovf;
 
     // Check for  imminent timer overflow interrupt and pre-increment counter
     if ( AVR_TIMER_TIFR & 1 && tcnt < 39999 )
     {
-            time_micros += 40000 / 2;
+            //time_micros += 40000 / 2;
+            if (time_micros )
+            time_micros += 1;
     }
     SREG = oldSREG;
 
-	return  time_micros + (tcnt >> 1);
+    //time_micros = time_micros * 20000;
+	//return  time_micros + (tcnt >> 1);
+	//return ((uint32_t)time_micros * 20000) + ((uint32_t)tcnt >> 1) + ((uint32_t)time_ovf * 0xFFFF * 20000);
+	return ((uint32_t)time_micros * 20000) + ((uint32_t)tcnt >> 1);
 
 }
 
@@ -202,18 +220,39 @@ uint32_t AVRTimer::millis()
     //uint32_t time_millis = timer_millis_counter + (AVR_TIMER_TCNT / 2000) ;
     //uint32_t time_millis =  timer_millis_counter + (AVR_TIMER_TCNT >> 11); // AVR_TIMER_CNT / 2048 is close enough (24us counter delay)
 
-    uint32_t time_millis =  timer_millis_counter;
+    //uint32_t time_millis =  timer_millis_counter;
+    uint32_t time_micros = timer_millis_counter;
     uint16_t tcnt = AVR_TIMER_TCNT;
+    //uint16_t time_ovf = timer_micros_ovf;
 
     // Check for imminent timer overflow interrupt and pre-increment counter
     if ( AVR_TIMER_TIFR & 1 && tcnt < 39999 )
     {
-            time_millis += 40000 / 2000;
+            //time_millis += 40000 / 2000;
+            time_micros += 1;
     }
     SREG = oldSREG;
 
-	return  time_millis + (tcnt >> 11);
+    //time_micros = time_micros * 20;
+	//return  time_millis + (tcnt >> 11);
+	//return  time_micros + (tcnt >> 11);
+	//return  ((uint32_t)time_micros * 20) + ((uint32_t)tcnt / 2000)  + ((uint32_t)time_ovf * 0xFFFF * 20);
+	return ((uint32_t)time_micros * 20) + ((uint32_t)tcnt / 2000);
 
+/*
+    uint16_t timtmp = (uint16_t)(micros() / 998);
+    _time_millis_tmp = timtmp - _time_millis_tmp;
+
+    if ((int32_t)_time_millis_tmp < 0) {
+        _time_millis_tmp = timtmp + 20;
+    }
+
+    _timer_millis_counter = _timer_millis_counter + _time_millis_tmp;
+
+    _time_millis_tmp = timtmp;
+
+    return _timer_millis_counter;
+*/
 }
 
 #endif // __SHAL_CORE_APM__

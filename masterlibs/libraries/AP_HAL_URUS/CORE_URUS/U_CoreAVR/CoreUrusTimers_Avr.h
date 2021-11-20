@@ -10,8 +10,8 @@ public:
 
     AVRTimer();
     static void     init();
-    static uint32_t micros();
-    static uint32_t millis();
+    uint32_t micros();
+    uint32_t millis();
     //static void delay_microseconds(uint16_t us);
 };
 
