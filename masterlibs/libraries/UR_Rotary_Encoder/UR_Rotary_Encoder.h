@@ -113,8 +113,8 @@ public:
 private:
 
     // rotary encoder state
-    static rot_enc_state_t _rotenc_state;
-    static rot_enc_conf_t _rotenc_conf;
+    static volatile rot_enc_state_t _rotenc_state;
+    static volatile rot_enc_conf_t _rotenc_conf;
     static flipflop_t _flipflop;
 
     // stores last timedelta microseconds per step result.

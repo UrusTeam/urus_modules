@@ -21,6 +21,10 @@
 
 #include "UR_Rotary_Encoder.h"
 
+#if (CONFIG_SHAL_CORE == SHAL_CORE_APM)
+#include <avr/interrupt.h>
+#endif
+
 #define ROT_PIN_A   2
 #define ROT_PIN_B   4
 
@@ -35,10 +39,10 @@
 
 extern const AP_HAL::HAL& hal;
 
-UR_Rotary_Encoder::rot_enc_state_t UR_Rotary_Encoder::_rotenc_state;
+volatile UR_Rotary_Encoder::rot_enc_state_t UR_Rotary_Encoder::_rotenc_state;
 UR_Rotary_Encoder::flipflop_t UR_Rotary_Encoder::_flipflop = {.clock = 0};
 uint32_t UR_Rotary_Encoder::_uspstp = 0;
-UR_Rotary_Encoder::rot_enc_conf_t UR_Rotary_Encoder::_rotenc_conf;
+volatile UR_Rotary_Encoder::rot_enc_conf_t UR_Rotary_Encoder::_rotenc_conf;
 
 UR_Rotary_Encoder::UR_Rotary_Encoder()
 {
@@ -63,22 +67,44 @@ void UR_Rotary_Encoder::inverted_dir(bool inverted)
 
 UR_Rotary_Encoder::DIR_ROT UR_Rotary_Encoder::get_enc_dir()
 {
+#if (CONFIG_SHAL_CORE == SHAL_CORE_APM)
+    uint8_t oldSREG = SREG;
+	cli();
+	DIR_ROT encstate = _rotenc_state.dir_enc;
+	SREG = oldSREG;
+	return encstate;
+#else
     return _rotenc_state.dir_enc;
+#endif
 }
 
 bool UR_Rotary_Encoder::get_step_status()
 {
+#if (CONFIG_SHAL_CORE == SHAL_CORE_APM)
+    uint8_t oldSREG = SREG;
+	cli();
+#endif
     bool status = _rotenc_state.step_status;
     if (status) {
         _rotenc_state.step_status = false;
     }
-
+#if (CONFIG_SHAL_CORE == SHAL_CORE_APM)
+    SREG = oldSREG;
+#endif
     return status;
 }
 
 uint16_t UR_Rotary_Encoder::get_step_val()
 {
+#if (CONFIG_SHAL_CORE == SHAL_CORE_APM)
+    uint8_t oldSREG = SREG;
+	cli();
+	uint16_t step = _rotenc_state.step_cnt;
+	SREG = oldSREG;
+	return step;
+#else
     return _rotenc_state.step_cnt;
+#endif
 }
 
 void UR_Rotary_Encoder::set_step_val(uint16_t val)
