@@ -44,10 +44,10 @@ AP_Baro_BMP085::AP_Baro_BMP085(AP_Baro &baro, AP_HAL::OwnPtr<AP_HAL::I2CDevice> 
 
     // take i2c bus sempahore
     if (!sem->take(HAL_SEMAPHORE_BLOCK_FOREVER)) {
-#if defined(SHAL_CORE_APM2) || defined(SHAL_CORE_MEGA02) || defined(SHAL_CORE_APM328)
+#if !HAL_MINIMIZE_FEATURES_AVR
         AP_HAL::panic(PSTR("BMP085: unable to get semaphore"));
 #else
-        AP_HAL::panic("BMP085: unable to get semaphore");
+        AP_HAL::panic(PSTR("BMP:e-1"));
 #endif
     }
 
@@ -58,10 +58,10 @@ AP_Baro_BMP085::AP_Baro_BMP085(AP_Baro &baro, AP_HAL::OwnPtr<AP_HAL::I2CDevice> 
 
     // We read the calibration data registers
     if (!_dev->read_registers(0xAA, buff, sizeof(buff))) {
-#if defined(SHAL_CORE_APM2) || defined(SHAL_CORE_MEGA02) || defined(SHAL_CORE_APM328)
+#if !HAL_MINIMIZE_FEATURES_AVR
         AP_HAL::panic(PSTR("BMP085: bad calibration registers"));
 #else
-        AP_HAL::panic("BMP085: bad calibration registers");
+        AP_HAL::panic(PSTR("BMP:e-2"));
 #endif
     }
 
@@ -89,7 +89,7 @@ AP_Baro_BMP085::AP_Baro_BMP085(AP_Baro &baro, AP_HAL::OwnPtr<AP_HAL::I2CDevice> 
 
     sem->give();
 
-    _dev->register_periodic_callback(20000, FUNCTOR_BIND_MEMBER(&AP_Baro_BMP085::_timer, void));
+    //_dev->register_periodic_callback(20000, FUNCTOR_BIND_MEMBER(&AP_Baro_BMP085::_timer, void));
 }
 
 /*
@@ -116,11 +116,20 @@ void AP_Baro_BMP085::_timer(void)
     }
 }
 
+void AP_Baro_BMP085::accumulate()
+{
+}
 /*
   transfer data to the frontend
  */
 void AP_Baro_BMP085::update(void)
 {
+    if (!_data_ready()) {
+        return;
+    }
+
+    _timer();
+
     hal.scheduler->suspend_timer_procs();
     if (_sem->take_nonblocking()) {
         if (!_has_sample) {

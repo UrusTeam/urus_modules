@@ -1,7 +1,9 @@
 #pragma once
 
 #include <AP_HAL/AP_HAL.h>
+#if !HAL_MINIMIZE_FEATURES_AVR
 #include <AP_Param/AP_Param.h>
+#endif
 #include <Filter/Filter.h>
 #include <Filter/DerivativeFilter.h>
 
@@ -21,7 +23,9 @@ class AP_Baro_Backend;
 class AP_Baro
 {
     friend class AP_Baro_Backend;
+#if !HAL_MINIMIZE_FEATURES_AVR
     friend class AP_Baro_SITL; // for access to sensors[]
+#endif
 
 public:
     AP_Baro();
@@ -96,7 +100,11 @@ public:
     // ground pressure in Pascal
     // the ground values are only valid after calibration
     float get_ground_pressure(void) const { return get_ground_pressure(_primary); }
+#if !HAL_MINIMIZE_FEATURES_AVR
     float get_ground_pressure(uint8_t i)  const { return sensors[i].ground_pressure.get(); }
+#else
+    float get_ground_pressure(uint8_t i)  const { return sensors[i].ground_pressure; }
+#endif
 
     // set the temperature to be used for altitude calibration. This
     // allows an external temperature source (such as a digital
@@ -121,7 +129,11 @@ public:
     void setHIL(uint8_t instance, float pressure, float temperature, float altitude, float climb_rate, uint32_t last_update_ms);
 
     // Set the primary baro
+#if !HAL_MINIMIZE_FEATURES_AVR
     void set_primary_baro(uint8_t primary) { _primary_baro.set_and_save(primary); };
+#else
+    void set_primary_baro(uint8_t primary) { _primary_baro = primary; };
+#endif
 
     // Set the type (Air or Water) of a particular instance
     void set_type(uint8_t instance, baro_type_t type) { sensors[instance].type = type; };
@@ -190,21 +202,39 @@ private:
         float pressure;                 // pressure in Pascal
         float temperature;              // temperature in degrees C
         float altitude;                 // calculated altitude
+#if !HAL_MINIMIZE_FEATURES_AVR
         AP_Float ground_pressure;
+#else
+        float ground_pressure;
+#endif
         float p_correction;
     } sensors[BARO_MAX_INSTANCES];
 
+#if !HAL_MINIMIZE_FEATURES_AVR
     AP_Float                            _alt_offset;
+#else
+    float                               _alt_offset;
+#endif
     float                               _alt_offset_active;
+#if !HAL_MINIMIZE_FEATURES_AVR
     AP_Int8                             _primary_baro; // primary chosen by user
     AP_Int8                             _ext_bus; // bus number for external barometer
+#else
+    int8_t                              _primary_baro; // primary chosen by user
+    int8_t                              _ext_bus; // bus number for external barometer
+#endif
     float                               _last_altitude_EAS2TAS;
     float                               _EAS2TAS;
     float                               _external_temperature;
     uint32_t                            _last_external_temperature_ms;
     DerivativeFilterFloat_Size7         _climb_rate_filter;
+#if !HAL_MINIMIZE_FEATURES_AVR
     AP_Float                            _specific_gravity; // the specific gravity of fluid for an ROV 1.00 for freshwater, 1.024 for salt water
     AP_Float                            _user_ground_temperature; // user override of the ground temperature used for EAS2TAS
+#else
+    float                               _specific_gravity; // the specific gravity of fluid for an ROV 1.00 for freshwater, 1.024 for salt water
+    float                               _user_ground_temperature; // user override of the ground temperature used for EAS2TAS
+#endif
     bool                                _hil_mode:1;
     float                               _guessed_ground_temperature; // currently ground temperature estimate using our best abailable source
 

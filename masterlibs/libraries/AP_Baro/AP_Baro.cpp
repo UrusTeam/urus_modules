@@ -46,7 +46,7 @@
 #define INTERNAL_TEMPERATURE_CLAMP 45.0f
 
 extern const AP_HAL::HAL& hal;
-
+#if !HAL_MINIMIZE_FEATURES_AVR
 // table of user settable parameters
 const AP_Param::GroupInfo AP_Baro::var_info[] PROGMEM = {
     // NOTE: Index numbers 0 and 1 were for the old integer
@@ -132,13 +132,16 @@ const AP_Param::GroupInfo AP_Baro::var_info[] PROGMEM = {
 
     AP_GROUPEND
 };
+#endif
 
 /*
   AP_Baro constructor
  */
 AP_Baro::AP_Baro()
 {
+#if !HAL_MINIMIZE_FEATURES_AVR
     AP_Param::setup_object_defaults(this, var_info);
+#endif
 }
 
 // calibrate the barometer. This must be called at least once before
@@ -147,7 +150,11 @@ void AP_Baro::calibrate(bool save)
 {
     // reset the altitude offset when we calibrate. The altitude
     // offset is supposed to be for within a flight
+#if !HAL_MINIMIZE_FEATURES_AVR
     _alt_offset.set_and_save(0);
+#else
+    _alt_offset = 0;
+#endif
 
     // start by assuming all sensors are calibrated (for healthy() test)
     for (uint8_t i=0; i<_num_sensors; i++) {
@@ -167,7 +174,7 @@ void AP_Baro::calibrate(bool save)
                 AP_HAL::panic(PSTR("PANIC: AP_Baro::read unsuccessful "
                         "for more than 500ms in AP_Baro::calibrate [2]\r\n"));
 #else
-                AP_HAL::panic(PSTR("PNC! Baro::cal [2]\r\n"));
+                AP_HAL::panic(PSTR("bar:e-1"));
 #endif
             }
             hal.scheduler->delay(10);
@@ -191,7 +198,7 @@ void AP_Baro::calibrate(bool save)
                 AP_HAL::panic(PSTR("PANIC: AP_Baro::read unsuccessful "
                         "for more than 500ms in AP_Baro::calibrate [3]\r\n"));
 #else
-                AP_HAL::panic(PSTR("PNC! Baro::cal [3]\r\n"));
+                AP_HAL::panic(PSTR("bar:e-2"));
 #endif
             }
         } while (!healthy());
@@ -209,7 +216,11 @@ void AP_Baro::calibrate(bool save)
             sensors[i].calibrated = false;
         } else {
             if (save) {
+#if !HAL_MINIMIZE_FEATURES_AVR
                 sensors[i].ground_pressure.set_and_save(sum_pressure[i] / count[i]);
+#else
+                sensors[i].ground_pressure = sum_pressure[i] / count[i];
+#endif
             }
         }
     }
@@ -225,7 +236,7 @@ void AP_Baro::calibrate(bool save)
 #if !HAL_MINIMIZE_FEATURES_AVR
     AP_HAL::panic(PSTR("AP_Baro: all sensors uncalibrated"));
 #else
-    AP_HAL::panic(PSTR("Baro: uncal"));
+    AP_HAL::panic(PSTR("bar:e-3"));
 #endif
 }
 
@@ -238,13 +249,19 @@ void AP_Baro::update_calibration()
 {
     for (uint8_t i=0; i<_num_sensors; i++) {
         if (healthy(i)) {
+#if !HAL_MINIMIZE_FEATURES_AVR
             sensors[i].ground_pressure.set(get_pressure(i));
+#else
+            sensors[i].ground_pressure = get_pressure(i);
+#endif
         }
 
         // don't notify the GCS too rapidly or we flood the link
         uint32_t now = AP_HAL::millis();
         if (now - _last_notify_ms > 10000) {
+#if !HAL_MINIMIZE_FEATURES_AVR
             sensors[i].ground_pressure.notify();
+#endif
             _last_notify_ms = now;
         }
     }
@@ -280,6 +297,7 @@ float AP_Baro::get_altitude_difference(float base_pressure, float pressure) cons
 // return current scale factor that converts from equivalent to true airspeed
 // valid for altitudes up to 10km AMSL
 // assumes standard atmosphere lapse rate
+
 float AP_Baro::get_EAS2TAS(void)
 {
     float altitude = get_altitude();
@@ -374,7 +392,7 @@ bool AP_Baro::_add_backend(AP_Baro_Backend *backend)
 #if !HAL_MINIMIZE_FEATURES_AVR
         AP_HAL::panic(PSTR("Too many barometer drivers"));
 #else
-        AP_HAL::panic(PSTR("many baro drvs"));
+        AP_HAL::panic(PSTR("bar:e-4"));
 #endif
     }
     drivers[_num_drivers++] = backend;
@@ -400,8 +418,12 @@ void AP_Baro::init(void)
 {
     // ensure that there isn't a previous ground temperature saved
     if (!is_zero(_user_ground_temperature)) {
+#if !HAL_MINIMIZE_FEATURES_AVR
         _user_ground_temperature.set_and_save(0.0f);
         _user_ground_temperature.notify();
+#else
+        _user_ground_temperature = 0.0f;
+#endif
     }
 
 #if CONFIG_HAL_BOARD == HAL_BOARD_SITL
@@ -519,7 +541,9 @@ void AP_Baro::init(void)
         AP_BoardConfig::sensor_config_error("Baro: unable to initialise driver");
 #endif
     }
+#if HAL_BARO_DEFAULT != HAL_BARO_URUS
     drivers[_num_drivers++] = new AP_Baro_URUS(*this);
+#endif // HAL_BARO_DEFAULT
 }
 
 /*
@@ -617,7 +641,7 @@ uint8_t AP_Baro::register_sensor(void)
 #if !HAL_MINIMIZE_FEATURES_AVR
         AP_HAL::panic(PSTR("Too many barometers"));
 #else
-        AP_HAL::panic(PSTR("many baros"));
+        AP_HAL::panic(PSTR("bar:e-5"));
 #endif
     }
     return _num_sensors++;

@@ -14,6 +14,7 @@ public:
 
     /* AP_Baro public interface: */
     void update();
+    void accumulate();
 
 private:
     void _cmd_read_pressure();
