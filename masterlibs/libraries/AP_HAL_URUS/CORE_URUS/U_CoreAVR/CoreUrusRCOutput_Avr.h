@@ -19,6 +19,15 @@ public:
     uint16_t read(uint8_t ch);
     void read(uint16_t* period_us, uint8_t len);
 
+#if defined(SHAL_CORE_APM328)
+    static volatile uint16_t tick_freq;
+    static volatile uint16_t pwm_dat_chan_1;
+    static volatile uint16_t pwm_dat_chan_2;
+    static volatile uint16_t pwm_dat_chan_3;
+    static volatile uint16_t pwm_dat_chan_4;
+    static volatile uint16_t pwm_cnt;
+#endif // defined
+
 private:
     uint16_t _timer_period(uint16_t speed_hz);
 #if defined(SHAL_CORE_APM328)

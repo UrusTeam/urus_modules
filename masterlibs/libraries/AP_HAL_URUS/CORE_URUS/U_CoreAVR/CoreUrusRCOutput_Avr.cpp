@@ -11,24 +11,33 @@
 #define HIGH_GPIO(pin)  PORTD |= 1<<pin
 #define LOW_GPIO(pin)   PORTD &= ~(1<<pin)
 
+#define CDIV_8      1 << CS01
+#define CDIV_64     (1 << CS01) | (1 << CS00)
+#define CDIV_256    1 << CS02
+#define CDIV_1024   (1 << CS02) | (1 << CS00)
+
 #define CPU_DIV_8       8
 #define CPU_DIV_64      64
 #define CPU_DIV_256     256
 #define CPU_DIV_1024    1024
 
-#define CPU_DIVIDER     CPU_DIV_8
-#define TIMER_RESOLUTION_FACTOR 0x13
-#define TIMER_SPEED_US  (((1000 / ((F_CPU / 1000000) / CPU_DIVIDER)) * TIMER_RESOLUTION_FACTOR) / 1000)
-
+#define CPU_DIVIDER     CPU_DIV_64
+#define TIMER_RESOLUTION_FACTOR 0x07
+#define TIMER_SPEED_US  (((1000000000ULL / (F_CPU / CPU_DIVIDER)) * TIMER_RESOLUTION_FACTOR) / 1000)
+/*
+#define TIMER_SPEED_US_BASE  (1000000000ULL / (F_CPU / CPU_DIVIDER))
+#define TIMER_RESOLUTION_FACTOR (62500 / TIMER_SPEED_US_BASE)
+#define TIMER_SPEED_US  ((TIMER_SPEED_US_BASE * TIMER_RESOLUTION_FACTOR) / 1000)
+*/
 #define HZ_TO_US(hz)    1000000UL / hz
 #define DEFAULT_HZ      50
 
-static volatile uint16_t tick_freq = 0;
-static volatile uint16_t pwm_dat_chan_1 = 0;
-static volatile uint16_t pwm_dat_chan_2 = 0;
-static volatile uint16_t pwm_dat_chan_3 = 0;
-static volatile uint16_t pwm_dat_chan_4 = 0;
-static volatile uint16_t pwm_cnt = 0;
+volatile uint16_t CLCoreUrusRCOutput_Avr::tick_freq = 0;
+volatile uint16_t CLCoreUrusRCOutput_Avr::pwm_dat_chan_1 = 0;
+volatile uint16_t CLCoreUrusRCOutput_Avr::pwm_dat_chan_2 = 0;
+volatile uint16_t CLCoreUrusRCOutput_Avr::pwm_dat_chan_3 = 0;
+volatile uint16_t CLCoreUrusRCOutput_Avr::pwm_dat_chan_4 = 0;
+volatile uint16_t CLCoreUrusRCOutput_Avr::pwm_cnt = 0;
 
 #endif
 
@@ -90,47 +99,53 @@ void CLCoreUrusRCOutput_Avr::init()
     hal.gpio->pinMode(44, HAL_GPIO_OUTPUT); // CH_11 (PL5/OC5C)
 #elif defined(SHAL_CORE_APM328)
     TCCR0A = (1<<WGM01);
+
 #if CPU_DIVIDER == CPU_DIV_8
-    TCCR0B = (1<<CS01);
+    TCCR0B = CDIV_8;
+#elif CPU_DIVIDER == CPU_DIV_64
+    TCCR0B = CDIV_64;
+#elif CPU_DIVIDER == CPU_DIV_256
+    TCCR0B = CDIV_256;
+#elif CPU_DIVIDER == CPU_DIV_1024
+    TCCR0B = CDIV_1024;
 #endif // CPU_DIVIDER
 
     OCR0A = TIMER_RESOLUTION_FACTOR; // Init OCR registers
-
     TIFR0 = _BV(TOV0) | _BV(OCF0B) | _BV(OCF0A);      //Clear pending interrupts
-    TIMSK0 = _BV(OCIE0A);    //Enable overflow interrupt
 
     // --------------- TIMER1: CH_5 ---------------------
     hal.gpio->pinMode(10,HAL_GPIO_OUTPUT); // CH_5 (PB2/OC1B)
 
     tick_freq = (uint16_t)(HZ_TO_US(DEFAULT_HZ) / TIMER_SPEED_US);
+
+    TIMSK0 = _BV(OCIE0A);    //Enable overflow interrupt
 #endif
     SREG = oldSREGinit;
-    sei();
 }
 
 #if defined(SHAL_CORE_APM328)
-ISR(TIMER0_COMPA_vect)
+ISR(TIMER0_COMPA_vect, ISR_NOBLOCK)
 {
-    if (pwm_cnt >= tick_freq) {
-        pwm_cnt = 0;
+    if (CLCoreUrusRCOutput_Avr::pwm_cnt >= CLCoreUrusRCOutput_Avr::tick_freq) {
+        CLCoreUrusRCOutput_Avr::pwm_cnt = 0;
     }
-    if (pwm_dat_chan_1 > 0) {
-        pwm_cnt < pwm_dat_chan_1 ? HIGH_GPIO(2) : LOW_GPIO(2);
-    }
-
-    if (pwm_dat_chan_2 > 0) {
-        pwm_cnt < pwm_dat_chan_2 ? HIGH_GPIO(3) : LOW_GPIO(3);
+    if (CLCoreUrusRCOutput_Avr::pwm_dat_chan_1 > 0) {
+        CLCoreUrusRCOutput_Avr::pwm_cnt < CLCoreUrusRCOutput_Avr::pwm_dat_chan_1 ? HIGH_GPIO(2) : LOW_GPIO(2);
     }
 
-    if (pwm_dat_chan_3 > 0) {
-        pwm_cnt < pwm_dat_chan_3 ? HIGH_GPIO(4) : LOW_GPIO(4);
+    if (CLCoreUrusRCOutput_Avr::pwm_dat_chan_2 > 0) {
+        CLCoreUrusRCOutput_Avr::pwm_cnt < CLCoreUrusRCOutput_Avr::pwm_dat_chan_2 ? HIGH_GPIO(3) : LOW_GPIO(3);
     }
 
-    if (pwm_dat_chan_4 > 0) {
-        pwm_cnt < pwm_dat_chan_4 ? HIGH_GPIO(5) : LOW_GPIO(5);
+    if (CLCoreUrusRCOutput_Avr::pwm_dat_chan_3 > 0) {
+        CLCoreUrusRCOutput_Avr::pwm_cnt < CLCoreUrusRCOutput_Avr::pwm_dat_chan_3 ? HIGH_GPIO(4) : LOW_GPIO(4);
     }
 
-    pwm_cnt++;
+    if (CLCoreUrusRCOutput_Avr::pwm_dat_chan_4 > 0) {
+        CLCoreUrusRCOutput_Avr::pwm_cnt < CLCoreUrusRCOutput_Avr::pwm_dat_chan_4 ? HIGH_GPIO(5) : LOW_GPIO(5);
+    }
+
+    CLCoreUrusRCOutput_Avr::pwm_cnt++;
 }
 #endif // defined
 
@@ -150,9 +165,14 @@ void CLCoreUrusRCOutput_Avr::set_freq(uint32_t chmask, uint16_t freq_hz)
         ICR3 = icr;
     }
 #elif defined(SHAL_CORE_APM328)
+    uint8_t oldSREG = SREG;
+	cli();
+
     if ((chmask & (_BV(CH_1) | _BV(CH_2) | _BV(CH_3) | _BV(CH_4))) != 0) {
         tick_freq = (uint16_t)(HZ_TO_US(freq_hz) / TIMER_SPEED_US);
     }
+
+    SREG = oldSREG;
 #endif
 }
 
@@ -239,6 +259,11 @@ void CLCoreUrusRCOutput_Avr::enable_ch(uint8_t ch)
 
 void CLCoreUrusRCOutput_Avr::disable_ch(uint8_t ch)
 {
+#if defined(SHAL_CORE_APM328)
+    uint8_t oldSREG = SREG;
+	cli();
+#endif // defined
+
     switch(ch) {
 #if defined(SHAL_CORE_APM2) || defined(SHAL_CORE_MEGA02)
     case 0: TCCR1A &= ~(1<<COM1B1); break; // CH_1 : OC1B
@@ -275,6 +300,9 @@ void CLCoreUrusRCOutput_Avr::disable_ch(uint8_t ch)
     case 4: TCCR1A &= ~(1<<COM1B1); break; // CH_5 : OC1B
 #endif
     }
+#if defined(SHAL_CORE_APM328)
+    SREG = oldSREG;
+#endif // defined
 }
 
 /* constrain pwm to be between min and max pulsewidth. */
@@ -286,9 +314,14 @@ static inline uint16_t constrain_period(uint16_t p) {
 
 void CLCoreUrusRCOutput_Avr::write(uint8_t ch, uint16_t period_us)
 {
+#if defined(SHAL_CORE_APM328)
+    uint8_t oldSREG = SREG;
+	cli();
+#endif // defined
     /* constrain, then scale from 1us resolution (input units)
      * to 0.5us (timer units) */
     uint16_t pwm = constrain_period(period_us) << 1;
+
 #if defined(SHAL_CORE_APM328)
     uint16_t pwm_dat = (pwm >> 1) / TIMER_SPEED_US;
 #endif // defined
@@ -331,6 +364,9 @@ void CLCoreUrusRCOutput_Avr::write(uint8_t ch, uint16_t period_us)
         break;
 #endif
     }
+#if defined(SHAL_CORE_APM328)
+    SREG = oldSREG;
+#endif // defined
 }
 
 void CLCoreUrusRCOutput_Avr::write(uint8_t ch, uint16_t* period_us, uint8_t len)
@@ -342,7 +378,13 @@ void CLCoreUrusRCOutput_Avr::write(uint8_t ch, uint16_t* period_us, uint8_t len)
 
 uint16_t CLCoreUrusRCOutput_Avr::read(uint8_t ch)
 {
+#if defined(SHAL_CORE_APM328)
+    uint8_t oldSREG = SREG;
+	cli();
+#endif // defined
+
     uint16_t pwm=0;
+
     switch(ch) {
 #if defined(SHAL_CORE_APM2) || defined(SHAL_CORE_MEGA02)
     case 0:  pwm=OCR1B; break;      // out1
@@ -364,6 +406,10 @@ uint16_t CLCoreUrusRCOutput_Avr::read(uint8_t ch)
 #endif
     }
     /* scale from 0.5us resolution (timer units) to 1us units */
+#if defined(SHAL_CORE_APM328)
+    SREG = oldSREG;
+#endif // defined
+
     return pwm>>1;
 }
 
