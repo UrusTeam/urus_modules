@@ -62,9 +62,10 @@ void CLCoreUrusScheduler_Avr::init()
     TCCR2B = _BV(CS21) | _BV(CS22); /* Prescaler to clk/256 */
     TCNT2 = _timer_reset_value;     /* Set count to timer reset value  */
     TIFR2 = _BV(TOV2);              /* Clear pending interrupts */
-    TIMSK2 = _BV(TOIE2);            /* Enable overflow interrupt*/
     /* Register _fire_isr_sched to trigger on overflow */
     isrregistry.register_signal(ISR_REGISTRY_TIMER2_OVF, _fire_isr_sched);
+    TIMSK2 = _BV(TOIE2);            /* Enable overflow interrupt*/
+
     /* Turn on global interrupt flag, AVR interupt system will start from this point */
 #elif defined(SHAL_CORE_APM16U) || defined(SHAL_CORE_APM32U4)
     /* TIMER0: Setup the overflow interrupt to occur at 1khz. */
@@ -97,6 +98,10 @@ void CLCoreUrusScheduler_Avr::_fire_isr_sched()
 
 void CLCoreUrusScheduler_Avr::delay_microseconds(uint16_t usec)
 {
+
+    if (--usec == 0) {
+        return;
+    }
 
     _start_micros = AP_HAL::micros();
     while ((AP_HAL::micros() - _start_micros) < usec);
@@ -208,8 +213,10 @@ void CLCoreUrusScheduler_Avr::system_initialized()
 {
     if (_initialized) {
 #if !defined(SHAL_CORE_APM16U) && !defined(SHAL_CORE_APM32U4)
+#if !HAL_MINIMIZE_FEATURES_AVR
         AP_HAL::panic(
             PSTR("PANIC: scheduler system initialized called more than once"));
+#endif
 #endif
         _initialized = false;
         return;
@@ -221,7 +228,9 @@ void CLCoreUrusScheduler_Avr::system_initialized()
 void CLCoreUrusScheduler_Avr::reboot(bool hold_in_bootloader)
 {
 #if !defined(SHAL_CORE_APM16U) && !defined(SHAL_CORE_APM32U4)
+#if !HAL_MINIMIZE_FEATURES_AVR
     hal.uartA->printf_PS(PSTR("GOING DOWN FOR A REBOOT\r\n"));
+#endif
     hal.scheduler->delay(100);
 #endif
 #if defined(SHAL_CORE_APM2) || defined(SHAL_CORE_MEGA02) || defined(SHAL_CORE_APM16U) || defined(SHAL_CORE_APM32U4)
