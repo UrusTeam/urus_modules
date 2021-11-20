@@ -37,9 +37,10 @@ HAL_URUS::HAL_URUS() :
     || defined(SHAL_CORE_MEGA02) \
     || defined(SHAL_CORE_APM328)) \
     || defined(SHAL_CORE_APM32U4)
-
+#if CONFIG_SHAL_CORE_UARTDriverA == ENABLED
     uartA = NSCORE_URUS::get_uartA_Driver();
     console = NSCORE_URUS::get_uartA_Driver();
+#endif // CONFIG_SHAL_CORE_UARTDriverA
 #endif
 
 #if CONFIG_SHAL_CORE == SHAL_CORE_APM && defined(SHAL_CORE_APM2) \
@@ -75,7 +76,9 @@ HAL_URUS::HAL_URUS() :
 #if CONFIG_SHAL_CORE_UTIL == ENABLED
     util = NSCORE_URUS::get_Util();
 #endif
+#if CONFIG_SHAL_CORE_STORAGE == ENABLED
     storage = NSCORE_URUS::get_Storage();
+#endif // CONFIG_SHAL_CORE_STORAGE
 #if CONFIG_SHAL_CORE_RCINPUT == ENABLED
     rcin = NSCORE_URUS::get_RCInput();
 #endif // CONFIG_SHAL_CORE_RCOUTPUT
@@ -124,33 +127,42 @@ void HAL_URUS::run(int argc, char * const argv[], Callbacks* callbacks) const
 
 void HAL_URUS::rcout_init()
 {
+#if CONFIG_SHAL_CORE_RCOUTPUT == ENABLED
 #if !defined(SHAL_CORE_APM32U4)
     rcout = NSCORE_URUS::get_RCOutput();
     rcout->init();
 #endif
+#endif // CONFIG_SHAL_CORE_RCOUTPUT
 }
 
 void HAL_URUS::rcin_init()
 {
+#if CONFIG_SHAL_CORE_RCINPUT == ENABLED
 #if !defined(SHAL_CORE_APM32U4)
     rcin = NSCORE_URUS::get_RCInput();
     rcin->init();
 #endif
+#endif // CONFIG_SHAL_CORE_RCINPUT
 }
 
 void HAL_URUS::analogin_init()
 {
+#if CONFIG_SHAL_CORE_ANALOGIN == ENABLED
 #if !defined(SHAL_CORE_APM32U4)
     analogin = NSCORE_URUS::get_AnalogIn();
     analogin->init();
 #endif
+#endif // CONFIG_SHAL_CORE_ANALOGIN
 }
 
 void HAL_URUS::i2c_init()
 {
+#if CONFIG_SHAL_CORE_I2C == ENABLED
 #if !defined(SHAL_CORE_APM32U4)
+    util = NSCORE_URUS::get_Util();
     i2c_mgr = NSCORE_URUS::get_I2CDeviceManager();
 #endif
+#endif // CONFIG_SHAL_CORE_I2C
 }
 
 static const HAL_URUS shal;
