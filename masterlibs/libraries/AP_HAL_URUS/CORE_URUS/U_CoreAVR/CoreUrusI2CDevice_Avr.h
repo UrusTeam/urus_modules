@@ -7,7 +7,6 @@
 #include "../CoreUrusI2CDevice.h"
 #include "CoreUrusSemaphores_Avr.h"
 #include <inttypes.h>
-#include <stdio.h>
 
 class CLCoreUrusI2CDevice_Avr : public NSCORE_URUS::CLCoreUrusI2CDevice {
 public:
