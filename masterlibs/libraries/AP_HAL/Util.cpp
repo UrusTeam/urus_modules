@@ -60,24 +60,22 @@ uint64_t AP_HAL::Util::get_system_clock_ms() const
     return 0;
 }
 
-void AP_HAL::Util::get_system_clock_utc(int32_t &hour, int32_t &min, int32_t &sec, int32_t &ms) const
+void AP_HAL::Util::get_system_clock_utc(uint16_t &hour, uint8_t &min, uint8_t &sec, uint16_t &ms) const
 {
-#if HAL_CPU_CLASS > HAL_CPU_CLASS_16
-     // get time of day in ms
-    uint32_t time_ms = AP_HAL::millis();
-
-    // separate time into ms, sec, min, hour and days but all expressed in milliseconds
+#if defined(SHAL_CORE_APM2) || defined(SHAL_CORE_APM328) || defined(SHAL_CORE_MEGA02) || defined(SHAL_CORE_APM32U4)
+    uint32_t time_ms = AP_HAL::millis();// 1000;
+    ms = time_ms % 1000;
     time_ms = time_ms / 1000;
-    ms = time_ms % 1;
-    uint32_t sec_ms = (time_ms % (60)) - ms;
-    uint32_t min_ms = (time_ms % (60 * 60)) - sec_ms - ms;
-    uint32_t hour_ms = (time_ms % (24 * 60 * 60)) - min_ms - sec_ms - ms;
+
+    uint8_t sec_ms = (uint8_t)(time_ms % 60);
+    uint8_t min_ms = (uint8_t)(((time_ms % (60 * 60)) - sec_ms) / 60);
+    uint16_t hour_ms = (uint16_t)((time_ms - min_ms - sec_ms) / (60 * 60));
 
     // convert times as milliseconds into appropriate units
     sec = sec_ms;
-    min = min_ms / (60);
-    hour = hour_ms / (60 * 60);
-#endif
+    min = min_ms;
+    hour = hour_ms;
+#endif // defined
 }
 
 // get milliseconds from now to a target time of day expressed as hour, min, sec, ms
