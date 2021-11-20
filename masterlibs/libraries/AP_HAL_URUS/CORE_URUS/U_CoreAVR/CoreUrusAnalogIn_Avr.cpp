@@ -8,7 +8,6 @@
 
 #include <avr/io.h>
 #include <avr/interrupt.h>
-#include <stdio.h>
 
 #define CHANNEL_READ_REPEAT 2
 
@@ -253,8 +252,10 @@ void CLCoreUrusAnalogIn_Avr::_register_channel(CLCoreUrusAnalogSource_Avr* ch)
 {
     if (_num_channels >= AVR_INPUT_MAX_CHANNELS) {
         for(;;) {
+#if !HAL_MINIMIZE_FEATURES_AVR
             hal.console->printf_PS(
                 PSTR("Error: AP_HAL_AVR::CLCoreUrusAnalogIn_Avr out of channels\n"));
+#endif
             hal.scheduler->delay(1000);
         }
     }
