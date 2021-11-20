@@ -7,7 +7,6 @@
 
 #include "CORE_URUS/CORE_URUS.h"
 
-#include <stdio.h>
 
 extern const AP_HAL::HAL &hal;
 static const NSCORE_URUS::CLCORE_URUS& _urus_core = NSCORE_URUS::get_CORE();
@@ -25,7 +24,9 @@ void panic(const prog_char_t* errormsg)
 {
     /* Print the error message on both ports */
 #if !defined(SHAL_CORE_APM16U) && !defined(SHAL_CORE_APM32U4)
+#if CONFIG_SHAL_CORE_UARTDriverA == ENABLED
     hal.uartA->println_P(errormsg);
+#endif // CONFIG_SHAL_CORE_UARTDriverA
 #endif
     /* Spin forever. */
     for(;;);
