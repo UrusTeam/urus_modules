@@ -3,8 +3,8 @@
 #include "AP_HAL_Namespace.h"
 #include <stdint.h>
 
-#define RC_OUTPUT_MIN_PULSEWIDTH 400
-#define RC_OUTPUT_MAX_PULSEWIDTH 2100
+#define RC_OUTPUT_MIN_PULSEWIDTH 1
+#define RC_OUTPUT_MAX_PULSEWIDTH 65534
 
 /* Define the CH_n names, indexed from 1, if we don't have them already */
 #ifndef CH_1
