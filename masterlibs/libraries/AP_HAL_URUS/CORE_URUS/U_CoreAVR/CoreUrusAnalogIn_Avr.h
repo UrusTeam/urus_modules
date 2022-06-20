@@ -9,7 +9,7 @@
 #if defined(SHAL_CORE_APM2) || defined(SHAL_CORE_MEGA02)
 #define AVR_INPUT_MAX_CHANNELS 12
 #elif defined(SHAL_CORE_APM328)
-#define AVR_INPUT_MAX_CHANNELS 3
+#define AVR_INPUT_MAX_CHANNELS 9
 #else
 #define AVR_INPUT_MAX_CHANNELS 3
 #endif
