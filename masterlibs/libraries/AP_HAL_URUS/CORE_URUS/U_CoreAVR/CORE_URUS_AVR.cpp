@@ -27,7 +27,6 @@
 ISRRegistry CORE_AVR::isrregistry;
 static CLCoreUrusTimers_Avr coreTimers;
 static CLCoreUrusScheduler_Avr coreScheduler;
-static CLCoreUrusGPIO_Avr coreGPIO;
 #else
 #if defined(SHAL_CORE_APM32U4)
 CLCoreUrusUARTDriver_AvrISRs(1);
