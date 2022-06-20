@@ -11,7 +11,7 @@
 
 namespace NSCORE_URUS {
 
-static const CLCORE_URUS& _urus_core = get_CORE();
+extern const CLCORE_URUS& _urus_core;
 bool CLCoreUrusScheduler::_isr_timer_running_shal = false;
 uint32_t CLCoreUrusScheduler::_timer_tick_shal = 0;
 uint32_t CLCoreUrusScheduler::_shal_tick_hz = 0;
