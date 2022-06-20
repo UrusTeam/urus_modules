@@ -133,7 +133,6 @@
 				<Compiler>
 					<Add option="-mcall-prologues" />
 					<Add option="-Os" />
-					<Add option='-Wl,&quot;--gc-sections, --relax&quot;' />
 					<Add option="-std=gnu++11" />
 					<Add option="-ffunction-sections" />
 					<Add option="-fdata-sections" />
@@ -168,13 +167,17 @@
 					<Add option="-DHAVE_STD_REMOVE_REFERENCE=0" />
 					<Add option="-DHAL_MINIMIZE_FEATURES=1" />
 					<Add option="-DHAL_MINIMIZE_FEATURES_AVR=1" />
+					<Add directory="$(#URUSSTOOL.base)/src/URUS/modules/urus_modules/masterlibs/libraries" />
+					<Add directory="$(#URUSSTOOL.base)/src/URUS/modules/urus_modules/masterlibs/libraries/AP_Common/missing" />
 					<Add directory="../../../../libraries" />
 					<Add directory="../../../../libraries/AP_Common/missing" />
 				</Compiler>
 				<Linker>
 					<Add option="-s" />
 					<Add option="-mmcu=atmega16u2" />
+					<Add option="-Wl,--gc-sections" />
 					<Add library="MasterLibUrus" />
+					<Add directory="$(#URUSSTOOL.base)/src/URUS/build/apm2/lib/Release" />
 					<Add directory="../../../../build/apm2/lib/Release/" />
 				</Linker>
 				<ExtraCommands>
@@ -193,10 +196,6 @@
 			<Add option="-DF_CPU=16000000UL" />
 		</Compiler>
 		<Unit filename="joypadA.cpp" />
-		<Extensions>
-			<code_completion />
-			<envvars />
-			<debugger />
-		</Extensions>
+		<Extensions />
 	</Project>
 </UrusStudio_project_file>
