@@ -148,13 +148,13 @@ void CLCoreUrusSPI0Device_Avr::_cs_assert()
     uint8_t new_spsr = (SPSR & ~valid_spsr_mask) | (_spsr & valid_spsr_mask);
     SPSR = new_spsr;
 
-    _cs_pin->write(0);
+    _cs_pin->write(1);
 }
 
 void CLCoreUrusSPI0Device_Avr::_cs_release()
 {
 
-    _cs_pin->write(1);
+    _cs_pin->write(0);
 
 }
 
@@ -211,7 +211,7 @@ bool CLCoreUrusSPI0Device_Avr::transfer(const uint8_t *send, uint32_t send_len,
             recv[i1] = _transfer(recv[i1]);
         }
     }
-    _cs_release();
+
     return true;
 }
 
