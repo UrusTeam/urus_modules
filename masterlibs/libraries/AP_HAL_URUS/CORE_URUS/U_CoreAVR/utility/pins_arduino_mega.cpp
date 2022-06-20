@@ -365,18 +365,18 @@ const uint8_t PROGMEM digital_pin_to_bit_mask_PGM[] = {
 	_BV(1), /* 9, port B */
 	_BV(2), /* 10, port B */
 	_BV(3), /* 11, port B */
-	_BV(4), /* 13, port B */
-	_BV(5), /* 14, port B */
-	_BV(6), /* 15, port B */
-	_BV(7), /* 16, port B */
-	_BV(0), /* 17, port C */
-	_BV(1), /* 18, port C */
-	_BV(2), /* 19, port C */
-	_BV(3), /* 20, port C */
-	_BV(4), /* 21, port C */
-	_BV(5), /* 22, port C */
-	_BV(6), /* 23, port C */
-	_BV(7), /* 24, port C */
+	_BV(4), /* 12, port B */
+	_BV(5), /* 13, port B */
+	_BV(6), /* 14, port B */
+	_BV(7), /* 15, port B */
+	_BV(0), /* 16, port C */
+	_BV(1), /* 17, port C */
+	_BV(2), /* 18, port C */
+	_BV(3), /* 19, port C */
+	_BV(4), /* 20, port C */
+	_BV(5), /* 21, port C */
+	_BV(6), /* 22, port C */
+	_BV(7), /* 23, port C */
 #elif defined(SHAL_CORE_APM32U4)
 	_BV(2), // D0 - PD2
 	_BV(3),	// D1 - PD3
