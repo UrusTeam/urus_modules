@@ -74,6 +74,7 @@ void UR_Stepper_Generic::move_steps(int64_t steps)
     STEP_DIR dir_state = (steps >= 0) ? STEP_DIR::DIR_CW : STEP_DIR::DIR_CCW;
     _set_step_dir(dir_state);
     _steps = steps;
+    _steps_remaining = 0;
 }
 
 void UR_Stepper_Generic::move_degree(int64_t deg)
@@ -106,7 +107,7 @@ void UR_Stepper_Generic::_start_move(int64_t steps)
 {
     float speed;
     _last_action_end = 0;
-    _steps_remaining = labs(steps);
+    _steps_remaining = (float)labs(steps);
     _step_count = 0;
     _rest = 0;
     switch (_profile.mode) {
@@ -140,18 +141,25 @@ void UR_Stepper_Generic::_start_move(int64_t steps)
 int64_t UR_Stepper_Generic::_next_action(void)
 {
     if (_steps_remaining > 0) {
-        _delay_micros((uint32_t)_next_action_interval, (uint32_t)_last_action_end);
+        float ms = (uint32_t)AP_HAL::micros();
+
+        uint32_t start_us = (uint32_t)_last_action_end;
+        if (!start_us) {
+            start_us = AP_HAL::micros();
+        }
+        if ((AP_HAL::micros() - start_us) < (uint32_t)_next_action_interval) {
+            return 0;
+        }
 
         hal.gpio->write(_profile.step_pin, HIGH);
 
-        float ms = AP_HAL::micros();
         float pulse = _step_pulse; // save value because _calc_step_pulse() will overwrite it
         _calc_step_pulse();
         // We should pull HIGH for at least 1-2us (step_high_min)
         _delay_micros(1);
         hal.gpio->write(_profile.step_pin, LOW);
         // account for _calc_step_pulse() execution time; sets ceiling for max rpm on slower MCUs
-        _last_action_end = AP_HAL::micros();
+        _last_action_end = (float)AP_HAL::micros();
         ms = _last_action_end - ms;
         _next_action_interval = (pulse > ms) ? pulse - ms : 1.0;
     } else {
@@ -220,7 +228,7 @@ inline void UR_Stepper_Generic::_delay_micros(uint32_t delay_us, uint32_t start_
 #if CONFIG_SHAL_CORE == SHAL_CORE_CYGWIN
         usleep(delay_us);
 #else
-        while (AP_HAL::micros() - start_us < delay_us);
+        while ((AP_HAL::micros() - start_us) < delay_us);
 #endif // CONFIG_SHAL_CORE
     }
 }
