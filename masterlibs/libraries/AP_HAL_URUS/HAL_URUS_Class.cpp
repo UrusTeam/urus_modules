@@ -8,7 +8,7 @@
 #include "HAL_URUS_Class.h"
 #include "CORE_URUS/CORE_URUS.h"
 
-static const NSCORE_URUS::CLCORE_URUS& _urus_core = NSCORE_URUS::get_CORE();
+extern const NSCORE_URUS::CLCORE_URUS& _urus_core;
 
 HAL_URUS::HAL_URUS() :
     AP_HAL::HAL(
