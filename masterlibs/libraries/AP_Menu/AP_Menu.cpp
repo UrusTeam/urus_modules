@@ -269,3 +269,14 @@ Menu::_allocate_buffers(void)
         memset(_argv, 0, (_args_max+1) * sizeof(_argv[0]));
     }
 }
+
+void Menu::display_prompt()
+{
+	if (_port == nullptr) {
+		// default to main serial port
+		_port = hal.console;
+	}
+
+    _allocate_buffers();
+    _display_prompt();
+}
