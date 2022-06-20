@@ -9,7 +9,7 @@
 
 
 extern const AP_HAL::HAL &hal;
-static const NSCORE_URUS::CLCORE_URUS& _urus_core = NSCORE_URUS::get_CORE();
+const NSCORE_URUS::CLCORE_URUS& _urus_core = NSCORE_URUS::get_CORE();
 
 namespace AP_HAL {
 
