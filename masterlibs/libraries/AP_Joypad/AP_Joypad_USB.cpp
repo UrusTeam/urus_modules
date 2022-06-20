@@ -175,6 +175,12 @@ void AP_Joypad_USB::_process_event()
         return;
     }
 
+    if (!hal.gpio->read(12)) {
+        hal.gpio->write(TXLED, LOW);
+        hal.gpio->write(RXLED, LOW);
+        return;
+    }
+
     if (_inproc_event) {
         return;
     }
@@ -296,6 +302,8 @@ bool AP_Joypad_USB::_configure()
     hal.gpio->write(7, 1);
     hal.gpio->pinMode(14, HAL_GPIO_INPUT);
     hal.gpio->write(14, 1);
+    hal.gpio->pinMode(12, HAL_GPIO_INPUT);
+    hal.gpio->write(12, 1);
 
 	while (!usb_configured()) {
         hal.gpio->toggle(RXLED);
@@ -444,7 +452,7 @@ int8_t AP_Joypad_USB::send_controller_data_to_usb(data_controller_t btnList, uin
 
 int8_t AP_Joypad_USB::usb_gamepad_send(void)
 {
-	uint8_t intr_state, timeout;
+	uint8_t timeout;
 
 	if (!usb_configuration) return -1;
 	UENUM = GAMEPAD_ENDPOINT;
