@@ -33,6 +33,7 @@
 #define VECTOR2_H
 
 #include <math.h>
+#include <float.h>
 
 template <typename T>
 struct Vector2

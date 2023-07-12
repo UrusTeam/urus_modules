@@ -83,7 +83,11 @@ void AP_AHRS_NavEKF::update(bool skip_ins_update)
 {
     // EKF1 is no longer supported - handle case where it is selected
     if (_ekf_type == 1) {
+#if !HAL_MINIMIZE_FEATURES_AVR
         _ekf_type.set(2);
+#else
+        _ekf_type = 2;
+#endif
     }
 
 #if CONFIG_HAL_BOARD == HAL_BOARD_SITL
@@ -110,11 +114,12 @@ void AP_AHRS_NavEKF::update(bool skip_ins_update)
         const Vector3f &exported_gyro_bias = get_gyro_drift();
         hal.opticalflow->push_gyro_bias(exported_gyro_bias.x, exported_gyro_bias.y);
     }
-
+#if !HAL_MINIMIZE_FEATURES_AVR
     if (_view != nullptr) {
         // update optional alternative attitude view
         _view->update(skip_ins_update);
     }
+#endif
 }
 
 void AP_AHRS_NavEKF::update_DCM(bool skip_ins_update)
@@ -404,7 +409,7 @@ bool AP_AHRS_NavEKF::get_position(struct Location &loc) const
             return true;
         }
         break;
-        
+
 #if CONFIG_HAL_BOARD == HAL_BOARD_SITL
     case EKF_TYPE_SITL: {
         const struct SITL::sitl_fdm &fdm = _sitl->state;
@@ -415,7 +420,7 @@ bool AP_AHRS_NavEKF::get_position(struct Location &loc) const
         return true;
     }
 #endif
-        
+
     default:
         break;
     }
@@ -725,7 +730,7 @@ bool AP_AHRS_NavEKF::get_hagl(float &height) const
     case EKF_TYPE2:
     default:
         return EKF2.getHAGL(height);
-        
+
     case EKF_TYPE3:
         return EKF3.getHAGL(height);
 
@@ -961,7 +966,7 @@ AP_AHRS_NavEKF::EKF_TYPE AP_AHRS_NavEKF::active_EKF_type(void) const
         }
         break;
     }
-        
+
 #if CONFIG_HAL_BOARD == HAL_BOARD_SITL
     case EKF_TYPE_SITL:
         ret = EKF_TYPE_SITL;
@@ -1069,7 +1074,7 @@ bool AP_AHRS_NavEKF::healthy(void) const
         }
         return true;
     }
-        
+
 #if CONFIG_HAL_BOARD == HAL_BOARD_SITL
     case EKF_TYPE_SITL:
         return true;
@@ -1081,7 +1086,11 @@ bool AP_AHRS_NavEKF::healthy(void) const
 
 void AP_AHRS_NavEKF::set_ekf_use(bool setting)
 {
+#if !HAL_MINIMIZE_FEATURES_AVR
     _ekf_type.set(setting?1:0);
+#else
+    _ekf_type = setting ? 1 : 0;
+#endif
 }
 
 // true if the AHRS has completed initialisation
@@ -1395,7 +1404,7 @@ void AP_AHRS_NavEKF::send_ekf_status_report(mavlink_channel_t chan)
         mavlink_msg_ekf_status_report_send(chan, 0, 0, 0, 0, 0, 0);
         break;
 #endif
-        
+
     case EKF_TYPE2:
         return EKF2.send_status_report(chan);
 

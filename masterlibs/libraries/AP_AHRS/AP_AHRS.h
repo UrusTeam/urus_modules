@@ -23,14 +23,19 @@
 #include <AP_Math/AP_Math.h>
 #include <inttypes.h>
 #include <AP_Compass/AP_Compass.h>
+#if !HAL_MINIMIZE_FEATURES_AVR
 #include <AP_Airspeed/AP_Airspeed.h>
+#endif
+#if !HAL_MINIMIZE_FEATURES_AVR
 #include <AP_Beacon/AP_Beacon.h>
+#endif
 #include <AP_GPS/AP_GPS.h>
 #include <AP_InertialSensor/AP_InertialSensor.h>
 #include <AP_Baro/AP_Baro.h>
+#if !HAL_MINIMIZE_FEATURES_AVR
 #include <AP_Param/AP_Param.h>
-
 class OpticalFlow;
+#endif
 #define AP_AHRS_TRIM_LIMIT 10.0f        // maximum trim angle in degrees
 #define AP_AHRS_RP_P_MIN   0.05f        // minimum value for AHRS_RP_P parameter
 #define AP_AHRS_YAW_P_MIN  0.05f        // minimum value for AHRS_YAW_P parameter
@@ -66,9 +71,11 @@ public:
         yaw_sensor(0),
         _vehicle_class(AHRS_VEHICLE_UNKNOWN),
         _compass(nullptr),
+#if !HAL_MINIMIZE_FEATURES_AVR
         _optflow(nullptr),
         _airspeed(nullptr),
         _beacon(nullptr),
+#endif
         _compass_last_update(0),
         _ins(ins),
         _baro(baro),
@@ -82,7 +89,17 @@ public:
         _active_accel_instance(0)
     {
         // load default values from var_info table
+#if !HAL_MINIMIZE_FEATURES_AVR
         AP_Param::setup_object_defaults(this, var_info);
+#else
+        gps_gain = 1.0f;
+        _gps_use = 1;
+        _kp_yaw = 0.2f;
+        _kp = 0.2f;
+        beta = 0.1f;
+        _gps_minsats = 6;
+        _ekf_type = 2;
+#endif
 
         // base the ki values by the sensors maximum drift
         // rate.
@@ -96,8 +113,12 @@ public:
         _home.alt        = 0;
         _home.lng        = 0;
         _home.lat        = 0;
-
+#if !HAL_MINIMIZE_FEATURES_AVR
         _last_trim = _trim.get();
+#else
+        _last_trim = _trim;
+#endif
+
         _rotation_autopilot_body_to_vehicle_body.from_euler(_last_trim.x, _last_trim.y, 0.0f);
         _rotation_vehicle_body_to_autopilot_body = _rotation_autopilot_body_to_vehicle_body.transposed();
     }
@@ -171,7 +192,7 @@ public:
     const Compass* get_compass() const {
         return _compass;
     }
-
+#if !HAL_MINIMIZE_FEATURES_AVR
     void set_optflow(const OpticalFlow *optflow) {
         _optflow = optflow;
     }
@@ -179,32 +200,36 @@ public:
     const OpticalFlow* get_optflow() const {
         return _optflow;
     }
-
+#endif
     // allow for runtime change of orientation
     // this makes initial config easier
     void set_orientation() {
+#if !HAL_MINIMIZE_FEATURES_AVR
         _ins.set_board_orientation((enum Rotation)_board_orientation.get());
         if (_compass != nullptr) {
             _compass->set_board_orientation((enum Rotation)_board_orientation.get());
         }
+#else
+        _ins.set_board_orientation((enum Rotation)_board_orientation);
+        if (_compass != nullptr) {
+            _compass->set_board_orientation((enum Rotation)_board_orientation);
+        }
+#endif
     }
-
+#if !HAL_MINIMIZE_FEATURES_AVR
     void set_airspeed(AP_Airspeed *airspeed) {
         _airspeed = airspeed;
     }
-
     void set_beacon(AP_Beacon *beacon) {
         _beacon = beacon;
     }
-
     const AP_Airspeed *get_airspeed(void) const {
         return _airspeed;
     }
-
     const AP_Beacon *get_beacon(void) const {
         return _beacon;
     }
-
+#endif
     const AP_GPS &get_gps() const {
         return _gps;
     }
@@ -321,15 +346,15 @@ public:
         *airspeed_ret *= get_EAS2TAS();
         return true;
     }
-
     // get apparent to true airspeed ratio
     float get_EAS2TAS(void) const {
+#if !HAL_MINIMIZE_FEATURES_AVR
         if (_airspeed) {
             return _airspeed->get_EAS2TAS();
         }
+#endif
         return 1.0f;
     }
-
     // return true if airspeed comes from an airspeed sensor, as
     // opposed to an IMU estimate
     bool airspeed_sensor_enabled(void) const {
@@ -419,7 +444,11 @@ public:
 
     // get trim
     const Vector3f &get_trim() const {
+#if !HAL_MINIMIZE_FEATURES_AVR
         return _trim.get();
+#else
+        return _trim;
+#endif
     }
 
     // set trim
@@ -449,7 +478,9 @@ public:
     }
 
     // for holding parameters
-    static const struct AP_Param::GroupInfo var_info[];
+#if !HAL_MINIMIZE_FEATURES_AVR
+    static const struct AP_Param::GroupInfo var_info[] PROGMEM;
+#endif
 
     // return secondary attitude solution if available, as eulers in radians
     virtual bool get_secondary_attitude(Vector3f &eulers) {
@@ -579,17 +610,17 @@ protected:
 
     // settable parameters
     // these are public for ArduCopter
-    AP_Float _kp_yaw;
-    AP_Float _kp;
-    AP_Float gps_gain;
+    float _kp_yaw;
+    float _kp;
+    float gps_gain;
 
-    AP_Float beta;
-    AP_Int8 _gps_use;
-    AP_Int8 _wind_max;
-    AP_Int8 _board_orientation;
-    AP_Int8 _gps_minsats;
-    AP_Int8 _gps_delay;
-    AP_Int8 _ekf_type;
+    float beta;
+    int8_t _gps_use;
+    int8_t _wind_max;
+    int8_t _board_orientation;
+    int8_t _gps_minsats;
+    int8_t _gps_delay;
+    int8_t _ekf_type;
 
     // flags structure
     struct ahrs_flags {
@@ -618,6 +649,7 @@ protected:
     // pointer to compass object, if available
     Compass         * _compass;
 
+#if !HAL_MINIMIZE_FEATURES_AVR
     // pointer to OpticalFlow object, if available
     const OpticalFlow *_optflow;
 
@@ -626,7 +658,7 @@ protected:
 
     // pointer to beacon object, if available
     AP_Beacon     * _beacon;
-
+#endif
     // time in microseconds of last compass update
     uint32_t _compass_last_update;
 
@@ -637,7 +669,11 @@ protected:
     const AP_GPS        &_gps;
 
     // a vector to capture the difference between the controller and body frames
+#if !HAL_MINIMIZE_FEATURES
     AP_Vector3f         _trim;
+#else
+    Vector3f         _trim;
+#endif
 
     // cached trim rotations
     Vector3f _last_trim;

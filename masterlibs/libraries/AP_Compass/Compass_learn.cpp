@@ -44,12 +44,16 @@ Compass::learn_offsets(void)
         _null_init_done = true;
         for (uint8_t k=0; k<COMPASS_MAX_INSTANCES; k++) {
             const Vector3f &field = _state[k].field;
+#if !HAL_MINIMIZE_FEATURES_AVR
             const Vector3f &ofs = _state[k].offset.get();
+#else
+            const Vector3f &ofs = _state[k].offset;
+#endif
             for (uint8_t i=0; i<_mag_history_size; i++) {
                 // fill the history buffer with the current mag vector,
                 // with the offset removed
-                _state[k].mag_history[i] = Vector3i(roundf(field.x) - ofs.x, 
-                                                    roundf(field.y) - ofs.y, 
+                _state[k].mag_history[i] = Vector3i(roundf(field.x) - ofs.x,
+                                                    roundf(field.y) - ofs.y,
                                                     roundf(field.z) - ofs.z);
             }
             _state[k].mag_history_index = 0;
@@ -58,14 +62,22 @@ Compass::learn_offsets(void)
     }
 
     for (uint8_t k=0; k<COMPASS_MAX_INSTANCES; k++) {
+#if !HAL_MINIMIZE_FEATURES_AVR
         const Vector3f &ofs = _state[k].offset.get();
+#else
+        const Vector3f &ofs = _state[k].offset;
+#endif
         const Vector3f &field = _state[k].field;
         Vector3f b1, diff;
         float length;
 
         if (ofs.is_nan()) {
             // offsets are bad possibly due to a past bug - zero them
+#if !HAL_MINIMIZE_FEATURES_AVR
             _state[k].offset.set(Vector3f());
+#else
+            _state[k].offset = Vector3f();
+#endif
         }
 
         // get a past element
@@ -95,8 +107,8 @@ Compass::learn_offsets(void)
         }
 
         // put the vector in the history
-        _state[k].mag_history[_state[k].mag_history_index] = Vector3i(roundf(field.x) - ofs.x, 
-                                                                      roundf(field.y) - ofs.y, 
+        _state[k].mag_history[_state[k].mag_history_index] = Vector3i(roundf(field.x) - ofs.x,
+                                                                      roundf(field.y) - ofs.y,
                                                                       roundf(field.z) - ofs.z);
         _state[k].mag_history_index = (_state[k].mag_history_index + 1) % _mag_history_size;
 
@@ -110,8 +122,11 @@ Compass::learn_offsets(void)
         if (length > max_change) {
             diff *= max_change / length;
         }
-
+#if !HAL_MINIMIZE_FEATURES_AVR
         Vector3f new_offsets = _state[k].offset.get() - diff;
+#else
+        Vector3f new_offsets = _state[k].offset - diff;
+#endif
 
         if (new_offsets.is_nan()) {
             // don't apply bad offsets
@@ -122,8 +137,12 @@ Compass::learn_offsets(void)
         new_offsets.x = constrain_float(new_offsets.x, -COMPASS_OFS_LIMIT, COMPASS_OFS_LIMIT);
         new_offsets.y = constrain_float(new_offsets.y, -COMPASS_OFS_LIMIT, COMPASS_OFS_LIMIT);
         new_offsets.z = constrain_float(new_offsets.z, -COMPASS_OFS_LIMIT, COMPASS_OFS_LIMIT);
-            
+
         // set the new offsets
+#if !HAL_MINIMIZE_FEATURES_AVR
         _state[k].offset.set(new_offsets);
+#else
+        _state[k].offset = new_offsets;
+#endif
     }
 }

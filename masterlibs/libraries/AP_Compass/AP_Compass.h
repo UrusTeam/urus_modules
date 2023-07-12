@@ -6,8 +6,10 @@
 #include <AP_Declination/AP_Declination.h>
 #include <AP_HAL/AP_HAL.h>
 #include <AP_Math/AP_Math.h>
+#if !HAL_MINIMIZE_FEATURES_AVR
 #include <AP_Param/AP_Param.h>
 #include <GCS_MAVLink/GCS_MAVLink.h>
+#endif
 
 #include "CompassCalibrator.h"
 #include "AP_Compass_Backend.h"
@@ -122,11 +124,12 @@ public:
     /*
       handle an incoming MAG_CAL command
     */
+#if !HAL_MINIMIZE_FEATURES_AVR
     MAV_RESULT handle_mag_cal_command(const mavlink_command_long_t &packet);
 
     void send_mag_cal_progress(mavlink_channel_t chan);
     void send_mag_cal_report(mavlink_channel_t chan);
-
+#endif
     // check if the compasses are pointing in the same direction
     bool consistent() const;
 
@@ -264,7 +267,9 @@ public:
     uint32_t last_update_ms(void) const { return _state[get_primary()].last_update_ms; }
     uint32_t last_update_ms(uint8_t i) const { return _state[i].last_update_ms; }
 
-    static const struct AP_Param::GroupInfo var_info[];
+#if !HAL_MINIMIZE_FEATURES_AVR
+    static const struct AP_Param::GroupInfo var_info[] PROGMEM;
+#endif
 
     // HIL variables
     struct {
@@ -282,12 +287,20 @@ public:
 
     // return the chosen learning type
     enum LearnType get_learn_type(void) const {
+#if !HAL_MINIMIZE_FEATURES
         return (enum LearnType)_learn.get();
+#else
+        return (enum LearnType)_learn;
+#endif
     }
 
     // return maximum allowed compass offsets
     uint16_t get_offsets_max(void) const {
+#if !HAL_MINIMIZE_FEATURES
         return (uint16_t)_offset_max.get();
+#else
+        return (uint16_t)_offset_max;
+#endif
     }
 
 private:
@@ -349,12 +362,17 @@ private:
     uint8_t     _compass_count;
 
     // settable parameters
+#if !HAL_MINIMIZE_FEATURES_AVR
     AP_Int8 _learn;
+#else
+    int8_t _learn;
+#endif
 
     // board orientation from AHRS
     enum Rotation _board_orientation;
 
     // primary instance
+#if !HAL_MINIMIZE_FEATURES
     AP_Int8     _primary;
 
     // declination in radians
@@ -362,6 +380,15 @@ private:
 
     // enable automatic declination code
     AP_Int8     _auto_declination;
+#else
+    int8_t     _primary;
+
+    // declination in radians
+    float    _declination;
+
+    // enable automatic declination code
+    int8_t     _auto_declination;
+#endif
 
     // first-time-around flag used by offset nulling
     bool        _null_init_done;
@@ -371,11 +398,15 @@ private:
 
     // motor compensation type
     // 0 = disabled, 1 = enabled for throttle, 2 = enabled for current
+#if !HAL_MINIMIZE_FEATURES_AVR
     AP_Int8     _motor_comp_type;
+#else
+    int8_t     _motor_comp_type;
+#endif
 
     // throttle expressed as a percentage from 0 ~ 1.0 or current expressed in amps
     float       _thr_or_curr;
-
+#if !HAL_MINIMIZE_FEATURES_AVR
     struct mag_state {
         AP_Int8     external;
         bool        healthy;
@@ -410,16 +441,64 @@ private:
         // board specific orientation
         enum Rotation rotation;
     } _state[COMPASS_MAX_INSTANCES];
+#else
+    struct mag_state {
+        int8_t     external;
+        bool        healthy;
+        int8_t     orientation;
+        Vector3f offset;
+        Vector3f diagonals;
+        Vector3f offdiagonals;
 
+        // device id detected at init.
+        // saved to eeprom when offsets are saved allowing ram &
+        // eeprom values to be compared as consistency check
+        int32_t    dev_id;
+
+        int8_t     use_for_yaw;
+
+        uint8_t     mag_history_index;
+        Vector3i    mag_history[_mag_history_size];
+
+        // factors multiplied by throttle and added to compass outputs
+        Vector3f motor_compensation;
+
+        // latest compensation added to compass
+        Vector3f    motor_offset;
+
+        // corrected magnetic field strength
+        Vector3f    field;
+
+        // when we last got data
+        uint32_t    last_update_ms;
+        uint32_t    last_update_usec;
+
+        // board specific orientation
+        enum Rotation rotation;
+    } _state[COMPASS_MAX_INSTANCES];
+#endif
+
+#if !HAL_MINIMIZE_FEATURES
     AP_Int16 _offset_max;
+#else
+    int16_t _offset_max;
+#endif
+
 #if !HAL_MINIMIZE_FEATURES
     CompassCalibrator _calibrator[COMPASS_MAX_INSTANCES];
 #endif
     // if we want HIL only
     bool _hil_mode:1;
 
+#if !HAL_MINIMIZE_FEATURES
     AP_Float _calibration_threshold;
 
     // mask of driver types to not load. Bit positions match DEVTYPE_ in backend
     AP_Int32 _driver_type_mask;
+#else
+    float _calibration_threshold;
+
+    // mask of driver types to not load. Bit positions match DEVTYPE_ in backend
+    int32_t _driver_type_mask;
+#endif
 };

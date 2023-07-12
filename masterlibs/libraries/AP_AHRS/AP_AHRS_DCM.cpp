@@ -630,7 +630,9 @@ AP_AHRS_DCM::drift_correction(float deltat)
         }
         float airspeed;
         if (airspeed_sensor_enabled()) {
+#if !HAL_MINIMIZE_FEATURES_AVR
             airspeed = _airspeed->get_airspeed();
+#endif
         } else {
             airspeed = _last_airspeed;
         }
@@ -701,7 +703,11 @@ AP_AHRS_DCM::drift_correction(float deltat)
     float ra_scale = 1.0f/(_ra_deltat*GRAVITY_MSS);
 
     if (_flags.correct_centrifugal && (_have_gps_lock || _flags.fly_forward)) {
+#if !HAL_MINIMIZE_FEATURES_AVR
         float v_scale = gps_gain.get() * ra_scale;
+#else
+        float v_scale = gps_gain * ra_scale;
+#endif
         Vector3f vdelta = (velocity - _last_velocity) * v_scale;
         GA_e += vdelta;
         GA_e.normalize();
@@ -796,7 +802,11 @@ AP_AHRS_DCM::drift_correction(float deltat)
     // flat, but still allow for yaw correction using the
     // accelerometers at high roll angles as long as we have a GPS
     if (AP_AHRS_DCM::use_compass()) {
+#if !HAL_MINIMIZE_FEATURES_AVR
         if (have_gps() && is_equal(gps_gain.get(), 1.0f)) {
+#else
+        if (have_gps() && is_equal(gps_gain, 1.0f)) {
+#endif
             error[besti].z *= sinf(fabsf(roll));
         } else {
             error[besti].z = 0;
@@ -933,10 +943,12 @@ void AP_AHRS_DCM::estimate_wind(void)
 
         _last_wind_time = now;
     } else if (now - _last_wind_time > 2000 && airspeed_sensor_enabled()) {
+#if !HAL_MINIMIZE_FEATURES_AVR
         // when flying straight use airspeed to get wind estimate if available
         Vector3f airspeed = _dcm_matrix.colx() * _airspeed->get_airspeed();
         Vector3f wind = velocity - (airspeed * get_EAS2TAS());
         _wind = _wind * 0.92f + wind * 0.08f;
+#endif
     }
 }
 
@@ -977,7 +989,9 @@ bool AP_AHRS_DCM::airspeed_estimate(float *airspeed_ret) const
 {
     bool ret = false;
     if (airspeed_sensor_enabled()) {
+#if !HAL_MINIMIZE_FEATURES_AVR
         *airspeed_ret = _airspeed->get_airspeed();
+#endif
         return true;
     }
 

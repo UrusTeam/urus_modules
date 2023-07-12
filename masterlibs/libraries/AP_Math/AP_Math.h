@@ -6,7 +6,9 @@
 // Assorted useful math operations for ArduPilot(Mega)
 
 #include <AP_Common/AP_Common.h>
+#if !HAL_MINIMIZE_FEATURES_AVR
 #include <AP_Param/AP_Param.h>
+#endif
 #include <math.h>
 #include "definitions.h"
 #ifdef __AVR__
@@ -22,7 +24,9 @@
 #include "edc.h"
 #include "float.h"
 #include "location.h"
+#if !HAL_MINIMIZE_FEATURES_AVR
 #include <AP_Param/AP_Param.h>
+#endif
 
 
 #ifndef M_PI_F
@@ -64,9 +68,11 @@
 #define LATLON_TO_M  0.01113195f
 #define LATLON_TO_CM 1.113195f
 
+#if !HAL_MINIMIZE_FEATURES_AVR
 // define AP_Param types AP_Vector3f and Ap_Matrix3f
 AP_PARAMDEFV(Matrix3f, Matrix3f, AP_PARAM_MATRIX3F);
 AP_PARAMDEFV(Vector3f, Vector3f, AP_PARAM_VECTOR3F);
+#endif
 
 // are two floats equal
 static inline bool is_equal(const float fVal1, const float fVal2) { return fabsf(fVal1 - fVal2) < FLT_EPSILON ? true : false; }

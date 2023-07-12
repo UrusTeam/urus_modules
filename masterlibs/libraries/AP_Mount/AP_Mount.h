@@ -152,6 +152,7 @@ protected:
     AP_Mount_Backend    *_backends[AP_MOUNT_MAX_INSTANCES];         // pointers to instantiated mounts
 
     // backend state including parameters
+#if !HAL_MINIMIZE_FEATURES_AVR
     struct mount_state {
         // Parameters
         AP_Int8         _type;              // mount type (None, Servo or MAVLink, see MountType enum)
@@ -182,6 +183,38 @@ protected:
         MAV_MOUNT_MODE  _mode;              // current mode (see MAV_MOUNT_MODE enum)
         struct Location _roi_target;        // roi target location
     } state[AP_MOUNT_MAX_INSTANCES];
+#else
+    struct mount_state {
+        // Parameters
+        int8_t         _type;              // mount type (None, Servo or MAVLink, see MountType enum)
+        int8_t         _default_mode;      // default mode on startup and when control is returned from autopilot
+        int8_t         _stab_roll;         // 1 = mount should stabilize earth-frame roll axis, 0 = no stabilization
+        int8_t         _stab_tilt;         // 1 = mount should stabilize earth-frame pitch axis
+        int8_t         _stab_pan;          // 1 = mount should stabilize earth-frame yaw axis
+
+        // RC input channels from receiver used for direct angular input from pilot
+        int8_t         _roll_rc_in;        // pilot provides roll input on this channel
+        int8_t         _tilt_rc_in;        // pilot provides tilt input on this channel
+        int8_t         _pan_rc_in;         // pilot provides pan input on this channel
+
+        // Mount's physical limits
+        int16_t        _roll_angle_min;    // min roll in 0.01 degree units
+        int16_t        _roll_angle_max;    // max roll in 0.01 degree units
+        int16_t        _tilt_angle_min;    // min tilt in 0.01 degree units
+        int16_t        _tilt_angle_max;    // max tilt in 0.01 degree units
+        int16_t        _pan_angle_min;     // min pan in 0.01 degree units
+        int16_t        _pan_angle_max;     // max pan in 0.01 degree units
+
+        Vector3f     _retract_angles;    // retracted position for mount, vector.x = roll vector.y = tilt, vector.z=pan
+        Vector3f     _neutral_angles;    // neutral position for mount, vector.x = roll vector.y = tilt, vector.z=pan
+
+        float        _roll_stb_lead;     // roll lead control gain
+        float        _pitch_stb_lead;    // pitch lead control gain
+
+        MAV_MOUNT_MODE  _mode;              // current mode (see MAV_MOUNT_MODE enum)
+        struct Location _roi_target;        // roi target location
+    } state[AP_MOUNT_MAX_INSTANCES];
+#endif
 
     DataFlash_Class *_dataflash;
 };

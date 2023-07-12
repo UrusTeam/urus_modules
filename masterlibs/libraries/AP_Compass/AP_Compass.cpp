@@ -36,6 +36,7 @@ extern AP_HAL::HAL& hal;
 #define AP_COMPASS_OFFSETS_MAX_DEFAULT 850
 #endif
 
+#if !HAL_MINIMIZE_FEATURES_AVR
 const AP_Param::GroupInfo Compass::var_info[] PROGMEM = {
     // index 0 was used for the old orientation matrix
 
@@ -429,6 +430,7 @@ const AP_Param::GroupInfo Compass::var_info[] PROGMEM = {
 
     AP_GROUPEND
 };
+#endif
 
 // Default constructor.
 // Note that the Vector/Matrix constructors already implicitly zero
@@ -445,7 +447,17 @@ Compass::Compass(void) :
     _thr_or_curr(0.0f),
     _hil_mode(false)
 {
+#if !HAL_MINIMIZE_FEATURES_AVR
     AP_Param::setup_object_defaults(this, var_info);
+#else
+    _learn = COMPASS_LEARN_DEFAULT;
+    _state[0].use_for_yaw = 1;
+    _auto_declination = 1;
+    _motor_comp_type = AP_COMPASS_MOT_COMP_DISABLED;
+    _state[0].orientation = ROTATION_NONE;
+    _calibration_threshold = AP_COMPASS_CALIBRATION_FITNESS_DEFAULT;
+    _offset_max = AP_COMPASS_OFFSETS_MAX_DEFAULT;
+#endif
     for (uint8_t i=0; i<COMPASS_MAX_BACKEND; i++) {
         _backends[i] = nullptr;
         _state[i].last_update_usec = 0;
@@ -513,7 +525,11 @@ bool Compass::_add_backend(AP_Compass_Backend *backend, const char *name, bool e
 bool Compass::_driver_enabled(enum DriverType driver_type)
 {
     uint32_t mask = (1U<<uint8_t(driver_type));
+#if !HAL_MINIMIZE_FEATURES_AVR
     return (mask & uint32_t(_driver_type_mask.get())) == 0;
+#else
+    return (mask & uint32_t(_driver_type_mask)) == 0;
+#endif
 }
 
 /*
@@ -536,7 +552,6 @@ void Compass::_detect_backends(void)
     do { if (_driver_enabled(driver_type)) { _add_backend(backend, name, external); } \
        if (_backend_count == COMPASS_MAX_BACKEND || \
            _compass_count == COMPASS_MAX_INSTANCES) { \
-          return; \
         } \
     } while (0)
 
@@ -838,7 +853,11 @@ Compass::set_offsets(uint8_t i, const Vector3f &offsets)
 {
     // sanity check compass instance provided
     if (i < COMPASS_MAX_INSTANCES) {
+#if !HAL_MINIMIZE_FEATURES_AVR
         _state[i].offset.set(offsets);
+#else
+        _state[i].offset = offsets;
+#endif
     }
 }
 
@@ -847,8 +866,12 @@ Compass::set_and_save_offsets(uint8_t i, const Vector3f &offsets)
 {
     // sanity check compass instance provided
     if (i < COMPASS_MAX_INSTANCES) {
+#if !HAL_MINIMIZE_FEATURES_AVR
         _state[i].offset.set(offsets);
         save_offsets(i);
+#else
+        _state[i].offset = offsets;
+#endif
     }
 }
 
@@ -857,7 +880,11 @@ Compass::set_and_save_diagonals(uint8_t i, const Vector3f &diagonals)
 {
     // sanity check compass instance provided
     if (i < COMPASS_MAX_INSTANCES) {
+#if !HAL_MINIMIZE_FEATURES_AVR
         _state[i].diagonals.set_and_save(diagonals);
+#else
+        _state[i].diagonals = diagonals;
+#endif
     }
 }
 
@@ -866,38 +893,52 @@ Compass::set_and_save_offdiagonals(uint8_t i, const Vector3f &offdiagonals)
 {
     // sanity check compass instance provided
     if (i < COMPASS_MAX_INSTANCES) {
+#if !HAL_MINIMIZE_FEATURES_AVR
         _state[i].offdiagonals.set_and_save(offdiagonals);
+#else
+        _state[i].offdiagonals = offdiagonals;
+#endif
     }
 }
 
 void
 Compass::save_offsets(uint8_t i)
 {
+#if !HAL_MINIMIZE_FEATURES_AVR
     _state[i].offset.save();  // save offsets
     _state[i].dev_id.save();  // save device id corresponding to these offsets
+#endif
 }
 
 void
 Compass::save_offsets(void)
 {
+#if !HAL_MINIMIZE_FEATURES_AVR
     for (uint8_t i=0; i<COMPASS_MAX_INSTANCES; i++) {
         save_offsets(i);
     }
+#endif
 }
 
 void
 Compass::set_motor_compensation(uint8_t i, const Vector3f &motor_comp_factor)
 {
+#if !HAL_MINIMIZE_FEATURES_AVR
     _state[i].motor_compensation.set(motor_comp_factor);
+#else
+    _state[i].motor_compensation = motor_comp_factor;
+#endif
 }
 
 void
 Compass::save_motor_compensation()
 {
+#if !HAL_MINIMIZE_FEATURES_AVR
     _motor_comp_type.save();
     for (uint8_t k=0; k<COMPASS_MAX_INSTANCES; k++) {
         _state[k].motor_compensation.save();
     }
+#endif
 }
 
 void
@@ -907,10 +948,17 @@ Compass::set_initial_location(int32_t latitude, int32_t longitude)
     // the declination based on the initial GPS fix
     if (_auto_declination) {
         // Set the declination based on the lat/lng from GPS
+#if !HAL_MINIMIZE_FEATURES_AVR
         _declination.set(radians(
                 AP_Declination::get_declination(
                     (float)latitude / 10000000,
                     (float)longitude / 10000000)));
+#else
+        _declination = radians(
+                AP_Declination::get_declination(
+                    (float)latitude / 10000000,
+                    (float)longitude / 10000000));
+#endif
     }
 }
 
@@ -932,17 +980,25 @@ Compass::use_for_yaw(uint8_t i) const
 void
 Compass::set_declination(float radians, bool save_to_eeprom)
 {
+#if !HAL_MINIMIZE_FEATURES_AVR
     if (save_to_eeprom) {
         _declination.set_and_save(radians);
     }else{
         _declination.set(radians);
     }
+#else
+    _declination = radians;
+#endif
 }
 
 float
 Compass::get_declination() const
 {
+#if !HAL_MINIMIZE_FEATURES_AVR
     return _declination.get();
+#else
+    return _declination;
+#endif
 }
 
 /*
@@ -998,7 +1054,9 @@ bool Compass::configured(uint8_t i)
     int32_t dev_id_orig = _state[i].dev_id;
 
     // load dev_id from eeprom
+#if !HAL_MINIMIZE_FEATURES_AVR
     _state[i].dev_id.load();
+#endif
 
     // if different then the device has not been configured
     if (_state[i].dev_id != dev_id_orig) {

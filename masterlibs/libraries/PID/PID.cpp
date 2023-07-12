@@ -8,7 +8,7 @@
 #include <AP_Math/AP_Math.h>
 
 extern const AP_HAL::HAL& hal;
-
+#if !HAL_MINIMIZE_FEATURES_AVR
 const AP_Param::GroupInfo PID::var_info[] = {
 
     // @Param: P
@@ -33,7 +33,7 @@ const AP_Param::GroupInfo PID::var_info[] = {
 
     AP_GROUPEND
 };
-
+#endif
 float PID::get_pid(float error, float scaler)
 {
     uint32_t tnow = AP_HAL::millis();
@@ -65,7 +65,7 @@ float PID::get_pid(float error, float scaler)
 		if (isnan(_last_derivative)) {
 			// we've just done a reset, suppress the first derivative
 			// term as we don't want a sudden change in input to cause
-			// a large D output change			
+			// a large D output change
 			derivative = 0;
 			_last_derivative = 0;
 		} else {
@@ -113,7 +113,7 @@ void
 PID::reset_I()
 {
     _integrator = 0;
-	// we use NAN (Not A Number) to indicate that the last 
+	// we use NAN (Not A Number) to indicate that the last
 	// derivative value is not valid
     _last_derivative = NAN;
     _pid_info.I = 0;
@@ -127,17 +127,21 @@ void PID::reset() {
 void
 PID::load_gains()
 {
+#if !HAL_MINIMIZE_FEATURES_AVR
     _kp.load();
     _ki.load();
     _kd.load();
     _imax.load();
+#endif
 }
 
 void
 PID::save_gains()
 {
+#if !HAL_MINIMIZE_FEATURES_AVR
     _kp.save();
     _ki.save();
     _kd.save();
     _imax.save();
+#endif
 }

@@ -19,7 +19,7 @@
  *
  */
 #pragma once
-#if !defined(SHAL_CORE_APM16U) && !defined(SHAL_CORE_APM32U4)
+#if !HAL_MINIMIZE_FEATURES_AVR
 #include <AP_Param/AP_Param.h>
 #include <AP_HAL/Util.h>
 #endif
@@ -77,7 +77,7 @@ public:
     // return the number of microseconds available for the current task
     uint16_t time_available_usec(void);
 
-#if !defined(SHAL_CORE_APM16U) && !defined(SHAL_CORE_APM32U4) && !defined(SHAL_CORE_APM328)
+#if !HAL_MINIMIZE_FEATURES_AVR
     // return debug parameter
     uint8_t debug(void) { return _debug; }
 #endif
@@ -102,7 +102,7 @@ public:
     static int8_t current_task;
 
 private:
-#if !defined(SHAL_CORE_APM16U) && !defined(SHAL_CORE_APM32U4) && !defined(SHAL_CORE_APM328)
+#if !HAL_MINIMIZE_FEATURES_AVR
     // used to enable scheduler debugging
     AP_Int8 _debug;
 

@@ -86,6 +86,7 @@ public:
         uint16_t               pre_arm_distance_min;    // min distance captured during pre-arm checks
         uint16_t               pre_arm_distance_max;    // max distance captured during pre-arm checks
 
+#if !HAL_MINIMIZE_FEATURES_AVR
         AP_Int8  type;
         AP_Int8  pin;
         AP_Int8  ratiometric;
@@ -100,6 +101,22 @@ public:
         AP_Int8  address;
         AP_Vector3f pos_offset; // position offset in body frame
         AP_Int8  orientation;
+#else
+        int8_t  type;
+        int8_t  pin;
+        int8_t  ratiometric;
+        int8_t  stop_pin;
+        int16_t settle_time_ms;
+        float scaling;
+        float offset;
+        int8_t  function;
+        int16_t min_distance_cm;
+        int16_t max_distance_cm;
+        int8_t  ground_clearance_cm;
+        int8_t  address;
+        Vector3f pos_offset; // position offset in body frame
+        int8_t  orientation;
+#endif
     };
 
     AP_Int16 _powersave_range;

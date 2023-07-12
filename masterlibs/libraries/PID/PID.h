@@ -3,8 +3,10 @@
 #pragma once
 
 #include <AP_Common/AP_Common.h>
+#if !HAL_MINIMIZE_FEATURES_AVR
 #include <AP_Param/AP_Param.h>
 #include <DataFlash/DataFlash.h>
+#endif
 #include <stdlib.h>
 #include <cmath>
 
@@ -13,12 +15,21 @@
 class PID {
 public:
 
+    struct PID_Info {
+        float desired;
+        float P;
+        float I;
+        float D;
+        float FF;
+        float AFF;
+    };
+
     PID(const float &   initial_p = 0.0f,
         const float &   initial_i = 0.0f,
         const float &   initial_d = 0.0f,
         const int16_t & initial_imax = 0)
     {
-		AP_Param::setup_object_defaults(this, var_info);
+		//AP_Param::setup_object_defaults(this, var_info);
         _kp = initial_p;
         _ki = initial_i;
         _kd = initial_d;
@@ -67,45 +78,51 @@ public:
     }
 
     float        kP() const {
-        return _kp.get();
+        return _kp;
     }
     float        kI() const {
-        return _ki.get();
+        return _ki;
     }
     float        kD() const {
-        return _kd.get();
+        return _kd;
     }
     int16_t        imax() const {
-        return _imax.get();
+        return _imax;
     }
 
     void        kP(const float v)               {
-        _kp.set(v);
+        _kp = v;
     }
     void        kI(const float v)               {
-        _ki.set(v);
+        _ki = v;
     }
     void        kD(const float v)               {
-        _kd.set(v);
+        _kd = v;
     }
     void        imax(const int16_t v)   {
-        _imax.set(abs(v));
+        _imax = abs(v);
     }
 
     float        get_integrator() const {
         return _integrator;
     }
 
-    static const struct AP_Param::GroupInfo        var_info[];
+    //static const struct AP_Param::GroupInfo        var_info[];
 
-    const DataFlash_Class::PID_Info& get_pid_info(void) const { return _pid_info; }
+    const PID_Info& get_pid_info(void) const { return _pid_info; }
 
 private:
+#if !HAL_MINIMIZE_FEATURES_AVR
     AP_Float        _kp;
     AP_Float        _ki;
     AP_Float        _kd;
     AP_Int16        _imax;
-
+#else
+    float        _kp;
+    float        _ki;
+    float        _kd;
+    int16_t      _imax;
+#endif
     float           _integrator;///< integrator value
     float           _last_error;///< last error for derivative
     float           _last_derivative;///< last derivative for low-pass filter
@@ -113,7 +130,7 @@ private:
 
     float           _get_pid(float error, uint16_t dt, float scaler);
 
-    DataFlash_Class::PID_Info _pid_info {};
+    PID_Info _pid_info {};
 
     /// Low pass filter cut frequency for derivative calculation.
     ///

@@ -13,6 +13,11 @@ public:
         hist[0] = hist[1]; hist[1] = newhist;
         return ret;
   }
+  void reset()
+  {
+      hist[0] = 0.0f;
+      hist[1] = 0.0f;
+  }
 private:
     float hist[2];
 };

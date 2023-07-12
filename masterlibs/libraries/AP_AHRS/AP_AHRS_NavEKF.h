@@ -102,13 +102,13 @@ public:
     const NavEKF3 &get_NavEKF3_const(void) const {
         return EKF3;
     }
-    
+
     // return secondary attitude solution if available, as eulers in radians
     bool get_secondary_attitude(Vector3f &eulers) override;
 
     // return secondary attitude solution if available, as quaternion
     bool get_secondary_quaternion(Quaternion &quat) override;
-    
+
     // return secondary position solution if available
     bool get_secondary_position(struct Location &loc) override;
 
@@ -213,7 +213,7 @@ public:
 
     // send a EKF_STATUS_REPORT for current EKF
     void send_ekf_status_report(mavlink_channel_t chan);
-    
+
     // get_hgt_ctrl_limit - get maximum height to be observed by the control loops in meters and a validity flag
     // this is used to limit height during optical flow navigation
     // it will return invalid when no limiting is required
@@ -290,11 +290,11 @@ private:
 
     // get the index of the current primary IMU
     uint8_t get_primary_IMU_index(void) const;
-    
+
 #if CONFIG_HAL_BOARD == HAL_BOARD_SITL
     SITL::SITL *_sitl;
     uint32_t _last_body_odm_update_ms = 0;
     void update_SITL(void);
-#endif    
+#endif
 };
 #endif

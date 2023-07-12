@@ -23,7 +23,7 @@
  */
 #include <AP_HAL/AP_HAL.h>
 
-#ifdef HAL_COMPASS_HMC5843_I2C_ADDR
+#if HAL_COMPASS_DEFAULT == HAL_COMPASS_HMC5843
 
 #include <assert.h>
 #include <utility>

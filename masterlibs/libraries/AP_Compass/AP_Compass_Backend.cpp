@@ -22,7 +22,11 @@ void AP_Compass_Backend::rotate_field(Vector3f &mag, uint8_t instance)
         mag.rotate(_compass._board_orientation);
     } else {
         // add user selectable orientation
+#if !HAL_MINIMIZE_FEATURES_AVR
         mag.rotate((enum Rotation)state.orientation.get());
+#else
+        mag.rotate((enum Rotation)state.orientation);
+#endif
     }
 }
 
@@ -43,6 +47,7 @@ void AP_Compass_Backend::correct_field(Vector3f &mag, uint8_t i)
 {
     Compass::mag_state &state = _compass._state[i];
 
+#if !HAL_MINIMIZE_FEATURES_AVR
     if (state.diagonals.get().is_zero()) {
         state.diagonals.set(Vector3f(1.0f,1.0f,1.0f));
     }
@@ -51,6 +56,16 @@ void AP_Compass_Backend::correct_field(Vector3f &mag, uint8_t i)
     const Vector3f &diagonals = state.diagonals.get();
     const Vector3f &offdiagonals = state.offdiagonals.get();
     const Vector3f &mot = state.motor_compensation.get();
+#else
+    if (state.diagonals.is_zero()) {
+        state.diagonals = Vector3f(1.0f,1.0f,1.0f);
+    }
+
+    const Vector3f &offsets = state.offset;
+    const Vector3f &diagonals = state.diagonals;
+    const Vector3f &offdiagonals = state.offdiagonals;
+    const Vector3f &mot = state.motor_compensation;
+#endif
 
     /*
      * note that _motor_offset[] is kept even if compensation is not
@@ -107,7 +122,11 @@ uint8_t AP_Compass_Backend::register_compass(void) const
 */
 void AP_Compass_Backend::set_dev_id(uint8_t instance, uint32_t dev_id)
 {
+#if !HAL_MINIMIZE_FEATURES_AVR
     _compass._state[instance].dev_id.set_and_notify(dev_id);
+#else
+    _compass._state[instance].dev_id = dev_id;
+#endif
 }
 
 /*
@@ -116,7 +135,11 @@ void AP_Compass_Backend::set_dev_id(uint8_t instance, uint32_t dev_id)
 void AP_Compass_Backend::set_external(uint8_t instance, bool external)
 {
     if (_compass._state[instance].external != 2) {
+#if !HAL_MINIMIZE_FEATURES_AVR
         _compass._state[instance].external.set_and_notify(external);
+#else
+        _compass._state[instance].external = external;
+#endif
     }
 }
 

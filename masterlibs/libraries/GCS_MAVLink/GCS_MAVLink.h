@@ -3,7 +3,9 @@
 #pragma once
 
 #include <AP_HAL/AP_HAL.h>
+#if !HAL_MINIMIZE_FEATURES_AVR
 #include <AP_Param/AP_Param.h>
+#endif
 #include <AP_Math/AP_Math.h>
 
 // we have separate helpers disabled to make it possible
@@ -90,6 +92,8 @@ bool comm_is_idle(mavlink_channel_t chan);
 #include "include/mavlink/v2.0/ardupilotmega/mavlink.h"
 
 // return a MAVLink variable type given a AP_Param type
+#if !HAL_MINIMIZE_FEATURES_AVR
 uint8_t mav_var_type(enum ap_var_type t);
+#endif
 
 #pragma GCC diagnostic pop

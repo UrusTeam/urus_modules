@@ -15,12 +15,15 @@
   along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 #include "AP_AHRS.h"
+#if !HAL_MINIMIZE_FEATURES_AVR
 #include "AP_AHRS_View.h"
+#endif
 #include <AP_HAL/AP_HAL.h>
 
 extern const AP_HAL::HAL& hal;
 
 // table of user settable parameters
+#if !HAL_MINIMIZE_FEATURES_AVR
 const AP_Param::GroupInfo AP_AHRS::var_info[] PROGMEM = {
     // index 0 and 1 are for old parameters that are no longer not used
 
@@ -130,6 +133,7 @@ const AP_Param::GroupInfo AP_AHRS::var_info[] PROGMEM = {
 
     AP_GROUPEND
 };
+#endif
 
 // return a smoothed and corrected gyro vector using the latest ins data (which may not have been consumed by the EKF yet)
 Vector3f AP_AHRS::get_gyro_latest(void) const
@@ -141,6 +145,7 @@ Vector3f AP_AHRS::get_gyro_latest(void) const
 // return airspeed estimate if available
 bool AP_AHRS::airspeed_estimate(float *airspeed_ret) const
 {
+#if !HAL_MINIMIZE_FEATURES_AVR
     if (airspeed_sensor_enabled()) {
         *airspeed_ret = _airspeed->get_airspeed();
         if (_wind_max > 0 && _gps.status() >= AP_GPS::GPS_OK_FIX_2D) {
@@ -155,6 +160,7 @@ bool AP_AHRS::airspeed_estimate(float *airspeed_ret) const
         }
         return true;
     }
+#endif
     return false;
 }
 
@@ -164,27 +170,40 @@ void AP_AHRS::set_trim(Vector3f new_trim)
     Vector3f trim;
     trim.x = constrain_float(new_trim.x, ToRad(-AP_AHRS_TRIM_LIMIT), ToRad(AP_AHRS_TRIM_LIMIT));
     trim.y = constrain_float(new_trim.y, ToRad(-AP_AHRS_TRIM_LIMIT), ToRad(AP_AHRS_TRIM_LIMIT));
+#if !HAL_MINIMIZE_FEATURES_AVR
     _trim.set_and_save(trim);
+#else
+    _trim = trim;
+#endif
 }
 
 // add_trim - adjust the roll and pitch trim up to a total of 10 degrees
 void AP_AHRS::add_trim(float roll_in_radians, float pitch_in_radians, bool save_to_eeprom)
 {
+#if !HAL_MINIMIZE_FEATURES_AVR
     Vector3f trim = _trim.get();
+#else
+    Vector3f trim = _trim;
+#endif
 
     // add new trim
     trim.x = constrain_float(trim.x + roll_in_radians, ToRad(-AP_AHRS_TRIM_LIMIT), ToRad(AP_AHRS_TRIM_LIMIT));
     trim.y = constrain_float(trim.y + pitch_in_radians, ToRad(-AP_AHRS_TRIM_LIMIT), ToRad(AP_AHRS_TRIM_LIMIT));
 
     // set new trim values
+#if !HAL_MINIMIZE_FEATURES_AVR
     _trim.set(trim);
+#else
+    _trim = trim;
+#endif
 
     // save to eeprom
+#if !HAL_MINIMIZE_FEATURES_AVR
     if( save_to_eeprom ) {
         _trim.save();
     }
+#endif
 }
-
 // return a ground speed estimate in m/s
 Vector2f AP_AHRS::groundspeed_vector(void)
 {
@@ -291,8 +310,13 @@ void AP_AHRS::calc_trig(const Matrix3f &rot,
 //      should be called after _dcm_matrix is updated
 void AP_AHRS::update_trig(void)
 {
+#if !HAL_MINIMIZE_FEATURES_AVR
     if (_last_trim != _trim.get()) {
         _last_trim = _trim.get();
+#else
+    if (_last_trim != _trim) {
+        _last_trim = _trim;
+#endif
         _rotation_autopilot_body_to_vehicle_body.from_euler(_last_trim.x, _last_trim.y, 0.0f);
         _rotation_vehicle_body_to_autopilot_body = _rotation_autopilot_body_to_vehicle_body.transposed();
     }
@@ -344,6 +368,7 @@ AP_AHRS_View *AP_AHRS::create_view(enum Rotation rotation)
  */
 void AP_AHRS::update_AOA_SSA(void)
 {
+#if !HAL_MINIMIZE_FEATURES_AVR
 #if APM_BUILD_TYPE(APM_BUILD_ArduPlane)
     uint32_t now = AP_HAL::millis();
     if (now - _last_AOA_update_ms < 50) {
@@ -385,6 +410,7 @@ void AP_AHRS::update_AOA_SSA(void)
     }
 
     _SSA = degrees(safe_asin(aoa_velocity.y / vel_len));
+#endif
 #endif
 }
 
