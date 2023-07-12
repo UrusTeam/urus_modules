@@ -407,7 +407,6 @@ bool AP_Baro::_add_backend(AP_Baro_Backend *backend)
     do { _add_backend(backend);     \
        if (_num_drivers == BARO_MAX_DRIVERS || \
           _num_sensors == BARO_MAX_INSTANCES) { \
-          return; \
        } \
     } while (0)
 
@@ -569,8 +568,8 @@ void AP_Baro::update(void)
         if (sensors[i].healthy) {
             // update altitude calculation;
             float altnow = get_altitude_difference(101325.0f, (sensors[i].pressure + sensors[i].p_correction), get_temperature());
-            float qnhtmpLocal = calculate_qnh(altnow, ((sensors[i].pressure + sensors[i].p_correction) / 100), get_temperature(), 1);
-            float qfeLocal = calculate_qfe(altnow, qnhtmpLocal, get_temperature(), 1) * 100;
+            //float qnhtmpLocal = calculate_qnh(altnow, ((sensors[i].pressure + sensors[i].p_correction) / 100), get_temperature(), 1);
+            //float qfeLocal = calculate_qfe(altnow, qnhtmpLocal, get_temperature(), 1) * 100;
 
             float ground_pressure = sensors[i].ground_pressure;
             if (is_zero(ground_pressure) || isnan(ground_pressure) || isinf(ground_pressure)) {

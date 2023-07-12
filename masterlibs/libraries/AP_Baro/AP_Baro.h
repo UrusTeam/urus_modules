@@ -116,7 +116,9 @@ public:
     uint32_t get_last_update(uint8_t instance) const { return sensors[instance].last_update_ms; }
 
     // settable parameters
+#if !HAL_MINIMIZE_FEATURES_AVR
     static const struct AP_Param::GroupInfo var_info[];
+#endif
 
     float get_external_temperature(void) const { return get_external_temperature(_primary); };
     float get_external_temperature(const uint8_t instance) const;
