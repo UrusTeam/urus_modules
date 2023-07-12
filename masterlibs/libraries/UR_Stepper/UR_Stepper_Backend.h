@@ -28,8 +28,8 @@ public:
     /** See update function on top class.
       */
     virtual void update();
-    virtual void move_degree(int64_t deg);
-    virtual void move_steps(int64_t steps);
+    virtual void move_degree(float deg);
+    virtual void move_steps(int32_t steps);
     virtual UR_STEPPER_NAMESPACE::State _get_current_state(void);
 
 protected:

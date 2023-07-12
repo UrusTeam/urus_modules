@@ -14,10 +14,10 @@ void UR_Stepper_Backend::setup_process(UR_Stepper::ProcessMode process_mode)
 void UR_Stepper_Backend::update()
 {}
 
-void UR_Stepper_Backend::move_degree(int64_t deg)
+void UR_Stepper_Backend::move_degree(float deg)
 {}
 
-void UR_Stepper_Backend::move_steps(int64_t steps)
+void UR_Stepper_Backend::move_steps(int32_t steps)
 {}
 
 UR_STEPPER_NAMESPACE::State UR_Stepper_Backend::_get_current_state(void)

@@ -27,8 +27,8 @@ public:
       */
     static UR_Stepper_Backend *configure(UR_Stepper &ur_stepper);
 
-    void move_steps(int64_t steps) override;
-    void move_degree(int64_t deg) override;
+    void move_steps(int32_t steps) override;
+    void move_degree(float deg) override;
 
 private:
     UR_Stepper_Generic(UR_Stepper &ur_stepper);
@@ -36,15 +36,18 @@ private:
     bool _configure();
 
     bool _auto_process = false;
-
-    int64_t _steps;
-    float _last_action_end;
-    float _next_action_interval;
+    int32_t _steps;
+#if LINEAR_SPEED_ENABLED == 1
+    uint32_t _last_action_end;
+    uint32_t _next_action_interval;
     float _rest;
     float _step_count;        // current position
-    float _steps_remaining;   // to complete the current move (absolute value)
+#endif // LINEAR_SPEED_ENABLED
+    int32_t _steps_remaining;   // to complete the current move (absolute value)
+#if LINEAR_SPEED_ENABLED == 1
     float _steps_to_cruise;   // steps to reach cruising (max) rpm
     float _steps_to_brake;    // steps needed to come to a full stop
+#endif // LINEAR_SPEED_ENABLED
     float _step_pulse;        // step pulse duration (microseconds)
     float _cruise_step_pulse; // step pulse duration for constant speed section (max rpm)
 
@@ -52,15 +55,15 @@ private:
 
     void _steps_loop(void);
     void _set_step_dir(STEP_DIR dir);
-    void _start_move(int64_t steps);
-    int64_t _next_action(void);
+    void _start_move(int32_t steps);
+    void _next_action(void);
     void _calc_step_pulse(void);
     State _get_current_state(void) override;
 
     /*
      * Calculate steps needed to rotate requested angle, given in degrees
      */
-    int64_t _calc_steps_for_rotation(int64_t deg);
+    float _calc_steps_for_rotation(float deg);
 
 };
 

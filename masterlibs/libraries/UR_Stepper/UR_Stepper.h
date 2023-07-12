@@ -7,7 +7,7 @@
 
 #define MOTOR_STEPS         200.0f
 #define MOTOR_RPM           200.0f
-#define MICROSTEPS          1.0f
+#define MICROSTEPS          1
 #define MOTOR_ACCEL         1000.0f
 #define MOTOR_DECEL         1000.0f
 
@@ -38,7 +38,7 @@ namespace UR_STEPPER_NAMESPACE
         float accel = MOTOR_ACCEL;     // acceleration [steps/s^2]
         float decel = MOTOR_DECEL;     // deceleration [steps/s^2]
         float steps = MOTOR_STEPS;
-        float microsteps = MICROSTEPS;
+        uint8_t microsteps = MICROSTEPS;
         float rpm = MOTOR_RPM;
         uint8_t dir_pin = DIR_PIN;
         uint8_t step_pin = STEP_PIN;
@@ -89,8 +89,8 @@ public:
       * @return None.
       */
     void update();
-    void move_degree(int64_t deg);
-    void move_steps(int64_t steps);
+    void move_degree(float deg);
+    void move_steps(int32_t steps);
     void set_profile(UR_STEPPER_NAMESPACE::stepper_profile_t profile);
     UR_STEPPER_NAMESPACE::State get_current_state(uint8_t backend = 0);
 

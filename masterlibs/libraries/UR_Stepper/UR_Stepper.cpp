@@ -69,14 +69,14 @@ bool UR_Stepper::_add_backend(UR_Stepper_Backend *backend)
     return true;
 }
 
-void UR_Stepper::move_degree(int64_t deg)
+void UR_Stepper::move_degree(float deg)
 {
     for (uint8_t i = 0; i < _backend_count; i++) {
         _backends[i]->move_degree(deg);
     }
 }
 
-void UR_Stepper::move_steps(int64_t steps)
+void UR_Stepper::move_steps(int32_t steps)
 {
     for (uint8_t i = 0; i < _backend_count; i++) {
         _backends[i]->move_steps(steps);
