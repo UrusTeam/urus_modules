@@ -1,5 +1,5 @@
 #pragma once
-
+//#if !defined(SHAL_CORE_APM328) && !defined(SHAL_CORE_APM2) && !defined(SHAL_CORE_MEGA02)
 // Gyro and Accelerometer calibration criteria
 #define AP_INERTIAL_SENSOR_ACCEL_TOT_MAX_OFFSET_CHANGE  4.0f
 #define AP_INERTIAL_SENSOR_ACCEL_MAX_OFFSET             250.0f
@@ -17,8 +17,9 @@
 #define INS_VIBRATION_CHECK_INSTANCES 1
 
 #include <stdint.h>
-
+#if !HAL_MINIMIZE_FEATURES_AVR
 #include <AP_AccelCal/AP_AccelCal.h>
+#endif
 #include <AP_HAL/AP_HAL.h>
 #include <AP_Math/AP_Math.h>
 #include <Filter/LowPassFilter2p.h>
@@ -26,7 +27,9 @@
 //#include <Filter/NotchFilter.h>
 
 class AP_InertialSensor_Backend;
+#if !HAL_MINIMIZE_FEATURES_AVR
 class AuxiliaryBus;
+#endif
 #if !HAL_MINIMIZE_FEATURES
 class AP_AHRS;
 #endif
@@ -44,7 +47,11 @@ class DataFlash_Class;
  * blog post describing the method: http://chionophilous.wordpress.com/2011/10/24/accelerometer-calibration-iv-1-implementing-gauss-newton-on-an-atmega/
  * original sketch available at http://rolfeschmidt.com/mathtools/skimetrics/adxl_gn_calibration.pde
  */
+#if !HAL_MINIMIZE_FEATURES_AVR
 class AP_InertialSensor : AP_AccelCal_Client
+#else
+class AP_InertialSensor
+#endif
 {
     friend class AP_InertialSensor_Backend;
 
@@ -128,7 +135,11 @@ public:
     bool gyro_calibrated_ok(uint8_t instance) const { return _gyro_cal_ok[instance]; }
     bool gyro_calibrated_ok_all() const;
     bool use_gyro(uint8_t instance) const;
+#if !HAL_MINIMIZE_FEATURES_AVR
     Gyro_Calibration_Timing gyro_calibration_timing() { return (Gyro_Calibration_Timing)_gyro_cal_timing.get(); }
+#else
+    Gyro_Calibration_Timing gyro_calibration_timing() { return (Gyro_Calibration_Timing)_gyro_cal_timing; }
+#endif
 
     bool get_accel_health(uint8_t instance) const { return (instance<_accel_count) ? _accel_healthy[instance] : false; }
     bool get_accel_health(void) const { return get_accel_health(_primary_accel); }
@@ -177,7 +188,9 @@ public:
     void wait_for_sample(void);
 
     // class level parameters
-    static const struct AP_Param::GroupInfo var_info[];
+#if !HAL_MINIMIZE_FEATURES_AVR
+    static const struct AP_Param::GroupInfo var_info[] PROGMEM;
+#endif
 
     // set overall board orientation
     void set_board_orientation(enum Rotation orientation) {
@@ -231,10 +244,10 @@ public:
     void set_delta_time(float delta_time);
     void set_delta_velocity(uint8_t instance, float deltavt, const Vector3f &deltav);
     void set_delta_angle(uint8_t instance, const Vector3f &deltaa, float deltaat);
-
+#if !HAL_MINIMIZE_FEATURES_AVR
     AuxiliaryBus *get_auxiliary_bus(int16_t backend_id) { return get_auxiliary_bus(backend_id, 0); }
     AuxiliaryBus *get_auxiliary_bus(int16_t backend_id, uint8_t instance);
-
+#endif
     void detect_backends(void);
 
     // accel peak hold detector
@@ -242,7 +255,9 @@ public:
     float get_accel_peak_hold_neg_x() const { return _peak_hold_state.accel_peak_hold_neg_x; }
 
     //Returns accel calibrator interface object pointer
+#if !HAL_MINIMIZE_FEATURES_AVR
     AP_AccelCal* get_acal() const { return _acal; }
+#endif
 
     // Returns body fixed accelerometer level data averaged during accel calibration's first step
     bool get_fixed_mount_accel_cal_sample(uint8_t sample_num, Vector3f& ret) const;
@@ -335,6 +350,7 @@ private:
     Vector3f _last_delta_angle[INS_MAX_INSTANCES];
     Vector3f _last_raw_gyro[INS_MAX_INSTANCES];
 
+#if !HAL_MINIMIZE_FEATURES_AVR
     // product id
     AP_Int16 _old_product_id;
 
@@ -350,6 +366,18 @@ private:
 
     // accelerometer position offset in body frame
     AP_Vector3f _accel_pos[INS_MAX_INSTANCES];
+#else
+    int16_t _old_product_id;
+    int32_t _accel_id[INS_MAX_INSTANCES];
+    int32_t _gyro_id[INS_MAX_INSTANCES];
+
+    Vector3f _accel_scale[INS_MAX_INSTANCES];
+    Vector3f _accel_offset[INS_MAX_INSTANCES];
+    Vector3f _gyro_offset[INS_MAX_INSTANCES];
+
+    // accelerometer position offset in body frame
+    Vector3f _accel_pos[INS_MAX_INSTANCES];
+#endif
 
     // accelerometer max absolute offsets to be used for calibration
     float _accel_max_abs_offsets[INS_MAX_INSTANCES];
@@ -377,6 +405,7 @@ private:
     float _temperature[INS_MAX_INSTANCES];
 
     // filtering frequency (0 means default)
+#if !HAL_MINIMIZE_FEATURES_AVR
     AP_Int8     _accel_filter_cutoff;
     AP_Int8     _gyro_filter_cutoff;
     AP_Int8     _gyro_cal_timing;
@@ -386,7 +415,17 @@ private:
 
     // control enable of fast sampling
     AP_Int8     _fast_sampling_mask;
+#else
+    int8_t     _accel_filter_cutoff;
+    int8_t     _gyro_filter_cutoff;
+    int8_t     _gyro_cal_timing;
 
+    // use for attitude, velocity, position estimates
+    int8_t     _use[INS_MAX_INSTANCES];
+
+    // control enable of fast sampling
+    int8_t     _fast_sampling_mask;
+#endif
     // board orientation from AHRS
     enum Rotation _board_orientation;
 
@@ -450,8 +489,11 @@ private:
     } _peak_hold_state;
 
     // threshold for detecting stillness
+#if !HAL_MINIMIZE_FEATURES_AVR
     AP_Float _still_threshold;
-
+#else
+    float _still_threshold;
+#endif
     /*
       state for HIL support
      */
@@ -459,23 +501,30 @@ private:
         float delta_time;
     } _hil {0};
 
+#if !HAL_MINIMIZE_FEATURES_AVR
     // Trim options
     AP_Int8 _acc_body_aligned;
     AP_Int8 _trim_option;
+#else
+    int8_t _acc_body_aligned;
+    int8_t _trim_option;
+#endif
 
     //DataFlash_Class *_dataflash;
 
     static AP_InertialSensor *_s_instance;
+#if !HAL_MINIMIZE_FEATURES_AVR
     AP_AccelCal* _acal;
-
     AccelCalibrator *_accel_calibrator;
-
+#endif
     //save accelerometer bias and scale factors
     void _acal_save_calibrations();
     void _acal_event_failure();
 
+#if !HAL_MINIMIZE_FEATURES_AVR
     // Returns AccelCalibrator objects pointer for specified acceleromter
     AccelCalibrator* _acal_get_calibrator(uint8_t i) override { return i<get_accel_count()?&(_accel_calibrator[i]):nullptr; }
+#endif
 
     float _trim_pitch;
     float _trim_roll;
@@ -489,3 +538,5 @@ private:
     bool _startup_error_counts_set;
     uint32_t _startup_ms;
 };
+
+//#endif

@@ -6,9 +6,13 @@
 #include <AP_HAL/I2CDevice.h>
 #include <AP_HAL/SPIDevice.h>
 #include <AP_Math/AP_Math.h>
+#if !HAL_MINIMIZE_FEATURES_AVR
 #include <AP_Notify/AP_Notify.h>
+#endif
 #include <AP_Vehicle/AP_Vehicle.h>
+#if !HAL_MINIMIZE_FEATURES_AVR
 #include <AP_AHRS/AP_AHRS.h>
+#endif
 
 #include "AP_InertialSensor.h"
 #include "AP_InertialSensor_BMI160.h"
@@ -17,6 +21,7 @@
 #include "AP_InertialSensor_L3G4200D.h"
 #include "AP_InertialSensor_LSM9DS0.h"
 #include "AP_InertialSensor_Invensense.h"
+#include "AP_InertialSensor_ITG3200.h"
 
 /* Define INS_TIMING_DEBUG to track down scheduling issues with the main loop.
  * Output is on the debug console. */
@@ -26,6 +31,8 @@
 #else
 #define timing_printf(fmt, args...)
 #endif
+
+#include <utility>
 
 extern const AP_HAL::HAL& hal;
 
@@ -52,6 +59,7 @@ extern const AP_HAL::HAL& hal;
 #define SAMPLE_UNIT 1
 
 // Class level parameters
+#if !HAL_MINIMIZE_FEATURES_AVR
 const AP_Param::GroupInfo AP_InertialSensor::var_info[] PROGMEM = {
     // @Param: PRODUCT_ID
     // @DisplayName: IMU Product ID
@@ -436,6 +444,7 @@ const AP_Param::GroupInfo AP_InertialSensor::var_info[] PROGMEM = {
      */
     AP_GROUPEND
 };
+#endif
 
 AP_InertialSensor *AP_InertialSensor::_s_instance = nullptr;
 
@@ -458,10 +467,21 @@ AP_InertialSensor::AP_InertialSensor() :
     _startup_ms(0)
 {
     if (_s_instance) {
-        AP_HAL::panic(PSTR("Too many inertial sensors"));
+        //AP_HAL::panic(PSTR("Too many inertial sensors"));
+        AP_HAL::panic(PSTR("INS E-01"));
     }
     _s_instance = this;
+
+#if !HAL_MINIMIZE_FEATURES_AVR
     AP_Param::setup_object_defaults(this, var_info);
+#else
+    _gyro_filter_cutoff = DEFAULT_GYRO_FILTER;
+    _accel_filter_cutoff = DEFAULT_ACCEL_FILTER;
+    _still_threshold =  DEFAULT_STILL_THRESH;
+    _use[0] = 1;
+    _gyro_cal_timing = 1;
+    _acc_body_aligned = 2;
+#endif
     for (uint8_t i=0; i<INS_MAX_BACKENDS; i++) {
         _backends[i] = nullptr;
     }
@@ -494,7 +514,9 @@ AP_InertialSensor::AP_InertialSensor() :
     memset(_delta_velocity_valid,0,sizeof(_delta_velocity_valid));
     memset(_delta_angle_valid,0,sizeof(_delta_angle_valid));
 
+#if !HAL_MINIMIZE_FEATURES_AVR
     AP_AccelCal::register_client(this);
+#endif
 }
 
 /*
@@ -515,20 +537,28 @@ uint8_t AP_InertialSensor::register_gyro(uint16_t raw_sample_rate_hz,
                                          uint32_t id)
 {
     if (_gyro_count == INS_MAX_INSTANCES) {
-        AP_HAL::panic(PSTR("Too many gyros"));
+        //AP_HAL::panic(PSTR("Too many gyros"));
+        AP_HAL::panic(PSTR("INS E-02"));
     }
 
     _gyro_raw_sample_rates[_gyro_count] = raw_sample_rate_hz;
     _gyro_over_sampling[_gyro_count] = 1;
 
+#if !HAL_MINIMIZE_FEATURES_AVR
     bool saved = _gyro_id[_gyro_count].load();
+#else
+    bool saved = _gyro_id[_gyro_count];
+#endif
 
     if (saved && (uint32_t)_gyro_id[_gyro_count] != id) {
         // inconsistent gyro id - mark it as needing calibration
         _gyro_cal_ok[_gyro_count] = false;
     }
-
+#if !HAL_MINIMIZE_FEATURES_AVR
     _gyro_id[_gyro_count].set((int32_t) id);
+#else
+    _gyro_id[_gyro_count] = (int32_t)id;
+#endif
 
 #if CONFIG_HAL_BOARD == HAL_BOARD_PX4 || CONFIG_HAL_BOARD == HAL_BOARD_VRBRAIN || CONFIG_HAL_BOARD == HAL_BOARD_SITL
     if (!saved) {
@@ -548,13 +578,17 @@ uint8_t AP_InertialSensor::register_accel(uint16_t raw_sample_rate_hz,
                                           uint32_t id)
 {
     if (_accel_count == INS_MAX_INSTANCES) {
-        AP_HAL::panic(PSTR("Too many accels"));
+        //AP_HAL::panic(PSTR("Too many accels"));
+        AP_HAL::panic(PSTR("INS E-03"));
     }
 
     _accel_raw_sample_rates[_accel_count] = raw_sample_rate_hz;
     _accel_over_sampling[_accel_count] = 1;
-
+#if !HAL_MINIMIZE_FEATURES_AVR
     bool saved = _accel_id[_accel_count].load();
+#else
+    bool saved = _accel_id[_accel_count];
+#endif
 
     if (!saved) {
         // inconsistent accel id
@@ -565,8 +599,11 @@ uint8_t AP_InertialSensor::register_accel(uint16_t raw_sample_rate_hz,
     } else {
         _accel_id_ok[_accel_count] = true;
     }
-
+#if !HAL_MINIMIZE_FEATURES_AVR
     _accel_id[_accel_count].set((int32_t) id);
+#else
+    _accel_id[_accel_count] = (int32_t)id;
+#endif
 
 #if CONFIG_HAL_BOARD == HAL_BOARD_PX4 || CONFIG_HAL_BOARD == HAL_BOARD_VRBRAIN || CONFIG_HAL_BOARD == HAL_BOARD_SITL
         // assume this is the same sensor and save its ID to allow seamless
@@ -592,7 +629,8 @@ void AP_InertialSensor::_start_backends()
     }
 
     if (_gyro_count == 0 || _accel_count == 0) {
-        AP_HAL::panic(PSTR("INS needs at least 1 gyro and 1 accel"));
+        //AP_HAL::panic(PSTR("INS needs at least 1 gyro and 1 accel"));
+        AP_HAL::panic(PSTR("INS E-04"));
     }
 }
 
@@ -633,9 +671,15 @@ AP_InertialSensor::init(uint16_t sample_rate)
     // initialise accel scale if need be. This is needed as we can't
     // give non-zero default values for vectors in AP_Param
     for (uint8_t i=0; i<get_accel_count(); i++) {
+#if !HAL_MINIMIZE_FEATURES_AVR
         if (_accel_scale[i].get().is_zero()) {
             _accel_scale[i].set(Vector3f(1,1,1));
         }
+#else
+        if (_accel_scale[i].is_zero()) {
+            _accel_scale[i] = Vector3f(1,1,1);
+        }
+#endif
     }
 
     // calibrate gyros unless gyro calibration has been disabled
@@ -660,8 +704,10 @@ bool AP_InertialSensor::_add_backend(AP_InertialSensor_Backend *backend)
         return false;
     }
     if (_backend_count == INS_MAX_BACKENDS) {
-        AP_HAL::panic(PSTR("Too many INS backends"));
+        //AP_HAL::panic(PSTR("Too many INS backends"));
+        AP_HAL::panic(PSTR("INS E-05"));
     }
+
     _backends[_backend_count++] = backend;
     return true;
 }
@@ -678,10 +724,12 @@ AP_InertialSensor::detect_backends(void)
 
     _backends_detected = true;
 
+#if !HAL_MINIMIZE_FEATURES_AVR
     if (_hil_mode) {
         _add_backend(AP_InertialSensor_HIL::detect(*this));
         return;
     }
+#endif
 #if CONFIG_HAL_BOARD == HAL_BOARD_SITL
     _add_backend(AP_InertialSensor_SITL::detect(*this));
 #elif HAL_INS_DEFAULT == HAL_INS_HIL
@@ -810,12 +858,18 @@ AP_InertialSensor::detect_backends(void)
     } else {
         hal.console->printf("aero: onboard IMU not detected\n");
     }
+#elif HAL_INS_DEFAULT == HAL_INS_ITG32XX
+    AP_InertialSensor_Backend *backend = new AP_InertialSensor_ITG3200(*this,
+            std::move(hal.i2c_mgr->get_device(HAL_INS_ITG32XX_GYRO_I2C_BUS, HAL_INS_ITG32XX_I2C_GYRO_ADDR)),
+            std::move(hal.i2c_mgr->get_device(HAL_INS_ITG32XX_ACCEL_I2C_BUS, HAL_INS_ITG32XX_I2C_ACCEL_ADDR)));
+    _add_backend(backend);
 #else
     #error Unrecognised HAL_INS_TYPE setting
 #endif
 
     if (_backend_count == 0) {
-        AP_HAL::panic(PSTR("No INS backends available"));
+        //AP_HAL::panic(PSTR("No INS backends available"));
+        AP_HAL::panic(PSTR("INS E-06"));
     }
 }
 
@@ -830,12 +884,15 @@ bool AP_InertialSensor::_calculate_trim(const Vector3f &accel_sample, float& tri
     trim_roll = atan2f(-accel_sample.y, -accel_sample.z);
     if (fabsf(trim_roll) > radians(10) ||
         fabsf(trim_pitch) > radians(10)) {
-        hal.console->printf_PS(PSTR("trim over maximum of 10 degrees\n"));
+        //hal.console->printf_PS(PSTR("trim over maximum of 10 degrees\n"));
+        hal.console->printf_PS(PSTR("INS E-07\n"));
         return false;
     }
+#if !HAL_MINIMIZE_FEATURES_AVR
     hal.console->printf_PS(PSTR("Trim OK: roll=%.2f pitch=%.2f\n"),
                           (double)degrees(trim_roll),
                           (double)degrees(trim_pitch));
+#endif
     return true;
 }
 
@@ -978,18 +1035,34 @@ bool AP_InertialSensor::accel_calibrated_ok_all() const
             return false;
         }
         // exactly 0.0 offset is extremely unlikely
+#if !HAL_MINIMIZE_FEATURES_AVR
         if (_accel_offset[i].get().is_zero()) {
             return false;
         }
+#else
+        if (_accel_offset[i].is_zero()) {
+            return false;
+        }
+#endif
         // exactly 1.0 scaling is extremely unlikely
+#if !HAL_MINIMIZE_FEATURES_AVR
         const Vector3f &scaling = _accel_scale[i].get();
+#else
+        const Vector3f &scaling = _accel_scale[i];
+#endif
         if (is_equal(scaling.x,1.0f) && is_equal(scaling.y,1.0f) && is_equal(scaling.z,1.0f)) {
             return false;
         }
         // zero scaling also indicates not calibrated
+#if !HAL_MINIMIZE_FEATURES_AVR
         if (_accel_scale[i].get().is_zero()) {
             return false;
         }
+#else
+        if (_accel_scale[i].is_zero()) {
+            return false;
+        }
+#endif
     }
     for (uint8_t i=get_accel_count(); i<INS_MAX_INSTANCES; i++) {
         if (_accel_id[i] != 0) {
@@ -1001,9 +1074,17 @@ bool AP_InertialSensor::accel_calibrated_ok_all() const
     // check calibrated accels matches number of accels (no unused accels should have offsets or scaling)
     if (get_accel_count() < INS_MAX_INSTANCES) {
         for (uint8_t i=get_accel_count(); i<INS_MAX_INSTANCES; i++) {
+#if !HAL_MINIMIZE_FEATURES_AVR
             const Vector3f &scaling = _accel_scale[i].get();
+#else
+            const Vector3f &scaling = _accel_scale[i];
+#endif
             bool have_scaling = (!is_zero(scaling.x) && !is_equal(scaling.x,1.0f)) || (!is_zero(scaling.y) && !is_equal(scaling.y,1.0f)) || (!is_zero(scaling.z) && !is_equal(scaling.z,1.0f));
+#if !HAL_MINIMIZE_FEATURES_AVR
             bool have_offsets = !_accel_offset[i].get().is_zero();
+#else
+            bool have_offsets = !_accel_offset[i].is_zero();
+#endif
             if (have_scaling || have_offsets) {
                 return false;
             }
@@ -1042,7 +1123,9 @@ AP_InertialSensor::_init_gyro()
     _calibrating = true;
 
     // flash leds to tell user to keep the IMU still
+#if !HAL_MINIMIZE_FEATURES_AVR
     AP_Notify::flags.initialising = true;
+#endif
 
     // cold start
     hal.console->printf_PS(PSTR("Init Gyro"));
@@ -1056,7 +1139,11 @@ AP_InertialSensor::_init_gyro()
 
     // remove existing gyro offsets
     for (uint8_t k=0; k<num_gyros; k++) {
+#if !HAL_MINIMIZE_FEATURES_AVR
         _gyro_offset[k].set(Vector3f());
+#else
+        _gyro_offset[k] = Vector3f();
+#endif
         new_gyro_offset[k].zero();
         best_diff[k] = -1.f;
         last_average[k].zero();
@@ -1140,10 +1227,12 @@ AP_InertialSensor::_init_gyro()
     hal.console->printf_PS(PSTR("\n"));
     for (uint8_t k=0; k<num_gyros; k++) {
         if (!converged[k]) {
+#if !HAL_MINIMIZE_FEATURES_AVR
             hal.console->printf_PS(PSTR("gyro[%u] did not converge: diff=%f dps (expected < %f)\n"),
                                 (unsigned)k,
                                 (double)ToDeg(best_diff[k]),
                                 (double)GYRO_INIT_MAX_DIFF_DPS);
+#endif
             _gyro_offset[k] = best_avg[k];
             // flag calibration as failed for this gyro
             _gyro_cal_ok[k] = false;
@@ -1159,20 +1248,29 @@ AP_InertialSensor::_init_gyro()
     // record calibration complete
     _calibrating = false;
 
+#if !HAL_MINIMIZE_FEATURES_AVR
     // stop flashing leds
     AP_Notify::flags.initialising = false;
+#endif
 }
 
 // save parameters to eeprom
 void AP_InertialSensor::_save_gyro_calibration()
 {
+#if !HAL_MINIMIZE_FEATURES_AVR
     for (uint8_t i=0; i<_gyro_count; i++) {
         _gyro_offset[i].save();
         _gyro_id[i].save();
     }
+#endif
     for (uint8_t i=_gyro_count; i<INS_MAX_INSTANCES; i++) {
+#if !HAL_MINIMIZE_FEATURES_AVR
         _gyro_offset[i].set_and_save(Vector3f());
         _gyro_id[i].set_and_save(0);
+#else
+        _gyro_offset[i] = Vector3f();
+        _gyro_id[i] = 0;
+#endif
     }
 }
 
@@ -1345,6 +1443,7 @@ check_sample:
         while (true) {
             for (uint8_t i=0; i<_backend_count; i++) {
                 _backends[i]->accumulate();
+                _backends[i]->update();
             }
 
             for (uint8_t i=0; i<INS_MAX_INSTANCES; i++) {
@@ -1531,6 +1630,7 @@ void AP_InertialSensor::set_delta_angle(uint8_t instance, const Vector3f &deltaa
 /*
  * Get an AuxiliaryBus of N @instance of backend identified by @backend_id
  */
+#if !HAL_MINIMIZE_FEATURES_AVR
 AuxiliaryBus *AP_InertialSensor::get_auxiliary_bus(int16_t backend_id, uint8_t instance)
 {
     detect_backends();
@@ -1542,7 +1642,7 @@ AuxiliaryBus *AP_InertialSensor::get_auxiliary_bus(int16_t backend_id, uint8_t i
 
     return backend->get_auxiliary_bus();
 }
-
+#endif
 // calculate vibration levels and check for accelerometer clipping (called by a backends)
 void AP_InertialSensor::calc_vibration_and_clipping(uint8_t instance, const Vector3f &accel, float dt)
 {
@@ -1611,52 +1711,73 @@ bool AP_InertialSensor::is_still()
 void AP_InertialSensor::acal_init()
 {
     // NOTE: these objects are never deallocated because the pre-arm checks force a reboot
+#if !HAL_MINIMIZE_FEATURES_AVR
     if (_acal == nullptr) {
         _acal = new AP_AccelCal;
     }
+
     if (_accel_calibrator == nullptr) {
         _accel_calibrator = new AccelCalibrator[INS_MAX_INSTANCES];
     }
+#endif
 }
 
 // update accel calibrator
 void AP_InertialSensor::acal_update()
 {
+#if !HAL_MINIMIZE_FEATURES_AVR
     if(_acal == nullptr) {
         return;
     }
-
     _acal->update();
 
     if (hal.util->get_soft_armed() && _acal->get_status() != ACCEL_CAL_NOT_STARTED) {
         _acal->cancel();
     }
+#endif
 }
 
 /*
     set and save accelerometer bias along with trim calculation
 */
+/*
 void AP_InertialSensor::_acal_save_calibrations()
 {
     Vector3f bias, gain;
     for (uint8_t i=0; i<_accel_count; i++) {
         if (_accel_calibrator[i].get_status() == ACCEL_CAL_SUCCESS) {
             _accel_calibrator[i].get_calibration(bias, gain);
+#if !HAL_MINIMIZE_FEATURES_AVR
             _accel_offset[i].set_and_save(bias);
             _accel_scale[i].set_and_save(gain);
             _accel_id[i].save();
+#else
+            _accel_offset[i] = bias;
+            _accel_scale[i] = gain;
+#endif
             _accel_id_ok[i] = true;
         } else {
+#if !HAL_MINIMIZE_FEATURES_AVR
             _accel_offset[i].set_and_save(Vector3f());
             _accel_scale[i].set_and_save(Vector3f());
+#else
+            _accel_offset[i] = Vector3f();
+            _accel_scale[i] = Vector3f();
+#endif
         }
     }
 
     // clear any unused accels
     for (uint8_t i=_accel_count; i<INS_MAX_INSTANCES; i++) {
+#if !HAL_MINIMIZE_FEATURES_AVR
         _accel_id[i].set_and_save(0);
         _accel_offset[i].set_and_save(Vector3f());
         _accel_scale[i].set_and_save(Vector3f());
+#else
+        _accel_id[i] = 0;
+        _accel_offset[i] = Vector3f();
+        _accel_scale[i] = Vector3f();
+#endif
     }
 
     Vector3f aligned_sample;
@@ -1688,23 +1809,28 @@ void AP_InertialSensor::_acal_save_calibrations()
             break;
         default:
             _new_trim = false;
-            /* no break */
+            // no break
     }
 
     if (fabsf(_trim_roll) > radians(10) ||
         fabsf(_trim_pitch) > radians(10)) {
-        hal.console->printf_PS(PSTR("ERR: Trim over maximum of 10 degrees!!"));
+        hal.console->printf_PS(PSTR("INS E-08"));
         _new_trim = false;  //we have either got faulty level during acal or highly misaligned accelerometers
     }
 
     _accel_cal_requires_reboot = true;
 }
-
+*/
 void AP_InertialSensor::_acal_event_failure()
 {
     for (uint8_t i=0; i<_accel_count; i++) {
+#if !HAL_MINIMIZE_FEATURES_AVR
         _accel_offset[i].set_and_notify(Vector3f(0,0,0));
         _accel_scale[i].set_and_notify(Vector3f(1,1,1));
+#else
+        _accel_offset[i] = Vector3f(0,0,0);
+        _accel_scale[i] = Vector3f(1,1,1);
+#endif
     }
 }
 
@@ -1725,6 +1851,7 @@ bool AP_InertialSensor::get_new_trim(float& trim_roll, float &trim_pitch)
 /*
     Returns body fixed accelerometer level data averaged during accel calibration's first step
 */
+/*
 bool AP_InertialSensor::get_fixed_mount_accel_cal_sample(uint8_t sample_num, Vector3f& ret) const
 {
     if (_accel_count <= (_acc_body_aligned-1) || _accel_calibrator[2].get_status() != ACCEL_CAL_SUCCESS || sample_num>=_accel_calibrator[2].get_num_samples_collected()) {
@@ -1734,10 +1861,11 @@ bool AP_InertialSensor::get_fixed_mount_accel_cal_sample(uint8_t sample_num, Vec
     ret.rotate(_board_orientation);
     return true;
 }
-
+*/
 /*
     Returns Primary accelerometer level data averaged during accel calibration's first step
 */
+/*
 bool AP_InertialSensor::get_primary_accel_cal_sample_avg(uint8_t sample_num, Vector3f& ret) const
 {
     uint8_t count = 0;
@@ -1759,7 +1887,7 @@ bool AP_InertialSensor::get_primary_accel_cal_sample_avg(uint8_t sample_num, Vec
     ret.rotate(_board_orientation);
     return true;
 }
-
+*/
 /*
   perform a simple 1D accel calibration, returning mavlink result code
  */

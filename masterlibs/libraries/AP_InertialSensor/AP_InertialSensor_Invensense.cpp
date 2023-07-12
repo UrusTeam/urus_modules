@@ -286,7 +286,9 @@ AP_InertialSensor_Invensense::~AP_InertialSensor_Invensense()
     if (_fifo_buffer != nullptr) {
         hal.util->dma_free(_fifo_buffer, MPU_FIFO_BUFFER_LEN * MPU_SAMPLE_SIZE);
     }
+#if !HAL_MINIMIZE_FEATURES_AVR
     delete _auxiliary_bus;
+#endif
 }
 
 AP_InertialSensor_Backend *AP_InertialSensor_Invensense::probe(AP_InertialSensor &imu,
@@ -527,6 +529,7 @@ bool AP_InertialSensor_Invensense::update()
 void AP_InertialSensor_Invensense::accumulate()
 {}
 
+#if !HAL_MINIMIZE_FEATURES_AVR
 AuxiliaryBus *AP_InertialSensor_Invensense::get_auxiliary_bus()
 {
     if (_auxiliary_bus) {
@@ -539,6 +542,7 @@ AuxiliaryBus *AP_InertialSensor_Invensense::get_auxiliary_bus()
 
     return _auxiliary_bus;
 }
+#endif
 
 /*
  * Return true if the Invensense has new data available for reading.
@@ -973,6 +977,7 @@ bool AP_InertialSensor_Invensense::_hardware_init(void)
     return true;
 }
 
+#if !HAL_MINIMIZE_FEATURES_AVR
 AP_Invensense_AuxiliaryBusSlave::AP_Invensense_AuxiliaryBusSlave(AuxiliaryBus &bus, uint8_t addr,
                                                          uint8_t instance)
     : AuxiliaryBusSlave(bus, addr, instance)
@@ -1140,3 +1145,4 @@ AP_HAL::Device::PeriodicHandle AP_Invensense_AuxiliaryBus::register_periodic_cal
     auto &backend = AP_InertialSensor_Invensense::from(_ins_backend);
     return backend._dev->register_periodic_callback(period_usec, cb);
 }
+#endif

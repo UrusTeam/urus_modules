@@ -28,7 +28,9 @@
 
 #include "AP_InertialSensor.h"
 
+#if !HAL_MINIMIZE_FEATURES_AVR
 class AuxiliaryBus;
+#endif
 class DataFlash_Class;
 
 class AP_InertialSensor_Backend
@@ -62,7 +64,9 @@ public:
     /*
      * Return an AuxiliaryBus if backend has another bus it is able to export
      */
+#if !HAL_MINIMIZE_FEATURES_AVR
     virtual AuxiliaryBus *get_auxiliary_bus() { return nullptr; }
+#endif
 
     /*
      * Return the unique identifier for this backend: it's the same for

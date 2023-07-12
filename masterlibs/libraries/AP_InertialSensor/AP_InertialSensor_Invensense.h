@@ -20,15 +20,19 @@
 
 #include "AP_InertialSensor.h"
 #include "AP_InertialSensor_Backend.h"
+#if !HAL_MINIMIZE_FEATURES_AVR
 #include "AuxiliaryBus.h"
 
 class AP_Invensense_AuxiliaryBus;
 class AP_Invensense_AuxiliaryBusSlave;
+#endif
 
 class AP_InertialSensor_Invensense : public AP_InertialSensor_Backend
 {
+#if !HAL_MINIMIZE_FEATURES_AVR
     friend AP_Invensense_AuxiliaryBus;
     friend AP_Invensense_AuxiliaryBusSlave;
+#endif
 
 public:
     virtual ~AP_InertialSensor_Invensense();
@@ -52,7 +56,9 @@ public:
     /*
      * Return an AuxiliaryBus if the bus driver allows it
      */
+#if !HAL_MINIMIZE_FEATURES_AVR
     AuxiliaryBus *get_auxiliary_bus() override;
+#endif
 
     void start() override;
 
@@ -117,7 +123,9 @@ private:
 
     AP_HAL::DigitalSource *_drdy_pin;
     AP_HAL::OwnPtr<AP_HAL::Device> _dev;
+#if !HAL_MINIMIZE_FEATURES_AVR
     AP_Invensense_AuxiliaryBus *_auxiliary_bus;
+#endif
 
     // which sensor type this is
     enum Invensense_Type _mpu_type;
@@ -146,6 +154,7 @@ private:
     } _accum;
 };
 
+#if !HAL_MINIMIZE_FEATURES_AVR
 class AP_Invensense_AuxiliaryBusSlave : public AuxiliaryBusSlave
 {
     friend class AP_Invensense_AuxiliaryBus;
@@ -190,3 +199,4 @@ private:
     static const uint8_t MAX_EXT_SENS_DATA = 24;
     uint8_t _ext_sens_data = 0;
 };
+#endif

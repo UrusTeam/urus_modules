@@ -96,7 +96,11 @@ void AP_InertialSensor_Backend::_rotate_and_correct_accel(uint8_t instance, Vect
     accel -= _imu._accel_offset[instance];
 
     // apply scaling
+#if !HAL_MINIMIZE_FEATURES_AVR
     const Vector3f &accel_scale = _imu._accel_scale[instance].get();
+#else
+    const Vector3f &accel_scale = _imu._accel_scale[instance];
+#endif
     accel.x *= accel_scale.x;
     accel.y *= accel_scale.y;
     accel.z *= accel_scale.z;
@@ -210,7 +214,7 @@ void AP_InertialSensor_Backend::_publish_accel(uint8_t instance, const Vector3f 
     _imu._delta_velocity_dt[instance] = _imu._delta_velocity_acc_dt[instance];
     _imu._delta_velocity_valid[instance] = true;
 
-
+/*
     if (_imu._accel_calibrator != nullptr && _imu._accel_calibrator[instance].get_status() == ACCEL_CAL_COLLECTING_SAMPLE) {
         Vector3f cal_sample = _imu._delta_velocity[instance];
 
@@ -218,16 +222,25 @@ void AP_InertialSensor_Backend::_publish_accel(uint8_t instance, const Vector3f 
         cal_sample.rotate_inverse(_imu._board_orientation);
 
         // remove scale factors
+#if !HAL_MINIMIZE_FEATURES_AVR
         const Vector3f &accel_scale = _imu._accel_scale[instance].get();
+#else
+        const Vector3f &accel_scale = _imu._accel_scale[instance];
+#endif
         cal_sample.x /= accel_scale.x;
         cal_sample.y /= accel_scale.y;
         cal_sample.z /= accel_scale.z;
 
         //remove offsets
+#if !HAL_MINIMIZE_FEATURES_AVR
         cal_sample += _imu._accel_offset[instance].get() * _imu._delta_velocity_dt[instance] ;
+#else
+        cal_sample += _imu._accel_offset[instance] * _imu._delta_velocity_dt[instance] ;
+#endif
 
         _imu._accel_calibrator[instance].new_sample(cal_sample, _imu._delta_velocity_dt[instance]);
     }
+*/
 }
 
 void AP_InertialSensor_Backend::_notify_new_accel_raw_sample(uint8_t instance,
