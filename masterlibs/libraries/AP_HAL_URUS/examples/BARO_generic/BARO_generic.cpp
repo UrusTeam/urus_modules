@@ -3,27 +3,31 @@
  */
 
 #include <AP_Baro/AP_Baro.h>
-#include <AP_BoardConfig/AP_BoardConfig.h>
+//#include <AP_BoardConfig/AP_BoardConfig.h>
+//#include <AP_InertialSensor/AP_InertialSensor.h>
 #include <AP_HAL/AP_HAL.h>
+
 
 const AP_HAL::HAL &hal = AP_HAL::get_HAL();
 
 static AP_Baro barometer;
+//static AP_InertialSensor ins;
 
 static uint32_t timer;
 static uint8_t counter;
-static AP_BoardConfig board_config;
+//static AP_BoardConfig board_config;
 
 void setup();
 void loop();
 
 void setup()
 {
-    hal.console->printf("Barometer library test\n");
+    hal.console->printf_PS(PSTR("Barometer library test\n"));
 
-    board_config.init();
+    //board_config.init();
 
     hal.scheduler->delay(1000);
+    //ins.init(100);
 
     barometer.init();
     barometer.calibrate();
@@ -48,15 +52,15 @@ void loop()
         barometer.update();
         uint32_t read_time = AP_HAL::micros() - timer;
         if (!barometer.healthy()) {
-            hal.console->printf("not healthy\n");
+            hal.console->printf_PS(PSTR("not healthy\n"));
             return;
         }
-        hal.console->printf(" Pressure: %.2f Pa\n"
+        hal.console->printf_PS(PSTR(" Pressure: %.2f Pa\n"
                             " Temperature: %.2f degC\n"
                             " Relative Altitude: %.2f m\n"
                             " climb=%.2f m/s\n"
-                            " Read + update time: %u usec\n"
-                            "\n",
+                            " Read + update time: %lu usec\n"
+                            "\n"),
                             (double)barometer.get_pressure(),
                             (double)barometer.get_temperature(),
                             (double)barometer.get_altitude(),

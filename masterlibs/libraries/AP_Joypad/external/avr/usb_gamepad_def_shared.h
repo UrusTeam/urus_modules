@@ -47,7 +47,7 @@
 
 #pragma once
 
-#if (CONFIG_SHAL_CORE == SHAL_CORE_APM) && defined(SHAL_CORE_APM16U)
+#if (CONFIG_SHAL_CORE == SHAL_CORE_APM) && (defined(SHAL_CORE_APM16U) || defined(SHAL_CORE_APM32U4))
 
 #define STR_MANUFACTURER    L"URUS"
 #define STR_PRODUCT         L"VR Joystick (EXAMPLE)"

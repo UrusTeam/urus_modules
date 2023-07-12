@@ -45,7 +45,7 @@
  * THE SOFTWARE.
  */
 
-#if (CONFIG_SHAL_CORE == SHAL_CORE_APM) && defined(SHAL_CORE_APM16U)
+#if (CONFIG_SHAL_CORE == SHAL_CORE_APM) && (defined(SHAL_CORE_APM16U) || defined(SHAL_CORE_APM32U4))
 
 #include <stdint.h>
 #include <avr/pgmspace.h>

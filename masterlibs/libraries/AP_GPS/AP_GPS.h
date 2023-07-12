@@ -21,10 +21,16 @@
 #include <inttypes.h>
 #include <AP_Progmem/AP_Progmem.h>
 #include <AP_Common/AP_Common.h>
+#if !HAL_MINIMIZE_FEATURES_AVR
 #include <AP_Param/AP_Param.h>
+#endif
 #include <AP_Math/AP_Math.h>
+#if !HAL_MINIMIZE_FEATURES_AVR
 #include <GCS_MAVLink/GCS_MAVLink.h>
+#endif
+#if !HAL_MINIMIZE_FEATURES_AVR
 #include <AP_Vehicle/AP_Vehicle.h>
+#endif
 #include "GPS_detect_state.h"
 #include <AP_SerialManager/AP_SerialManager.h>
 
@@ -66,7 +72,9 @@ class AP_GPS
 public:
     // constructor
 	AP_GPS() {
+#if !HAL_MINIMIZE_FEATURES_AVR
 		AP_Param::setup_object_defaults(this, var_info);
+#endif
     }
 
     /// Startup initialisation.
@@ -319,15 +327,24 @@ public:
     void setHIL(uint8_t instance, GPS_Status status, uint64_t time_epoch_ms,
                 const Location &location, const Vector3f &velocity, uint8_t num_sats,
                 uint16_t hdop, bool _have_vertical_velocity);
-
+#if !HAL_MINIMIZE_FEATURES_AVR
     static const struct AP_Param::GroupInfo var_info[];
+#endif
 
     // dataflash for logging, if available
+#if !HAL_MINIMIZE_FEATURES_AVR
     DataFlash_Class *_DataFlash;
+#endif
 
     // configuration parameters
+#if !HAL_MINIMIZE_FEATURES_AVR
     AP_Int8 _type[GPS_MAX_INSTANCES];
     AP_Int8 _navfilter;
+#else
+    int8_t _type[GPS_MAX_INSTANCES];
+    int8_t _navfilter;
+#endif
+
 #if GPS_MAX_INSTANCES > 1
     AP_Int8 _auto_switch;
     AP_Int8 _min_dgps;
@@ -335,10 +352,17 @@ public:
     AP_Int8 _inject_to;
     uint32_t _last_instance_swap_ms;
 #endif
+#if !HAL_MINIMIZE_FEATURES_AVR
     AP_Int8 _sbas_mode;
     AP_Int8 _min_elevation;
     AP_Int8 _raw_data;
     AP_Int8 _gnss_mode;
+#else
+    int8_t _sbas_mode;
+    int8_t _min_elevation;
+    int8_t _raw_data;
+    int8_t _gnss_mode;
+#endif
 
     // handle sending of initialisation strings to the GPS
     void send_blob_start(uint8_t instance, const prog_char *_blob, uint16_t size);
@@ -352,7 +376,9 @@ public:
     void inject_data(uint8_t instance, uint8_t *data, uint8_t len);
 
     //MAVLink Status Sending
+#if !HAL_MINIMIZE_FEATURES_AVR
     void send_mavlink_gps_raw(mavlink_channel_t chan);
+#endif
 #if GPS_MAX_INSTANCES > 1
     void send_mavlink_gps2_raw(mavlink_channel_t chan);
 #endif

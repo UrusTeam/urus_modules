@@ -46,6 +46,7 @@ public:
     /** See update function on top class.
       */
     virtual void update();
+    virtual void set_button_array_data(uint8_t data_button[], uint8_t playerID);
 
 protected:
     // access to frontend

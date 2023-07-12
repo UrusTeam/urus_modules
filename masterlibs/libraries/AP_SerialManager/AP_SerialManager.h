@@ -24,7 +24,9 @@
 #include <AP_Math/AP_Math.h>
 #include <AP_Common/AP_Common.h>
 #include <AP_HAL/AP_HAL.h>
+#if !HAL_MINIMIZE_FEATURES_AVR
 #include <GCS_MAVLink/GCS_MAVLink.h>
+#endif
 
 #define SERIALMANAGER_NUM_PORTS 6
 
@@ -111,7 +113,7 @@ public:
     static AP_SerialManager *get_instance(void) {
         return _instance;
     }
-    
+
     // init_console - initialise console at default baud rate
     void init_console();
 
@@ -131,12 +133,13 @@ public:
     // get_mavlink_channel - provides the mavlink channel associated with a given protocol (and instance)
     //  instance should be zero if searching for the first instance, 1 for the second, etc
     //  returns true if a channel is found, false if not
+#if !HAL_MINIMIZE_FEATURES_AVR
     bool get_mavlink_channel(enum SerialProtocol protocol, uint8_t instance, mavlink_channel_t &mav_chan) const;
 
     // get_mavlink_protocol - provides the specific MAVLink protocol for a
     // given channel, or SerialProtocol_None if not found
     SerialProtocol get_mavlink_protocol(mavlink_channel_t mav_chan) const;
-    
+#endif
     // set_blocking_writes_all - sets block_writes on or off for all serial channels
     void set_blocking_writes_all(bool blocking);
 
@@ -144,17 +147,27 @@ public:
     void set_console_baud(enum SerialProtocol protocol, uint8_t instance) const;
 
     // parameter var table
+#if !HAL_MINIMIZE_FEATURES_AVR
     static const struct AP_Param::GroupInfo var_info[];
+#endif
 
 private:
     static AP_SerialManager *_instance;
-    
+
     // array of uart info
+#if !HAL_MINIMIZE_FEATURES_AVR
     struct {
         AP_Int8 protocol;
         AP_Int32 baud;
         AP_HAL::UARTDriver* uart;
     } state[SERIALMANAGER_NUM_PORTS];
+#else
+    struct {
+        int8_t protocol;
+        int32_t baud;
+        AP_HAL::UARTDriver* uart;
+    } state[SERIALMANAGER_NUM_PORTS];
+#endif
 
     uint32_t map_baudrate(int32_t rate) const;
 

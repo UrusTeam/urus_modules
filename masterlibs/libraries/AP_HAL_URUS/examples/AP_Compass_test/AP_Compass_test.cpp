@@ -5,25 +5,27 @@
 
 #include <AP_Compass/AP_Compass.h>
 #include <AP_HAL/AP_HAL.h>
-#include <AP_BoardConfig/AP_BoardConfig.h>
+//#include <AP_BoardConfig/AP_BoardConfig.h>
+#include <AP_InertialSensor/AP_InertialSensor.h>
 
 const AP_HAL::HAL& hal = AP_HAL::get_HAL();
 
-static AP_BoardConfig board_config;
+//static AP_BoardConfig board_config;
 static Compass compass;
+static AP_InertialSensor ins;
 
 uint32_t timer;
 
 static void setup()
 {
-    hal.console->printf("Compass library test\n");
+    hal.console->printf_PS(PSTR("Compass library test\n"));
 
-    board_config.init();
+    //board_config.init();
 
     if (!compass.init()) {
-        AP_HAL::panic("compass initialisation failed!");
+        hal.console->printf_PS(PSTR("compass initialisation failed!\n"));
     }
-    hal.console->printf("init done - %u compasses detected\n", compass.get_count());
+    hal.console->printf_PS(PSTR("init done - %u compasses detected\n"), compass.get_count());
 
     // set offsets to account for surrounding interference
     compass.set_and_save_offsets(0, 0, 0, 0);
@@ -51,17 +53,17 @@ static void loop()
         for (uint8_t i = 0; i < compass_count; i++) {
             float heading;
 
-            hal.console->printf("Compass #%u: ", i);
+            hal.console->printf_PS(PSTR("Compass #%u: "), i);
 
             if (!compass.healthy()) {
-                hal.console->printf("not healthy\n");
+                hal.console->printf_PS(PSTR("not healthy\n"));
                 continue;
             }
 
             Matrix3f dcm_matrix;
             // use roll = 0, pitch = 0 for this example
             dcm_matrix.from_euler(0, 0, 0);
-            heading = compass.calculate_heading(dcm_matrix, i);
+            heading = compass.calculate_heading(dcm_matrix);
             compass.learn_offsets();
 
             const Vector3f &mag = compass.get_field(i);
@@ -82,21 +84,21 @@ static void loop()
             offset[i][2] = -(max[i][2] + min[i][2]) / 2;
 
             // display all to user
-            hal.console->printf("Heading: %.2f (%3d, %3d, %3d)",
+            hal.console->printf_PS(PSTR("Heading: %.2f (%3d, %3d, %3d)"),
                                 (double)ToDeg(heading),
                                 (int)mag.x,
                                 (int)mag.y,
                                 (int)mag.z);
 
             // display offsets
-            hal.console->printf(" offsets(%.2f, %.2f, %.2f)",
+            hal.console->printf_PS(PSTR(" offsets(%.2f, %.2f, %.2f)"),
                                 (double)offset[i][0],
                                 (double)offset[i][1],
                                 (double)offset[i][2]);
 
-            hal.console->printf(" t=%u", (unsigned)read_time);
+            hal.console->printf_PS(PSTR(" t=%u"), (unsigned)read_time);
 
-            hal.console->printf("\n");
+            hal.console->printf_PS(PSTR("\n"));
         }
     } else {
         hal.scheduler->delay(1);

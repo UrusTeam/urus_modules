@@ -42,7 +42,7 @@ CLCoreUrusI2CDevice_Avr::CLCoreUrusI2CDevice_Avr(uint8_t bus, uint8_t address) :
     _address(address)
 {
     begin();
-    setTimeout(100);
+    setTimeout(20);
 }
 
 void CLCoreUrusI2CDevice_Avr::begin()

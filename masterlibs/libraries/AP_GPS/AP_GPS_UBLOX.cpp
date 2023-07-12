@@ -36,7 +36,7 @@
 extern const AP_HAL::HAL& hal;
 
 #if UBLOX_DEBUGGING
- # define Debug(fmt, args ...)  do {hal.console->printf("%s:%d: " fmt "\n", __FUNCTION__, __LINE__, ## args); hal.scheduler->delay(1); } while(0)
+ # define Debug(fmt, args ...)  do {hal.console->printf_PS(PSTR("%s:%d: " fmt "\n"), __FUNCTION__, __LINE__, ## args); hal.scheduler->delay(1); } while(0)
 #else
  # define Debug(fmt, args ...)
 #endif

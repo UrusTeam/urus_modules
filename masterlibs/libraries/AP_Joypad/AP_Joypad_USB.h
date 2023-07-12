@@ -38,7 +38,7 @@
 
 #include <AP_HAL/AP_HAL.h>
 
-#if (CONFIG_HAL_BOARD == HAL_BOARD_URUS) && (CONFIG_SHAL_CORE == SHAL_CORE_APM) && defined(SHAL_CORE_APM16U)
+#if (CONFIG_HAL_BOARD == HAL_BOARD_URUS) && (CONFIG_SHAL_CORE == SHAL_CORE_APM) && (defined(SHAL_CORE_APM16U) || defined(SHAL_CORE_APM32U4))
 
 #include "external/avr/usb_gamepad_def_shared.h"
 #include "AP_Joypad.h"
@@ -131,6 +131,8 @@ public:
 
     static void fire_isr_usb_genvect();
     static void fire_isr_usb_comvect();
+    void set_button_array_data(uint8_t data_button[], uint8_t playerID);
+
     static volatile bool _inproc_event;
 
 private:

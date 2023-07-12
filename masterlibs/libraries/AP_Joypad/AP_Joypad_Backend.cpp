@@ -31,5 +31,8 @@ void AP_Joypad_Backend::process(AP_Joypad::ProcessMode process_mode)
 void AP_Joypad_Backend::update()
 {}
 
+void AP_Joypad_Backend::set_button_array_data(uint8_t data_button[], uint8_t playerID)
+{}
+
 #endif
 

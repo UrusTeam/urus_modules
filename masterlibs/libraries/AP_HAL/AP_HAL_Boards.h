@@ -76,6 +76,7 @@
 #define HAL_INS_MPU6500     19
 #define HAL_INS_EDGE        20
 #define HAL_INS_RST         21
+#define HAL_INS_ITG32XX     22
 
 /* Barometer driver types */
 #define HAL_BARO_BMP085      1

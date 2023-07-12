@@ -109,7 +109,6 @@ void CLCoreUrusRCOutput_Avr::init()
 #elif CPU_DIVIDER == CPU_DIV_1024
     TCCR0B = CDIV_1024;
 #endif // CPU_DIVIDER
-
     OCR0A = TIMER_RESOLUTION_FACTOR; // Init OCR registers
     TIFR0 = _BV(TOV0) | _BV(OCF0B) | _BV(OCF0A);      //Clear pending interrupts
 
@@ -124,7 +123,7 @@ void CLCoreUrusRCOutput_Avr::init()
 }
 
 #if defined(SHAL_CORE_APM328)
-ISR(TIMER0_COMPA_vect, ISR_NOBLOCK)
+ISR(TIMER0_COMPA_vect)
 {
     if (CLCoreUrusRCOutput_Avr::pwm_cnt >= CLCoreUrusRCOutput_Avr::tick_freq) {
         CLCoreUrusRCOutput_Avr::pwm_cnt = 0;
@@ -320,7 +319,16 @@ void CLCoreUrusRCOutput_Avr::write(uint8_t ch, uint16_t period_us)
 #endif // defined
     /* constrain, then scale from 1us resolution (input units)
      * to 0.5us (timer units) */
-    uint16_t pwm = constrain_period(period_us) << 1;
+    uint16_t pwm = 0;
+#if defined(SHAL_CORE_APM328)
+    if ((ch == 0) && (ch == 1)) {
+        pwm = period_us;
+    } else {
+        pwm = constrain_period(period_us) << 1;
+    }
+#else
+    pwm = constrain_period(period_us) << 1;
+#endif
 
 #if defined(SHAL_CORE_APM328)
     uint16_t pwm_dat = (pwm >> 1) / TIMER_SPEED_US;

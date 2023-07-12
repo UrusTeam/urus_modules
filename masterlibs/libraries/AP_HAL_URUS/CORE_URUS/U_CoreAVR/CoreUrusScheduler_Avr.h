@@ -72,15 +72,15 @@ private:
 
     bool _initialized;
 
-    uint32_t now_micros;
+    //uint32_t now_micros;
 #if defined(SHAL_CORE_APM2) || defined(SHAL_CORE_MEGA02)
-    uint16_t dt_micros;
-    uint16_t centinel_micros;
-    uint16_t ms_cb;
+    //uint16_t dt_micros;
+    //uint16_t centinel_micros;
+    //uint16_t ms_cb;
 #endif
-    uint32_t start;
-    volatile bool _in_delay_proc;
-    static volatile uint32_t _start_micros;
+    //uint32_t start;
+    //volatile bool _in_delay_proc;
+    //static volatile uint32_t _start_micros;
     static volatile uint8_t _timer_reset_value;
 
 };

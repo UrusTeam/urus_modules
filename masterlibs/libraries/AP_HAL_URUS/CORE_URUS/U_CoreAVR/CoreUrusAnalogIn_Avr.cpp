@@ -9,7 +9,10 @@
 #include <avr/io.h>
 #include <avr/interrupt.h>
 
-#define CHANNEL_READ_REPEAT 2
+#define CHANNEL_READ_REPEAT 1
+
+#define cbi(sfr, bit) (_SFR_BYTE(sfr) &= ~_BV(bit))
+#define sbi(sfr, bit) (_SFR_BYTE(sfr) |= _BV(bit))
 
 extern const AP_HAL::HAL& hal;
 
@@ -193,7 +196,7 @@ void CLCoreUrusAnalogSource_Avr::stop_read()
 
 bool CLCoreUrusAnalogSource_Avr::reading_settled()
 {
-    if (_settle_time_ms != 0 && (AP_HAL::millis() - _read_start_time_ms) < _settle_time_ms) {
+    if ((_settle_time_ms != 0) && ((AP_HAL::millis() - _read_start_time_ms) < _settle_time_ms)) {
         return false;
     }
     return true;
@@ -216,15 +219,26 @@ void CLCoreUrusAnalogSource_Avr::new_sample(uint16_t sample)
 
 // CLCoreUrusAnalogIn_Avr constructor
 CLCoreUrusAnalogIn_Avr::CLCoreUrusAnalogIn_Avr() :
+    _active_channel(0),
     _vcc(CLCoreUrusAnalogSource_Avr(ANALOG_INPUT_BOARD_VCC))
 {}
 
 void CLCoreUrusAnalogIn_Avr::init()
 {
+#if defined(ADCSRA)
+    sbi(ADCSRA, ADPS2);
+    sbi(ADCSRA, ADPS1);
+    sbi(ADCSRA, ADPS0);
+
+    // enable a2d conversions
+    sbi(ADCSRA, ADEN);
+#endif
+    /* Register each private channel with CLCoreUrusAnalogIn_Avr. */
+#if HAL_HAVE_BOARD_VOLTAGE == 1
+    _register_channel(&_vcc);
+#endif // HAL_HAVE_BOARD_VOLTAGE
     /* Register CLCoreUrusAnalogIn_Avr::_timer_event with the scheduler. */
     hal.scheduler->register_timer_process(FUNCTOR_BIND_MEMBER(&CLCoreUrusAnalogIn_Avr::_timer_event, void));
-    /* Register each private channel with CLCoreUrusAnalogIn_Avr. */
-    _register_channel(&_vcc);
 }
 
 AP_HAL::AnalogSource* CLCoreUrusAnalogIn_Avr::channel(int16_t n)
@@ -280,6 +294,11 @@ void CLCoreUrusAnalogIn_Avr::_register_channel(CLCoreUrusAnalogSource_Avr* ch)
 
 void CLCoreUrusAnalogIn_Avr::_timer_event(void)
 {
+    if (_num_channels == 0) {
+        /* No channels are registered - nothing to be done. */
+        return;
+    }
+
     if (_channels[_active_channel]->_pin == ANALOG_INPUT_NONE) {
         _channels[_active_channel]->new_sample(0);
         goto next_channel;
@@ -288,11 +307,6 @@ void CLCoreUrusAnalogIn_Avr::_timer_event(void)
     if (ADCSRA & _BV(ADSC)) {
         /* ADC Conversion is still running - this should not happen, as we
          * are called at 1khz. */
-        return;
-    }
-
-    if (_num_channels == 0) {
-        /* No channels are registered - nothing to be done. */
         return;
     }
 

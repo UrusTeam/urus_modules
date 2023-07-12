@@ -36,7 +36,7 @@
 
 #include <AP_HAL/AP_HAL.h>
 
-#if (CONFIG_HAL_BOARD == HAL_BOARD_URUS) && (CONFIG_SHAL_CORE == SHAL_CORE_APM) && defined(SHAL_CORE_APM16U)
+#if (CONFIG_HAL_BOARD == HAL_BOARD_URUS) && (CONFIG_SHAL_CORE == SHAL_CORE_APM) && (defined(SHAL_CORE_APM16U) || defined(SHAL_CORE_APM32U4))
 
 #include <avr/io.h>
 #include <avr/wdt.h>
@@ -44,8 +44,13 @@
 
 #include "AP_Joypad_USB.h"
 
+#if defined(SHAL_CORE_APM32U4)
+#define TXLED 30
+#define RXLED 17
+#else
 #define TXLED 5
 #define RXLED 4
+#endif // defined
 
 extern const usb_string_descriptor_struct string0 PROGMEM;
 extern const usb_string_descriptor_struct string1 PROGMEM;
@@ -123,6 +128,7 @@ AP_Joypad_Backend *AP_Joypad_USB::configure(AP_Joypad &joypad)
 
 void AP_Joypad_USB::usart_init(uint16_t baud_setting)
 {
+#if !defined(SHAL_CORE_APM32U4)
     // Set baud rate
     UBRR1 = baud_setting;
     // Enable receiver and transmitter
@@ -130,28 +136,34 @@ void AP_Joypad_USB::usart_init(uint16_t baud_setting)
     // Set frame format: 8data, 1stop bit
     UCSR1C = (1<<UCSZ10)|(1<<UCSZ11);
     UCSR1A = (1<<U2X1);
+#endif // defined
 }
 
 void AP_Joypad_USB::serialWrite(unsigned char data)
 {
+#if !defined(SHAL_CORE_APM32U4)
     // Wait for empty transmit buffer
     while (!( UCSR1A & (1<<UDRE1))){
     }
     // Put data into buffer, sends the data
     UDR1 = data;
+#endif // defined
 }
 
 void AP_Joypad_USB::flush_serialRead()
 {
+#if !defined(SHAL_CORE_APM32U4)
     unsigned char dummy;
     while ( UCSR1A & (1<<RXC1) ) {
         dummy = UDR1;
     }
     dummy++;
+#endif // defined
 }
 
 unsigned char AP_Joypad_USB::serialRead(uint16_t timeout)
 {
+#if !defined(SHAL_CORE_APM32U4)
     // Wait for data to be received
     while (!(UCSR1A & (1<<RXC1))) {
         hal.scheduler->delay_microseconds(200);
@@ -165,6 +177,7 @@ unsigned char AP_Joypad_USB::serialRead(uint16_t timeout)
     }
     // Get and return received data from buffer
     return UDR1;
+#endif // defined
     return 0;
 }
 
@@ -174,17 +187,18 @@ void AP_Joypad_USB::_process_event()
         flush_serialRead();
         return;
     }
-
+/*
     if (!hal.gpio->read(12)) {
         hal.gpio->write(TXLED, LOW);
         hal.gpio->write(RXLED, LOW);
         return;
     }
-
+*/
     if (_inproc_event) {
         return;
     }
 
+#if !defined(SHAL_CORE_APM32U4)
     if (!hal.gpio->read(14)) {
         _inproc_event = true;
         hal.gpio->write(TXLED, 0);
@@ -192,6 +206,7 @@ void AP_Joypad_USB::_process_event()
         hal.gpio->write(TXLED, 1);
         hal.scheduler->reboot(false);
     }
+#endif
 
     if ((AP_HAL::micros() - _now) > 4000LU)
     {
@@ -205,6 +220,8 @@ void AP_Joypad_USB::_process_event()
         _inproc_event = true;
         _now = AP_HAL::micros();
 		hal.gpio->write(TXLED, 1);
+
+#if !defined(SHAL_CORE_APM32U4)
 		flush_serialRead();
 		int serialIndex = 0;
 
@@ -262,20 +279,23 @@ void AP_Joypad_USB::_process_event()
 		controllerData2.stick3_x = get_16bit_value(serialIndex);
 		serialIndex += 2;
 		controllerData2.stick3_y = get_16bit_value(serialIndex);
-
-		// Communication with the Arduino chip is over here
-		hal.gpio->write(TXLED, 0);
+#endif
         // Finally, we send the data out via the USB port
 		send_controller_data_to_usb(controllerData1, 1);
 		hal.scheduler->delay(1);
 		send_controller_data_to_usb(controllerData2, 2);
 		hal.scheduler->delay(1);
+		// Communication with the Arduino chip is over here
+		hal.gpio->write(TXLED, 0);
 		_inproc_event = false;
     }
 }
 
 int16_t AP_Joypad_USB::get_16bit_value(int serial_index)
 {
+#if defined(SHAL_CORE_APM32U4)
+    return 0;
+#else
     int16_t returnValue = 0;
     serialWrite(serial_index);
     serial_index++;
@@ -285,13 +305,14 @@ int16_t AP_Joypad_USB::get_16bit_value(int serial_index)
     serial_index++;
     returnValue += serialRead(25) << 8;
     return returnValue;
+#endif // defined
 }
 
 bool AP_Joypad_USB::_configure()
 {
     //12 for 115200 bps
     // 7 for 250000 bps
-    usart_init(12);
+    usart_init(7);
 	// Configure our USB connection
 	usb_configure();
     hal.gpio->pinMode(TXLED, HAL_GPIO_OUTPUT);
@@ -302,8 +323,8 @@ bool AP_Joypad_USB::_configure()
     hal.gpio->write(7, 1);
     hal.gpio->pinMode(14, HAL_GPIO_INPUT);
     hal.gpio->write(14, 1);
-    hal.gpio->pinMode(12, HAL_GPIO_INPUT);
-    hal.gpio->write(12, 1);
+    //hal.gpio->pinMode(12, HAL_GPIO_INPUT);
+    //hal.gpio->write(12, 1);
 
 	while (!usb_configured()) {
         hal.gpio->toggle(RXLED);
@@ -714,6 +735,22 @@ ISR(USB_COM_vect)
     }
 
     AP_Joypad_USB::fire_isr_usb_comvect();
+}
+
+void AP_Joypad_USB::set_button_array_data(uint8_t data_button[], uint8_t playerID)
+{
+    switch (playerID) {
+        case 1: {
+            memcpy(&controllerData1.button_array[0], data_button, BUTTON_ARRAY_LENGTH);
+        }
+        break;
+        case 2: {
+            memcpy(&controllerData2.button_array[0], data_button, BUTTON_ARRAY_LENGTH);
+        }
+        break;
+        default:
+            ;
+    }
 }
 
 #endif

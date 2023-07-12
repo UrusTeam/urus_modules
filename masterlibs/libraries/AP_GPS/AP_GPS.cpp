@@ -17,12 +17,15 @@
 #include <AP_Common/AP_Common.h>
 #include <AP_Math/AP_Math.h>
 #include <AP_HAL/AP_HAL.h>
+#if !HAL_MINIMIZE_FEATURES_AVR
 #include <AP_Notify/AP_Notify.h>
+#endif
 #include "AP_GPS.h"
 
 extern const AP_HAL::HAL& hal;
 
 // table of user settable parameters
+#if !HAL_MINIMIZE_FEATURES_AVR
 const AP_Param::GroupInfo AP_GPS::var_info[] PROGMEM = {
     // @Param: TYPE
     // @DisplayName: GPS type
@@ -123,15 +126,26 @@ const AP_Param::GroupInfo AP_GPS::var_info[] PROGMEM = {
 
     AP_GROUPEND
 };
+#endif
 
 /// Startup initialisation.
 void AP_GPS::init(DataFlash_Class *dataflash, const AP_SerialManager& serial_manager)
 {
+#if !HAL_MINIMIZE_FEATURES_AVR
     _DataFlash = dataflash;
+#endif
     primary_instance = 0;
 
     // search for serial ports with gps protocol
     _port[0] = serial_manager.find_serial(AP_SerialManager::SerialProtocol_GPS, 0);
+
+#if defined(SHAL_CORE_APM32U4) || (CONFIG_SHAL_CORE == SHAL_CORE_APM)
+    _type[0] = 1;
+    _navfilter = GPS_ENGINE_AIRBORNE_4G;
+    _sbas_mode = 0;
+    _min_elevation = 5;
+    _gnss_mode = 1;
+#endif // defined
 
 #if GPS_MAX_INSTANCES > 1
     _port[1] = serial_manager.find_serial(AP_SerialManager::SerialProtocol_GPS, 1);
@@ -256,7 +270,7 @@ AP_GPS::detect_instance(uint8_t instance)
             hal.console->print(" ublox ");
             new_gps = new AP_GPS_UBLOX(*this, state[instance], _port[instance]);
         }
-#if !defined(SHAL_CORE_APM2)
+#if !defined(SHAL_CORE_APM2) && !defined(SHAL_CORE_APM328) && !defined(SHAL_CORE_APM32U4) && (CONFIG_SHAL_CORE != SHAL_CORE_APM)
 		else if ((_type[instance] == GPS_TYPE_AUTO || _type[instance] == GPS_TYPE_MTK19) &&
                  AP_GPS_MTK19::_detect(dstate->mtk19_detect_state, data)) {
 			hal.console->print(" MTK19 ");
@@ -277,7 +291,7 @@ AP_GPS::detect_instance(uint8_t instance)
 #endif
 #if !defined(GPS_SKIP_SIRF_NMEA)
 		// save a bit of code space on a 1280
-#if !defined(SHAL_CORE_APM2)
+#if !defined(SHAL_CORE_APM2) && !defined(SHAL_CORE_APM328) && !defined(SHAL_CORE_APM32U4) && (CONFIG_SHAL_CORE != SHAL_CORE_APM)
 		else if ((_type[instance] == GPS_TYPE_AUTO || _type[instance] == GPS_TYPE_SIRF) &&
                  AP_GPS_SIRF::_detect(dstate->sirf_detect_state, data)) {
 			hal.console->print(" SIRF ");
@@ -437,7 +451,9 @@ AP_GPS::update(void)
     num_instances = 1;
 #endif // GPS_MAX_INSTANCES
 	// update notify with gps status. We always base this on the primary_instance
+#if !HAL_MINIMIZE_FEATURES_AVR
     AP_Notify::flags.gps_status = state[primary_instance].status;
+#endif
 }
 
 /*
@@ -468,7 +484,11 @@ AP_GPS::setHIL(uint8_t instance, GPS_Status _status, uint64_t time_epoch_ms,
     istate.time_week_ms  = gps_time_ms - istate.time_week*(86400*7*(uint64_t)1000);
     timing[instance].last_message_time_ms = tnow;
     timing[instance].last_fix_time_ms = tnow;
+#if !HAL_MINIMIZE_FEATURES_AVR
     _type[instance].set(GPS_TYPE_HIL);
+#else
+    _type[instance] = GPS_TYPE_HIL;
+#endif
 }
 
 /**
@@ -519,10 +539,10 @@ AP_GPS::inject_data(uint8_t instance, uint8_t *data, uint8_t len)
         drivers[instance]->inject_data(data, len);
 }
 
+#if !HAL_MINIMIZE_FEATURES_AVR
 void
 AP_GPS::send_mavlink_gps_raw(mavlink_channel_t chan)
 {
-#if !HAL_MINIMIZE_FEATURES
     static uint32_t last_send_time_ms[MAVLINK_COMM_NUM_BUFFERS];
     if (status(0) > AP_GPS::NO_GPS) {
         // when we have a GPS then only send new data
@@ -551,8 +571,8 @@ AP_GPS::send_mavlink_gps_raw(mavlink_channel_t chan)
         ground_speed(0)*100,  // cm/s
         ground_course_cd(0), // 1/100 degrees,
         num_sats(0));
-#endif
 }
+#endif
 
 #if GPS_MAX_INSTANCES > 1
 void

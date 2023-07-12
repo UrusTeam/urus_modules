@@ -14,7 +14,7 @@ public:
     // reading. This is needed for sonar devices where you have more
     // than one sonar, and you want to stop them interfering with each
     // other. It assumes that if held low the device is stopped, if
-    // held high the device starts reading.    
+    // held high the device starts reading.
     virtual void set_stop_pin(uint8_t p) = 0;
 
     // optionally allow a settle period in milliseconds. This is only
@@ -35,6 +35,7 @@ public:
     // return a voltage from 0.0 to 5.0V, assuming a ratiometric
     // sensor
     virtual float voltage_average_ratiometric() = 0;
+    virtual bool reading_settled() = 0;
 };
 
 class AP_HAL::AnalogIn {

@@ -33,6 +33,7 @@ extern const AP_HAL::HAL& hal;
 #define SERIAL5_BAUD AP_SERIALMANAGER_MAVLINK_BAUD/1000
 #endif
 
+#if !HAL_MINIMIZE_FEATURES_AVR
 const AP_Param::GroupInfo AP_SerialManager::var_info[] PROGMEM = {
     // @Param: 0_BAUD
     // @DisplayName: Serial0 baud rate
@@ -128,7 +129,7 @@ const AP_Param::GroupInfo AP_SerialManager::var_info[] PROGMEM = {
 
     AP_GROUPEND
 };
-
+#endif
 // singleton instance
 AP_SerialManager *AP_SerialManager::_instance;
 
@@ -137,7 +138,9 @@ AP_SerialManager::AP_SerialManager()
 {
     _instance = this;
     // setup parameter defaults
+#if !HAL_MINIMIZE_FEATURES_AVR
     AP_Param::setup_object_defaults(this, var_info);
+#endif
 }
 
 // init_console - initialise console at default baud rate
@@ -156,11 +159,17 @@ extern bool g_nsh_should_exit;
 void AP_SerialManager::init()
 {
     // initialise pointers to serial ports
+#if defined(SHAL_CORE_APM32U4)
+    state[3].uart = hal.uartB;  // serial3, uartB, normally 1st GPS
+    state[3].protocol = SerialProtocol_GPS;
+    state[3].baud = AP_SERIALMANAGER_GPS_BAUD/1000;
+#else
     state[1].uart = hal.uartC;  // serial1, uartC, normally telem1
     state[2].uart = hal.uartD;  // serial2, uartD, normally telem2
     state[3].uart = hal.uartB;  // serial3, uartB, normally 1st GPS
     state[4].uart = hal.uartE;  // serial4, uartE, normally 2nd GPS
     state[5].uart = hal.uartF;  // serial5
+#endif
 
     if (state[0].uart == nullptr) {
         init_console();
@@ -255,7 +264,11 @@ AP_HAL::UARTDriver *AP_SerialManager::find_serial(enum SerialProtocol protocol, 
 
     // search for matching protocol
     for(uint8_t i=0; i<SERIALMANAGER_NUM_PORTS; i++) {
+#if !HAL_MINIMIZE_FEATURES_AVR
         if (protocol_match(protocol, (enum SerialProtocol)state[i].protocol.get())) {
+#else
+        if (protocol_match(protocol, (enum SerialProtocol)state[i].protocol)) {
+#endif
             if (found_instance == instance) {
                 return state[i].uart;
             }
@@ -276,7 +289,11 @@ uint32_t AP_SerialManager::find_baudrate(enum SerialProtocol protocol, uint8_t i
 
     // search for matching protocol
     for(uint8_t i=0; i<SERIALMANAGER_NUM_PORTS; i++) {
+#if !HAL_MINIMIZE_FEATURES_AVR
         if (protocol_match(protocol, (enum SerialProtocol)state[i].protocol.get())) {
+#else
+        if (protocol_match(protocol, (enum SerialProtocol)state[i].protocol)) {
+#endif
             if (found_instance == instance) {
                 return map_baudrate(state[i].baud);
             }
@@ -291,6 +308,7 @@ uint32_t AP_SerialManager::find_baudrate(enum SerialProtocol protocol, uint8_t i
 // get_mavlink_channel - provides the mavlink channel associated with a given protocol
 //  instance should be zero if searching for the first instance, 1 for the second, etc
 //  returns true if a channel is found, false if not
+#if !HAL_MINIMIZE_FEATURES_AVR
 bool AP_SerialManager::get_mavlink_channel(enum SerialProtocol protocol, uint8_t instance, mavlink_channel_t &mav_chan) const
 {
     // check for MAVLink
@@ -303,7 +321,6 @@ bool AP_SerialManager::get_mavlink_channel(enum SerialProtocol protocol, uint8_t
     // report failure
     return false;
 }
-
 
 // get_mavlink_protocol - provides the specific MAVLink protocol for a
 // given channel, or SerialProtocol_None if not found
@@ -322,6 +339,7 @@ AP_SerialManager::SerialProtocol AP_SerialManager::get_mavlink_protocol(mavlink_
     }
     return SerialProtocol_None;
 }
+#endif
 
 // set_blocking_writes_all - sets block_writes on or off for all serial channels
 void AP_SerialManager::set_blocking_writes_all(bool blocking)
@@ -341,7 +359,11 @@ void AP_SerialManager::set_console_baud(enum SerialProtocol protocol, uint8_t in
 
     // find baud rate of this protocol
     for (uint8_t i=0; i<SERIALMANAGER_NUM_PORTS; i++) {
+#if !HAL_MINIMIZE_FEATURES_AVR
         if (protocol_match(protocol, (enum SerialProtocol)state[i].protocol.get())) {
+#else
+        if (protocol_match(protocol, (enum SerialProtocol)state[i].protocol)) {
+#endif
             if (instance == found_instance) {
                 // set console's baud rate
                 state[0].uart->begin(map_baudrate(state[i].baud));

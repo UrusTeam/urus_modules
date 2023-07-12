@@ -51,7 +51,7 @@ void AP_Joypad::_configure_backends()
     }
 
     _backends_configuring = true;
-#if defined(SHAL_CORE_APM16U)
+#if defined(SHAL_CORE_APM16U) || defined(SHAL_CORE_APM32U4)
     _add_backend(AP_Joypad_USB::configure(*this));
 #endif
     _backends_configuring = false;
@@ -76,7 +76,7 @@ bool AP_Joypad::_add_backend(AP_Joypad_Backend *backend)
 #if HAL_CPU_CLASS > HAL_CPU_CLASS_16
         hal.console->printf("JOYPAD: MAX BACKEND REACHED!\n");
 #else
-#if defined(SHAL_CORE_APM16U)
+#if defined(SHAL_CORE_APM16U) || defined(SHAL_CORE_APM32U4)
         while(1);
 #else
         hal.console->printf_PS(PSTR("JOYPAD: MAX BACKEND REACHED!\n"));
@@ -87,6 +87,15 @@ bool AP_Joypad::_add_backend(AP_Joypad_Backend *backend)
     _backends[_backend_count++] = backend;
 
     return true;
+}
+
+void AP_Joypad::set_button_array_data(uint8_t data_button[], uint8_t playerID)
+{
+    if (!_backends) {
+        return;
+    }
+
+    _backends[0]->set_button_array_data(data_button, playerID);
 }
 
 #endif

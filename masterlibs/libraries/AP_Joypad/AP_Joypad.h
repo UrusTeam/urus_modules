@@ -66,6 +66,7 @@ public:
       * @return None.
       */
     void update();
+    void set_button_array_data(uint8_t data_button[], uint8_t playerID);
 
 private:
 

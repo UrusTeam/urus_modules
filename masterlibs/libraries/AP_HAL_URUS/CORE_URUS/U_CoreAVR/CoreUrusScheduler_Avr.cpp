@@ -24,7 +24,7 @@ extern const AP_HAL::HAL& hal;
 AP_HAL::Proc CLCoreUrusScheduler_Avr::_failsafe = nullptr;
 volatile bool CLCoreUrusScheduler_Avr::_timer_suspended = false;
 volatile bool CLCoreUrusScheduler_Avr::_timer_event_missed = false;
-volatile uint32_t CLCoreUrusScheduler_Avr::_start_micros = 0;
+//volatile uint32_t CLCoreUrusScheduler_Avr::_start_micros = 0;
 
 AP_HAL::MemberProc CLCoreUrusScheduler_Avr::_timer_proc[URUS_SCHEDULER_MAX_TIMER_PROCS] = {nullptr};
 uint8_t CLCoreUrusScheduler_Avr::_num_timer_procs = 0;
@@ -34,8 +34,7 @@ volatile uint8_t CLCoreUrusScheduler_Avr::_timer_reset_value = (256 - 124);
 
 CLCoreUrusScheduler_Avr::CLCoreUrusScheduler_Avr() :
     NSCORE_URUS::CLCoreUrusScheduler(),
-    _min_delay_cb_ms(0x7FFF),
-    _in_delay_proc(false)
+    _min_delay_cb_ms(0x7FFF)
 {}
 
 bool CLCoreUrusScheduler_Avr::in_main_thread() const
@@ -103,27 +102,28 @@ void CLCoreUrusScheduler_Avr::delay_microseconds(uint16_t usec)
         return;
     }
 
-    _start_micros = AP_HAL::micros();
+    uint32_t _start_micros = AP_HAL::micros();
     while ((AP_HAL::micros() - _start_micros) < usec);
-
 }
 
 void CLCoreUrusScheduler_Avr::delay(uint16_t ms)
 {
+/*
     if (_in_delay_proc) {
         return;
     }
 
     _in_delay_proc = true;
-    now_micros = AP_HAL::micros();
+*/
+    uint32_t now_micros = AP_HAL::micros();
 #if defined(SHAL_CORE_APM2) || defined(SHAL_CORE_MEGA02)
-    start = AP_HAL::millis();
-    dt_micros = 0;
-    centinel_micros = URUS_MAGIC_TIME;
-    ms_cb = ms;
+    uint32_t start = AP_HAL::millis();
+    uint16_t dt_micros = 0;
+    uint16_t centinel_micros = (uint16_t)URUS_MAGIC_TIME;
+    uint16_t ms_cb = ms;
 
-    while ((AP_HAL::millis() - start) < ms) {
-        dt_micros = AP_HAL::micros() - now_micros;
+    while ((AP_HAL::millis() - start) < (uint32_t)ms) {
+        dt_micros = (uint16_t)(AP_HAL::micros() - now_micros);
         now_micros = AP_HAL::micros();
         delay_microseconds(centinel_micros);
 
@@ -156,7 +156,7 @@ void CLCoreUrusScheduler_Avr::delay(uint16_t ms)
         }
     }
 #endif
-    _in_delay_proc = false;
+    //_in_delay_proc = false;
 }
 
 void CLCoreUrusScheduler_Avr::register_delay_callback(AP_HAL::Proc proc,
