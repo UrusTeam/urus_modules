@@ -32,6 +32,9 @@ float CLCoreUrusAnalogSource_Avr::read_average()
 {
     if (_pin == ANALOG_INPUT_BOARD_VCC) {
         uint16_t v = (uint16_t) _read_average();
+        if (v == 0) {
+            return 1126400.0f / 0.001f;
+        }
         return 1126400UL / v;
     } else {
         return _read_average();
@@ -104,6 +107,9 @@ float CLCoreUrusAnalogSource_Avr::read_latest()
     uint16_t latest = _latest;
     SREG = sreg;
     if (_pin == ANALOG_INPUT_BOARD_VCC) {
+        if (latest == 0) {
+            return 1126400.0f / 0.001f;
+        }
         return 1126400UL / latest;
     } else {
         return latest;
