@@ -27,8 +27,8 @@ public:
       */
     static UR_Stepper_Backend *configure(UR_Stepper &ur_stepper);
 
-    void move_steps(int32_t steps) override;
-    void move_degree(float deg) override;
+    void move_steps(int32_t steps, bool force) override;
+    void move_degree(float deg, bool force) override;
 
 private:
     UR_Stepper_Generic(UR_Stepper &ur_stepper);
@@ -37,9 +37,9 @@ private:
 
     bool _auto_process = false;
     int32_t _steps;
-#if LINEAR_SPEED_ENABLED == 1
     uint32_t _last_action_end;
-    uint32_t _next_action_interval;
+    //uint32_t _next_action_interval;
+#if LINEAR_SPEED_ENABLED == 1
     float _rest;
     float _step_count;        // current position
 #endif // LINEAR_SPEED_ENABLED
@@ -51,10 +51,11 @@ private:
     float _step_pulse;        // step pulse duration (microseconds)
     float _cruise_step_pulse; // step pulse duration for constant speed section (max rpm)
 
-    static inline void _delay_micros(uint32_t delay_us, uint32_t start_us = 0);
+    void _delay_micros(uint32_t delay_us, uint32_t start_us = 0);
 
     void _steps_loop(void);
     void _set_step_dir(STEP_DIR dir);
+    void _update_step_pulse() override;
     void _start_move(int32_t steps);
     void _next_action(void);
     void _calc_step_pulse(void);

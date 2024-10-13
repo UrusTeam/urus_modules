@@ -89,9 +89,9 @@ public:
       * @return None.
       */
     void update();
-    void move_degree(float deg);
-    void move_steps(int32_t steps);
-    void set_profile(UR_STEPPER_NAMESPACE::stepper_profile_t profile);
+    void move_degree(float deg, bool force = false);
+    void move_steps(int32_t steps, bool force = false);
+    void set_profile(UR_STEPPER_NAMESPACE::stepper_profile_t profile, uint8_t backend = 0);
     UR_STEPPER_NAMESPACE::State get_current_state(uint8_t backend = 0);
 
 private:

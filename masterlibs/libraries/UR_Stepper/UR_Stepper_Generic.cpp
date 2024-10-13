@@ -73,9 +73,15 @@ bool UR_Stepper_Generic::_configure()
     return true;
 }
 
-void UR_Stepper_Generic::move_steps(int32_t steps)
+void UR_Stepper_Generic::move_steps(int32_t steps, bool force)
 {
     STEP_DIR dir_state = (steps > 0) ? STEP_DIR::DIR_CW : STEP_DIR::DIR_CCW;
+
+    if (force) {
+        _steps_remaining = 0;
+        //_last_action_end = 0;
+    }
+
     if (_steps_remaining <= 0) {
         _set_step_dir(dir_state);
         _steps = steps;
@@ -86,9 +92,9 @@ void UR_Stepper_Generic::move_steps(int32_t steps)
     //_steps_remaining = 0;
 }
 
-void UR_Stepper_Generic::move_degree(float deg)
+void UR_Stepper_Generic::move_degree(float deg, bool force)
 {
-    move_steps((int32_t)_calc_steps_for_rotation(deg));
+    move_steps((int32_t)_calc_steps_for_rotation(deg), force);
 }
 
 float UR_Stepper_Generic::_calc_steps_for_rotation(float deg)
@@ -115,6 +121,12 @@ void UR_Stepper_Generic::_steps_loop(void)
 void UR_Stepper_Generic::_set_step_dir(STEP_DIR dir)
 {
     hal.gpio->write(_profile.dir_pin, dir);
+}
+
+void UR_Stepper_Generic::_update_step_pulse()
+{
+    _cruise_step_pulse = (float)(STEP_PULSE(_profile.steps, (float)_profile.microsteps, _profile.rpm));
+    _step_pulse = _cruise_step_pulse;
 }
 
 void UR_Stepper_Generic::_start_move(int32_t steps)
@@ -157,48 +169,56 @@ void UR_Stepper_Generic::_start_move(int32_t steps)
         _steps_to_cruise = 0.0f;
         _steps_to_brake = 0.0f;
 #endif // LINEAR_SPEED_ENABLED
+/*
         _cruise_step_pulse = (float)STEP_PULSE(_profile.steps, (float)_profile.microsteps, _profile.rpm);
         _step_pulse = _cruise_step_pulse;
+*/
+        //_update_step_pulse();
+        ;
     }
 }
 
 void UR_Stepper_Generic::_next_action(void)
 {
+    //_update_step_pulse();
+
     if (_steps_remaining > 0) {
-#if LINEAR_SPEED_ENABLED == 1
-        uint32_t ms = AP_HAL::micros();
-#endif // LINEAR_SPEED_ENABLED
+        uint32_t ms_now = AP_HAL::micros();
+//#if LINEAR_SPEED_ENABLED == 1
+        //uint32_t ms_now = AP_HAL::micros();
+//#endif // LINEAR_SPEED_ENABLED
         /*
         uint32_t start_us = (uint32_t)_last_action_end;
         if (!start_us) {
             start_us = AP_HAL::micros();
         }
         */
-#if LINEAR_SPEED_ENABLED == 1
-        if ((ms - _last_action_end) < _next_action_interval) {
-            //hal.console->printf_PS(PSTR("B %ld*%ld*%ld*%ld\n"), ms, _last_action_end, (uint32_t)_step_pulse, (uint32_t)_steps_remaining);
-            return 0;
+//#if LINEAR_SPEED_ENABLED == 1
+        //if ((ms_now - _last_action_end) < _next_action_interval) {
+        if ((ms_now - _last_action_end) < (uint32_t)_step_pulse) {
+            //hal.console->printf_PS(PSTR("B %ld*%ld*%ld*%ld\n"), ms_now, _last_action_end, (uint32_t)_step_pulse, (uint32_t)_steps_remaining);
+            return;
         }
-#endif // LINEAR_SPEED_ENABLED
-        //hal.console->printf_PS(PSTR("A %ld*%ld*%ld\n"), ms, _last_action_end, _next_action_interval);
+//#endif // LINEAR_SPEED_ENABLED
+        //hal.console->printf_PS(PSTR("A %ld*%ld*%ld\n"), ms_now, _last_action_end, _next_action_interval);
 
-#if LINEAR_SPEED_ENABLED == 1
-        uint32_t pulse = (uint32_t)_step_pulse; // save value because _calc_step_pulse() will overwrite it
-#endif // LINEAR_SPEED_ENABLED
+//#if LINEAR_SPEED_ENABLED == 1
+        //uint32_t pulse_time = (uint32_t)_step_pulse; // save value because _calc_step_pulse() will overwrite it
+//#endif // LINEAR_SPEED_ENABLED
         _calc_step_pulse();
         //hal.scheduler->delay_microseconds(1500);
         hal.gpio->write(_profile.step_pin, HIGH);
         // We should pull HIGH for at least 1-2us (step_high_min)
-        _delay_micros(1);
-        //hal.scheduler->delay_microseconds(1);
+        //_delay_micros(1);
+        hal.scheduler->delay_microseconds(1);
         hal.gpio->write(_profile.step_pin, LOW);
         //_delay_micros(100);
         // account for _calc_step_pulse() execution time; sets ceiling for max rpm on slower MCUs
-#if LINEAR_SPEED_ENABLED == 1
+//#if LINEAR_SPEED_ENABLED == 1
         _last_action_end = AP_HAL::micros();
-        uint32_t resms = _last_action_end - ms;
-        _next_action_interval = (pulse > resms) ? (uint32_t)(pulse - resms): 1;
-#endif // LINEAR_SPEED_ENABLED
+        //uint32_t ms_delta = _last_action_end - ms_now;
+        //_next_action_interval = (pulse_time > ms_delta) ? (uint32_t)(pulse_time - ms_delta): 1;
+//#endif // LINEAR_SPEED_ENABLED
     } //else {
         // end of move
         //_last_action_end = 0;
@@ -261,7 +281,7 @@ UR_STEPPER_NAMESPACE::State UR_Stepper_Generic::_get_current_state(void)
     return state;
 }
 
-inline void UR_Stepper_Generic::_delay_micros(uint32_t delay_us, uint32_t start_us) {
+void UR_Stepper_Generic::_delay_micros(uint32_t delay_us, uint32_t start_us) {
     if (delay_us) {
         if (!start_us) {
             start_us = AP_HAL::micros();

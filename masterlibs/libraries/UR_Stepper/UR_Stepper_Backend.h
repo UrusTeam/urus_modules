@@ -28,9 +28,10 @@ public:
     /** See update function on top class.
       */
     virtual void update();
-    virtual void move_degree(float deg);
-    virtual void move_steps(int32_t steps);
+    virtual void move_degree(float deg, bool force);
+    virtual void move_steps(int32_t steps, bool force);
     virtual UR_STEPPER_NAMESPACE::State _get_current_state(void);
+    virtual void _update_step_pulse();
 
 protected:
     // access to frontend

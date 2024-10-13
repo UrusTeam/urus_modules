@@ -23,7 +23,7 @@ void UR_Stepper::configure(ProcessMode process_mode)
 
 void UR_Stepper::update()
 {
-    if (!_backends) {
+    if (_backend_count == 0) {
         return;
     }
 
@@ -69,23 +69,28 @@ bool UR_Stepper::_add_backend(UR_Stepper_Backend *backend)
     return true;
 }
 
-void UR_Stepper::move_degree(float deg)
+void UR_Stepper::move_degree(float deg, bool force)
 {
     for (uint8_t i = 0; i < _backend_count; i++) {
-        _backends[i]->move_degree(deg);
+        _backends[i]->move_degree(deg, force);
     }
 }
 
-void UR_Stepper::move_steps(int32_t steps)
+void UR_Stepper::move_steps(int32_t steps, bool force)
 {
     for (uint8_t i = 0; i < _backend_count; i++) {
-        _backends[i]->move_steps(steps);
+        _backends[i]->move_steps(steps, force);
     }
 }
 
-void UR_Stepper::set_profile(UR_STEPPER_NAMESPACE::stepper_profile_t profile)
+void UR_Stepper::set_profile(UR_STEPPER_NAMESPACE::stepper_profile_t profile, uint8_t backend)
 {
+    if (_backend_count == 0) {
+        return;
+    }
+
     _profile = profile;
+    _backends[backend]->_update_step_pulse();
 }
 
 UR_STEPPER_NAMESPACE::State UR_Stepper::get_current_state(uint8_t backend)
