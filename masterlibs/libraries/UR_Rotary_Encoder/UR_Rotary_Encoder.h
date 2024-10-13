@@ -31,7 +31,8 @@ public:
 
     enum DIR_ROT {
         ROT_CCW = 0,
-        ROT_CW
+        ROT_CW,
+        ROT_IDLE
     };
 
     /*
@@ -55,20 +56,20 @@ public:
     } rot_enc_conf_t;
 
     typedef struct __rot_enc_state_s {
-        uint16_t step_cnt = 0;          // step counter state
-        DIR_ROT dir_enc = ROT_CW;       // rotation direction state
+        int16_t step_cnt = 0;          // step counter state
+        //volatile DIR_ROT dir_enc = ROT_CW;       // rotation direction state
         bool step_status = false;       // status step state
         uint8_t invert_dir = 0;         // set 0x02 will invert the rotation direction,
                                         // setting 0x00 make normal rotation
-        bool st_pina_last = false;      // store last pin state
+        uint8_t st_pin_last = 0;      // store last pin state
         uint8_t tick_state = 0;         // the pins ticks interrupt states
         uint32_t delta_uspstp = 0;      // delta microseconds per steps
     } rot_enc_state_t;
-
+/*
     typedef struct __flipflop_s {
        uint8_t clock : 1;               // sense each transition as flipflop clock.
     } flipflop_t;
-
+*/
     UR_Rotary_Encoder();
 
     /** Wrap only, make some people happy, this will be
@@ -101,26 +102,37 @@ public:
     void update();
 
     // this could be ever called on the ISR context or on the loop.
-    static void interrupt_flipflop();
-    uint16_t get_step_val();
-    void set_step_val(uint16_t val);
+    void interrupt_flipflop();
+    int16_t get_step_val();
+    void set_step_val(int16_t val);
     bool get_step_status();
     DIR_ROT get_enc_dir();
-    void inverted_dir(bool inverted);
+    void inverted_dir(bool inverted = false);
     uint32_t get_rpm();
     void set_encoder_state_conf(rot_enc_conf_t encst);
+/*
+    void set_pin_last_state(uint8_t pinlst) {
+        _rotenc_state.st_pin_last = pinlst;
+    }
 
+    uint8_t get_pin_last_state() {
+        return _rotenc_state.st_pin_last;
+    }
+*/
 private:
-
+    static const int8_t _rot_table[];
+    //static UR_Rotary_Encoder *_this_rotary;
     // rotary encoder state
-    static volatile rot_enc_state_t _rotenc_state;
-    static volatile rot_enc_conf_t _rotenc_conf;
-    static flipflop_t _flipflop;
+    rot_enc_state_t _rotenc_state;
+    rot_enc_conf_t _rotenc_conf;
+    //static flipflop_t _flipflop;
 
     // stores last timedelta microseconds per step result.
-    static uint32_t _uspstp;
+    uint32_t _uspstp;
+    int16_t _last_step_cnt = 0;
 
     bool _configure();
+    uint8_t _read_pins();
 };
 
 #endif
