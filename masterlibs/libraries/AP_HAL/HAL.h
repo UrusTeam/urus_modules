@@ -34,20 +34,26 @@ public:
         AP_HAL::RCOutput*   _rcout,
         AP_HAL::Scheduler*  _scheduler,
         AP_HAL::Util*       _util,
+#ifndef HAL_MINIMIZE_FEATURES_AVR
         AP_HAL::OpticalFlow *_opticalflow,
 #if HAL_WITH_UAVCAN
         AP_HAL::CANManager* _can_mgr[MAX_NUMBER_OF_CAN_DRIVERS])
 #else
         AP_HAL::CANManager** _can_mgr)
 #endif
+#else
+        AP_HAL::OpticalFlow *_opticalflow)
+#endif
         :
 #if !defined(SHAL_CORE_APM16U) && !defined(SHAL_CORE_APM32U4)
         uartA(_uartA),
         uartB(_uartB),
+#if !defined(SHAL_CORE_APM328)
         uartC(_uartC),
         uartD(_uartD),
         uartE(_uartE),
         uartF(_uartF),
+#endif
         i2c_mgr(_i2c_mgr),
         spi(_spi),
         analogin(_analogin),
@@ -64,8 +70,12 @@ public:
         rcin(_rcin),
         rcout(_rcout),
         scheduler(_scheduler),
+#if !defined(SHAL_CORE_APM328)
         util(_util),
         opticalflow(_opticalflow)
+#else
+        util(_util)
+#endif
 #else
         scheduler(_scheduler)
 #endif
@@ -104,10 +114,12 @@ public:
 #if !defined(SHAL_CORE_APM16U) && !defined(SHAL_CORE_APM32U4)
     AP_HAL::UARTDriver* uartA;
     AP_HAL::UARTDriver* uartB;
+#if !defined(SHAL_CORE_APM328)
     AP_HAL::UARTDriver* uartC;
     AP_HAL::UARTDriver* uartD;
     AP_HAL::UARTDriver* uartE;
     AP_HAL::UARTDriver* uartF;
+#endif
     AP_HAL::I2CDeviceManager* i2c_mgr;
     AP_HAL::SPIDeviceManager* spi;
     AP_HAL::AnalogIn*   analogin;
@@ -127,11 +139,15 @@ public:
     AP_HAL::Scheduler*  scheduler;
 #if !defined(SHAL_CORE_APM16U) && !defined(SHAL_CORE_APM32U4)
     AP_HAL::Util        *util;
+#if !defined(SHAL_CORE_APM328)
     AP_HAL::OpticalFlow *opticalflow;
+#endif
+#ifndef HAL_MINIMIZE_FEATURES_AVR
 #if HAL_WITH_UAVCAN
     AP_HAL::CANManager* can_mgr[MAX_NUMBER_OF_CAN_DRIVERS];
 #else
     AP_HAL::CANManager** can_mgr;
 #endif
+#endif // HAL_MINIMIZE_FEATURES_AVR
 #endif
 };

@@ -163,10 +163,11 @@ void AP_InertialSensor_Backend::_notify_new_gyro_raw_sample(uint8_t instance,
     }
     _imu._gyro_last_sample_us[instance] = sample_us;
 
+#ifndef HAL_MINIMIZE_FEATURES_AVR
     // push gyros if optical flow present
     if (hal.opticalflow)
         hal.opticalflow->push_gyro(gyro.x, gyro.y, dt);
-
+#endif // HAL_MINIMIZE_FEATURES_AVR
     // compute delta angle
     Vector3f delta_angle = (gyro + _imu._last_raw_gyro[instance]) * 0.5f * dt;
 
@@ -335,11 +336,12 @@ uint16_t AP_InertialSensor_Backend::get_sample_rate_hz(void) const
 void AP_InertialSensor_Backend::_publish_temperature(uint8_t instance, float temperature)
 {
     _imu._temperature[instance] = temperature;
-
+#ifndef HAL_MINIMIZE_FEATURES_AVR
     /* give the temperature to the control loop in order to keep it constant*/
     if (instance == 0) {
         hal.util->set_imu_temp(temperature);
     }
+#endif // HAL_MINIMIZE_FEATURES_AVR
 }
 
 /*

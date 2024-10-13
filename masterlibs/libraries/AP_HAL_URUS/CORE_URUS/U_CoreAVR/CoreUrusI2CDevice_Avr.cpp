@@ -49,8 +49,13 @@ void CLCoreUrusI2CDevice_Avr::begin()
 {
     // activate internal pull-ups for twi
     // as per note from atmega128 manual pg204
+#if defined(SHAL_CORE_APM2) || defined(SHAL_CORE_MEGA02)
     sbi(PORTD, 0);
     sbi(PORTD, 1);
+#elif defined(SHAL_CORE_APM328)
+    sbi(PORTC, 4);
+    sbi(PORTC, 5);
+#endif // defined
 
     // initialize twi prescaler and bit rate
     cbi(TWSR, TWPS0);

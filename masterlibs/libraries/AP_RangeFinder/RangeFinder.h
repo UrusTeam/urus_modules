@@ -135,10 +135,10 @@ public:
     // update state of all rangefinders. Should be called at around
     // 10Hz from main loop
     void update(void);
-
+#if !HAL_MINIMIZE_FEATURES_AVR
     // Handle an incoming DISTANCE_SENSOR message (from a MAVLink enabled range finder)
     void handle_msg(mavlink_message_t *msg);
-
+#endif
     // return true if we have a range finder with the specified orientation
     bool has_orientation(enum Rotation orientation) const;
 
@@ -154,7 +154,9 @@ public:
     int16_t max_distance_cm_orient(enum Rotation orientation) const;
     int16_t min_distance_cm_orient(enum Rotation orientation) const;
     int16_t ground_clearance_cm_orient(enum Rotation orientation) const;
+#if !HAL_MINIMIZE_FEATURES_AVR
     MAV_DISTANCE_SENSOR get_mav_distance_sensor_type_orient(enum Rotation orientation) const;
+#endif
     RangeFinder_Status status_orient(enum Rotation orientation) const;
     bool has_data_orient(enum Rotation orientation) const;
     uint8_t range_valid_count_orient(enum Rotation orientation) const;

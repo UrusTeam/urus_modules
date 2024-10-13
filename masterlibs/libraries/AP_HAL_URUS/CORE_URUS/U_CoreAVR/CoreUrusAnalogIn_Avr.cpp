@@ -263,7 +263,7 @@ float CLCoreUrusAnalogIn_Avr::board_voltage(void)
 
 CLCoreUrusAnalogSource_Avr* CLCoreUrusAnalogIn_Avr::_create_channel(int16_t chnum)
 {
-    CLCoreUrusAnalogSource_Avr *ch = new CLCoreUrusAnalogSource_Avr(chnum);
+    CLCoreUrusAnalogSource_Avr *ch = new CLCoreUrusAnalogSource_Avr((uint8_t)chnum);
     _register_channel(ch);
     return ch;
 }

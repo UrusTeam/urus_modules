@@ -44,6 +44,7 @@ public:
     enum flow_control {
         FLOW_CONTROL_DISABLE=0, FLOW_CONTROL_ENABLE=1, FLOW_CONTROL_AUTO=2
     };
+#ifndef HAL_MINIMIZE_FEATURES_AVR
     virtual void set_flow_control(enum flow_control flow_control_setting) {};
     virtual enum flow_control get_flow_control(void) { return FLOW_CONTROL_DISABLE; }
 
@@ -54,7 +55,7 @@ public:
      * file descriptor
      */
     virtual bool set_unbuffered_writes(bool on){ return false; };
-
+#endif // HAL_MINIMIZE_FEATURES_AVR
     /* Implementations of BetterStream virtual methods. These are
      * provided by AP_HAL to ensure consistency between ports to
      * different boards

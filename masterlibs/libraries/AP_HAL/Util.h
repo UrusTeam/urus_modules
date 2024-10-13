@@ -15,6 +15,7 @@ public:
     void set_soft_armed(const bool b) { soft_armed = b; }
     bool get_soft_armed() const { return soft_armed; }
 
+#ifndef HAL_MINIMIZE_FEATURES_AVR
     void set_capabilities(uint64_t cap) { capabilities |= cap; }
     void clear_capabilities(uint64_t cap) { capabilities &= ~(cap); }
     uint64_t get_capabilities() const { return capabilities; }
@@ -40,7 +41,7 @@ public:
       return state of safety switch, if applicable
      */
     virtual enum safety_state safety_switch_state(void) { return SAFETY_NONE; }
-
+#endif // HAL_MINIMIZE_FEATURES_AVR
     /*
       set system clock in UTC microseconds
      */
@@ -65,8 +66,9 @@ public:
       Buf should be filled with a printable string and must be null
       terminated
      */
+#ifndef HAL_MINIMIZE_FEATURES_AVR
     virtual bool get_system_id(char buf[40]) { return false; }
-
+#endif // HAL_MINIMIZE_FEATURES_AVR
     /**
        how much free memory do we have in bytes. If unknown return 4096
      */
@@ -75,6 +77,7 @@ public:
     /**
        return commandline arguments, if available
      */
+#ifndef HAL_MINIMIZE_FEATURES_AVR
     virtual void commandline_arguments(uint8_t &argc, char * const *&argv) { argc = 0; }
 
     /*
@@ -94,7 +97,7 @@ public:
 
     /* Support for an imu heating system */
     virtual void set_imu_target_temp(int8_t *target) {}
-
+#endif // HAL_MINIMIZE_FEATURES_AVR
     /*
       performance counter calls - wrapper around original PX4 interface
      */
@@ -104,11 +107,12 @@ public:
         PC_INTERVAL,      /**< measure the interval between instances of an event */
     };
     typedef void *perf_counter_t;
+#ifndef HAL_MINIMIZE_FEATURES_AVR
     virtual perf_counter_t perf_alloc(perf_counter_type t, const char *name) { return nullptr; }
     virtual void perf_begin(perf_counter_t h) {}
     virtual void perf_end(perf_counter_t h) {}
     virtual void perf_count(perf_counter_t h) {}
-
+#endif // HAL_MINIMIZE_FEATURES_AVR
     // create a new semaphore
     virtual Semaphore *new_semaphore(void) { return nullptr; }
 

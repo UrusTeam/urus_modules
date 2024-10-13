@@ -46,11 +46,12 @@ bool CLCoreUrusScheduler_Avr::in_main_thread() const
 void CLCoreUrusScheduler_Avr::init()
 {
     ISRRegistry& isrregistry = CORE_AVR::isrregistry;
-#if defined(SHAL_CORE_APM2) || defined(SHAL_CORE_MEGA02)
+#if defined(SHAL_CORE_APM2) || defined(SHAL_CORE_MEGA02) || defined(SHAL_CORE_APM328)
     CLCoreUrusUtil_Avr* coreUtil = (CLCoreUrusUtil_Avr*)NSCORE_URUS::get_Util();
-
+#if defined(SHAL_CORE_APM2) || defined(SHAL_CORE_MEGA02)
     clk_core_timers.clk_per_sec = F_CPU;
     start_sched();
+#endif
 #endif
 
     CLCoreUrusTimers_Avr::avr_timer.init();
@@ -79,7 +80,7 @@ void CLCoreUrusScheduler_Avr::init()
     /* Turn on global interrupt flag, AVR interupt system will start from this point */
 #endif
     sei();
-#if defined(SHAL_CORE_APM2) || defined(SHAL_CORE_MEGA02)
+#if defined(SHAL_CORE_APM2) || defined(SHAL_CORE_MEGA02) || defined(SHAL_CORE_APM328)
     coreUtil->memcheck_init();
 #endif
 }

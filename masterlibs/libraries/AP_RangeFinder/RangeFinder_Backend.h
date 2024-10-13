@@ -30,24 +30,30 @@ public:
 
     // update the state structure
     virtual void update() = 0;
-
+#if !HAL_MINIMIZE_FEATURES_AVR
     virtual void handle_msg(mavlink_message_t *msg) { return; }
-
+#endif
     void update_pre_arm_check();
 
     uint8_t instance() const { return state.instance; }
+#if !HAL_MINIMIZE_FEATURES_AVR
     enum Rotation orientation() const { return (Rotation)state.orientation.get(); }
+#else
+    enum Rotation orientation() const { return (Rotation)state.orientation; }
+#endif
     uint16_t distance_cm() const { return state.distance_cm; }
     uint16_t voltage_mv() const { return state.voltage_mv; }
     int16_t max_distance_cm() const { return state.max_distance_cm; }
     int16_t min_distance_cm() const { return state.min_distance_cm; }
     int16_t ground_clearance_cm() const { return state.ground_clearance_cm; }
+#if !HAL_MINIMIZE_FEATURES_AVR
     MAV_DISTANCE_SENSOR get_mav_distance_sensor_type() const {
         if (state.type == RangeFinder::RangeFinder_TYPE_NONE) {
             return MAV_DISTANCE_SENSOR_UNKNOWN;
         }
         return _get_mav_distance_sensor_type();
     }
+#endif
     RangeFinder::RangeFinder_Status status() const {
         if (state.type == RangeFinder::RangeFinder_TYPE_NONE) {
             // turned off at runtime?
@@ -55,8 +61,11 @@ public:
         }
         return state.status;
     }
+#if !HAL_MINIMIZE_FEATURES_AVR
     RangeFinder::RangeFinder_Type type() const { return (RangeFinder::RangeFinder_Type)state.type.get(); }
-
+#else
+    RangeFinder::RangeFinder_Type type() const { return (RangeFinder::RangeFinder_Type)state.type; }
+#endif
     // true if sensor is returning data
     bool has_data() const {
         return ((state.status != RangeFinder::RangeFinder_NotConnected) &&
@@ -81,7 +90,8 @@ protected:
     RangeFinder::RangeFinder_State &state;
 
     // semaphore for access to shared frontend data
-    AP_HAL::Semaphore *_sem;    
-
+    AP_HAL::Semaphore *_sem;
+#if !HAL_MINIMIZE_FEATURES_AVR
     virtual MAV_DISTANCE_SENSOR _get_mav_distance_sensor_type() const = 0;
+#endif
 };

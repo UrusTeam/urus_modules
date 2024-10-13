@@ -50,7 +50,7 @@
 #if (CONFIG_SHAL_CORE == SHAL_CORE_APM) && (defined(SHAL_CORE_APM16U) || defined(SHAL_CORE_APM32U4))
 
 #define STR_MANUFACTURER    L"URUS"
-#define STR_PRODUCT         L"VR Joystick (EXAMPLE)"
+#define STR_PRODUCT         L"VR Joystick (Fenix version)"
 
 #define VENDOR_ID		0x8282
 #define PRODUCT_ID		0x3201

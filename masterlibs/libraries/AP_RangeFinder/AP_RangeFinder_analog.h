@@ -16,11 +16,11 @@ public:
     void update(void);
 
 protected:
-
+#if !HAL_MINIMIZE_FEATURES_AVR
     MAV_DISTANCE_SENSOR _get_mav_distance_sensor_type() const override {
         return MAV_DISTANCE_SENSOR_UNKNOWN;
     }
-
+#endif
 private:
     // update raw voltage
     void update_voltage(void);

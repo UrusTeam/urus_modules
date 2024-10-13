@@ -15,6 +15,7 @@
 
 #include "RangeFinder.h"
 #include "AP_RangeFinder_analog.h"
+#if !HAL_MINIMIZE_FEATURES_AVR
 #include "AP_RangeFinder_PulsedLightLRF.h"
 #include "AP_RangeFinder_MaxsonarI2CXL.h"
 #include "AP_RangeFinder_MaxsonarSerialLV.h"
@@ -24,12 +25,14 @@
 #include "AP_RangeFinder_uLanding.h"
 #include "AP_RangeFinder_TeraRangerI2C.h"
 #include "AP_RangeFinder_VL53L0X.h"
+#endif
 #include <AP_BoardConfig/AP_BoardConfig.h>
 
 extern const AP_HAL::HAL &hal;
 
 // table of user settable parameters
 const AP_Param::GroupInfo RangeFinder::var_info[] PROGMEM = {
+#if !HAL_MINIMIZE_FEATURES_AVR
     // @Param: _TYPE
     // @DisplayName: Rangefinder type
     // @Description: What type of rangefinder device that is connected
@@ -155,7 +158,7 @@ const AP_Param::GroupInfo RangeFinder::var_info[] PROGMEM = {
     // @Values: 0:Forward, 1:Forward-Right, 2:Right, 3:Back-Right, 4:Back, 5:Back-Left, 6:Left, 7:Forward-Left, 24:Up, 25:Down
     // @User: Advanced
     AP_GROUPINFO("_ORIENT", 53, RangeFinder, state[0].orientation, ROTATION_PITCH_270),
-
+#endif
 #if RANGEFINDER_MAX_INSTANCES > 1
     // @Param: 2_TYPE
     // @DisplayName: Second Rangefinder type
@@ -530,7 +533,11 @@ RangeFinder::RangeFinder(AP_SerialManager &_serial_manager, enum Rotation orient
 
     // set orientation defaults
     for (uint8_t i=0; i<RANGEFINDER_MAX_INSTANCES; i++) {
+#if !HAL_MINIMIZE_FEATURES_AVR
         state[i].orientation.set_default(orientation_default);
+#else
+        state[i].orientation = orientation_default;
+#endif
     }
 }
 
@@ -601,7 +608,11 @@ bool RangeFinder::_add_backend(AP_RangeFinder_Backend *backend)
  */
 void RangeFinder::detect_instance(uint8_t instance)
 {
+#if !HAL_MINIMIZE_FEATURES_AVR
     enum RangeFinder_Type _type = (enum RangeFinder_Type)state[instance].type.get();
+#else
+    enum RangeFinder_Type _type = (enum RangeFinder_Type)state[instance].type;
+#endif
     switch (_type) {
 #if !HAL_MINIMIZE_FEATURES
     case RangeFinder_TYPE_PLI2C:
@@ -737,6 +748,7 @@ RangeFinder::RangeFinder_Status RangeFinder::status_orient(enum Rotation orienta
     return backend->status();
 }
 
+#if !HAL_MINIMIZE_FEATURES_AVR
 void RangeFinder::handle_msg(mavlink_message_t *msg)
 {
     uint8_t i;
@@ -746,6 +758,7 @@ void RangeFinder::handle_msg(mavlink_message_t *msg)
         }
     }
 }
+#endif
 
 // return true if we have a range finder with the specified orientation
 bool RangeFinder::has_orientation(enum Rotation orientation) const
@@ -856,7 +869,7 @@ const Vector3f &RangeFinder::get_pos_offset_orient(enum Rotation orientation) co
     }
     return backend->get_pos_offset();
 }
-
+#if !HAL_MINIMIZE_FEATURES_AVR
 MAV_DISTANCE_SENSOR RangeFinder::get_mav_distance_sensor_type_orient(enum Rotation orientation) const
 {
     AP_RangeFinder_Backend *backend = find_instance(orientation);
@@ -865,3 +878,4 @@ MAV_DISTANCE_SENSOR RangeFinder::get_mav_distance_sensor_type_orient(enum Rotati
     }
     return backend->get_mav_distance_sensor_type();
 }
+#endif

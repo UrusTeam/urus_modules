@@ -49,13 +49,15 @@ public:
 
     virtual void     reboot(bool hold_in_bootloader) = 0;
 
+#ifndef HAL_MINIMIZE_FEATURES_AVR
     /**
        optional function to stop clock at a given time, used by log replay
      */
     virtual void     stop_clock(uint64_t time_usec) {}
+#endif // HAL_MINIMIZE_FEATURES_AVR
 
     virtual bool     in_main_thread() const = 0;
-
+#ifndef HAL_MINIMIZE_FEATURES_AVR
     virtual void create_uavcan_thread() {};
-
+#endif // HAL_MINIMIZE_FEATURES_AVR
 };

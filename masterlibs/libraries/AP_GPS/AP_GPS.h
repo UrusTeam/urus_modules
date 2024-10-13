@@ -378,7 +378,6 @@ public:
     //MAVLink Status Sending
 #if !HAL_MINIMIZE_FEATURES_AVR
     void send_mavlink_gps_raw(mavlink_channel_t chan);
-#endif
 #if GPS_MAX_INSTANCES > 1
     void send_mavlink_gps2_raw(mavlink_channel_t chan);
 #endif
@@ -389,6 +388,7 @@ public:
     void send_mavlink_gps2_rtk(mavlink_channel_t chan);
 #endif
 #endif
+#endif //HAL_MINIMIZE_FEATURES_AVR
 
 private:
     struct GPS_timing {

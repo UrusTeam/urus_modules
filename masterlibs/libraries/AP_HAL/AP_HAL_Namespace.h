@@ -28,10 +28,10 @@ namespace AP_HAL {
     class Scheduler;
     class Semaphore;
     class OpticalFlow;
-
+#ifndef HAL_MINIMIZE_FEATURES_AVR
     class CANManager;
     class CAN;
-
+#endif // HAL_MINIMIZE_FEATURES_AVR
     class Util;
 
     /* Utility Classes */

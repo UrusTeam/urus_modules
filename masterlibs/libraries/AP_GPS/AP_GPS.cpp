@@ -242,7 +242,9 @@ AP_GPS::detect_instance(uint8_t instance)
 		}
 		uint32_t baudrate = pgm_read_dword(&_baudrates[dstate->last_baud]);
 		_port[instance]->begin(baudrate);
+#ifndef HAL_MINIMIZE_FEATURES_AVR
 		_port[instance]->set_flow_control(AP_HAL::UARTDriver::FLOW_CONTROL_DISABLE);
+#endif // HAL_MINIMIZE_FEATURES_AVR
 		dstate->last_baud_change_ms = now;
 #if UBLOX_RXM_RAW_LOGGING
     if(_raw_data != 0)

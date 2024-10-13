@@ -62,7 +62,7 @@ public:
     /* See Device::adjust_periodic_callback() */
     virtual bool adjust_periodic_callback(
         Device::PeriodicHandle h, uint32_t period_usec) override = 0;
-
+#ifndef HAL_MINIMIZE_FEATURES_AVR
     /*
      * Force I2C transfers to be split between send and receive parts, with a
      * stop condition between them. Setting this allows to conveniently
@@ -72,6 +72,7 @@ public:
      * this method is not needed.
      */
     virtual void set_split_transfers(bool set) {};
+#endif // HAL_MINIMIZE_FEATURES_AVR
 };
 
 class I2CDeviceManager {

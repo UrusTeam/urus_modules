@@ -164,11 +164,13 @@ void AP_SerialManager::init()
     state[3].protocol = SerialProtocol_GPS;
     state[3].baud = AP_SERIALMANAGER_GPS_BAUD/1000;
 #else
+#if !defined(SHAL_CORE_APM328)
     state[1].uart = hal.uartC;  // serial1, uartC, normally telem1
     state[2].uart = hal.uartD;  // serial2, uartD, normally telem2
     state[3].uart = hal.uartB;  // serial3, uartB, normally 1st GPS
     state[4].uart = hal.uartE;  // serial4, uartE, normally 2nd GPS
     state[5].uart = hal.uartF;  // serial5
+#endif
 #endif
 
     if (state[0].uart == nullptr) {
@@ -246,9 +248,11 @@ void AP_SerialManager::init()
                     state[i].uart->begin(map_baudrate(state[i].baud),
                                          AP_SERIALMANAGER_SBUS1_BUFSIZE_RX,
                                          AP_SERIALMANAGER_SBUS1_BUFSIZE_TX);
+#ifndef HAL_MINIMIZE_FEATURES_AVR
                     state[i].uart->configure_parity(2);    // enable even parity
                     state[i].uart->set_stop_bits(2);
                     state[i].uart->set_unbuffered_writes(true);
+#endif // HAL_MINIMIZE_FEATURES_AVR
                     break;
             }
         }

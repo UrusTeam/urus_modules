@@ -84,7 +84,7 @@ void CORE_AVR::init_core() const
     coreScheduler.init();
 #if CONFIG_SHAL_CORE_UARTDriverA == ENABLED
 #if defined(SHAL_CORE_APM2) || defined(SHAL_CORE_APM328) || defined(SHAL_CORE_MEGA02)
-    coreUARTA_Driver.begin(115200, 32, 32);
+    coreUARTA_Driver.begin(115200, 64, 64);
 #if defined(SHAL_CORE_APM328)
     PORTD |= _BV(0);
 #else

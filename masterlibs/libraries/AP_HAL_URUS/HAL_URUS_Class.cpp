@@ -28,8 +28,12 @@ HAL_URUS::HAL_URUS() :
         nullptr, /* rcoutput */
         nullptr, /* scheduler */
         nullptr, /* util */
+#ifndef HAL_MINIMIZE_FEATURES_AVR
         nullptr, /* onboard optical flow */
         nullptr) /* can */
+#else
+        nullptr) /* onboard optical flow */
+#endif // HAL_MINIMIZE_FEATURES_AVR
 {
     scheduler = NSCORE_URUS::get_scheduler();
 #if CONFIG_SHAL_CORE == SHAL_CORE_APM && (defined(SHAL_CORE_APM2) \
@@ -102,6 +106,7 @@ void HAL_URUS::run(int argc, char * const argv[], Callbacks* callbacks) const
     _urus_core.init_core();
 
     gpio->init();
+
 #if CONFIG_SHAL_CORE == SHAL_CORE_APM && (defined(SHAL_CORE_APM2) \
     || CONFIG_SHAL_CORE == SHAL_CORE_CYGWIN \
     || defined(SHAL_CORE_MEGA02) \
